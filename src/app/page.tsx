@@ -98,51 +98,55 @@ export default function Home() {
   ]
 
   return (
-    <div className="min-h-screen w-full px-4 py-8">
-      <div className="max-w-[1440px] mx-auto">
-      {/* Header - Logo + Navigation chips only */}
-      <header className="mb-6 lg:mb-8 flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-8">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">◉</span>
+    <div className="min-h-screen w-full overflow-x-hidden">
+      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="max-w-[1440px] mx-auto">
+        {/* Header - Logo + Navigation chips only */}
+        <header className="mb-6 lg:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+            {/* Logo */}
+            <div className="flex items-center space-x-2 flex-shrink-0">
+              <div className="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-sm">◉</span>
+              </div>
+              <span className="text-xl font-bold text-slate-900">VibeDaily</span>
             </div>
-            <span className="text-xl font-bold text-slate-900">VibeDaily</span>
+            
+            {/* Navigation Chips */}
+            <div className="flex-1 min-w-0 overflow-hidden">
+              <NavChips 
+                items={navItems} 
+                onChipClick={(item) => setActiveChip(item.label)} 
+              />
+            </div>
           </div>
-          
-          {/* Navigation Chips */}
-          <NavChips 
-            items={navItems} 
-            onChipClick={(item) => setActiveChip(item.label)} 
-          />
-        </div>
-      </header>
+        </header>
 
-      {/* Main Layout - Flexbox untuk layout 2 kolom yang reliable */}
-      <main className="flex flex-col xl:flex-row gap-8 xl:items-start">
-        {/* Left Column - Main Content (flexible width) */}
-        <div className="flex-1 min-w-0">
-          {/* Section Badge */}
-          <div className="mb-6">
-            <span className="section-badge">Best of the week</span>
+        {/* Main Layout - Flexbox untuk layout 2 kolom yang reliable */}
+        <main className="flex flex-col xl:flex-row gap-6 sm:gap-8 xl:items-start">
+          {/* Left Column - Main Content (flexible width) */}
+          <div className="flex-1 min-w-0">
+            {/* Section Badge */}
+            <div className="mb-4 sm:mb-6">
+              <span className="section-badge">Best of the week</span>
+            </div>
+            
+            {/* Hero */}
+            <Hero {...heroData} />
+            
+            {/* Ticker */}
+            <Ticker items={tickerItems} />
           </div>
-          
-          {/* Hero */}
-          <Hero {...heroData} />
-          
-          {/* Ticker */}
-          <Ticker items={tickerItems} />
-        </div>
 
-        {/* Right Rail - Fixed width 380px di desktop, disejajarkan dengan BEST OF THE WEEK */}
-        <div className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px]">
-          <RightRailList 
-            items={recommendedItems} 
-            onSearch={(query) => console.log('Search:', query)}
-          />
+          {/* Right Rail - Responsive: full width mobile, 380px desktop */}
+          <div className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px]">
+            <RightRailList 
+              items={recommendedItems} 
+              onSearch={(query) => console.log('Search:', query)}
+            />
+          </div>
+        </main>
         </div>
-      </main>
       </div>
     </div>
   )
