@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import GlassFrame from './_components/GlassFrame'
 import NavChips from './_components/NavChips'
 import Hero from './_components/Hero'
 import Ticker from './_components/Ticker'
@@ -99,7 +98,8 @@ export default function Home() {
   ]
 
   return (
-    <GlassFrame>
+    <div className="min-h-screen w-full px-4 py-8">
+      <div className="max-w-[1440px] mx-auto">
       {/* Header - Logo + Navigation chips only */}
       <header className="mb-6 lg:mb-8 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-8">
@@ -119,15 +119,15 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Section Badge */}
-      <div className="mb-6">
-        <span className="section-badge">Best of the week</span>
-      </div>
-
-      {/* Main Grid - exact two column layout with 380px right rail and 32px gap */}
-      <main className="grid lg:grid-cols-[1fr,380px] gap-8">
-        {/* Left Column - Main Content */}
-        <div className="min-w-0">
+      {/* Main Layout - Flexbox untuk layout 2 kolom yang reliable */}
+      <main className="flex flex-col xl:flex-row gap-8 xl:items-start">
+        {/* Left Column - Main Content (flexible width) */}
+        <div className="flex-1 min-w-0">
+          {/* Section Badge */}
+          <div className="mb-6">
+            <span className="section-badge">Best of the week</span>
+          </div>
+          
           {/* Hero */}
           <Hero {...heroData} />
           
@@ -135,12 +135,15 @@ export default function Home() {
           <Ticker items={tickerItems} />
         </div>
 
-        {/* Right Rail - Fixed width 380px, hidden on mobile */}
-        <RightRailList 
-          items={recommendedItems} 
-          onSearch={(query) => console.log('Search:', query)}
-        />
+        {/* Right Rail - Fixed width 380px di desktop, disejajarkan dengan BEST OF THE WEEK */}
+        <div className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px]">
+          <RightRailList 
+            items={recommendedItems} 
+            onSearch={(query) => console.log('Search:', query)}
+          />
+        </div>
       </main>
-    </GlassFrame>
+      </div>
+    </div>
   )
 }

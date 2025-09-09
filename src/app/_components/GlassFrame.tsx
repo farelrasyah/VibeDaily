@@ -9,7 +9,7 @@ interface GlassFrameProps {
 
 export default function GlassFrame({ children, className = '' }: GlassFrameProps) {
   return (
-    <section className={`container glass-frame ${className}`}>
+    <section className={`max-w-7xl mx-auto glass-frame ${className}`}>
       {children}
     </section>
   )

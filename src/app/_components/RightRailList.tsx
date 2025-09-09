@@ -28,7 +28,7 @@ export default function RightRailList({
   const regularItems = items.filter(item => !item.featured).slice(0, 5)
 
   return (
-    <aside className="hidden lg:block w-[380px]">
+    <aside className="w-full xl:w-[380px] flex-shrink-0">
       {/* Toolbar: EN dropdown + Search capsule */}
       <div className="toolbar">
         <button className="text-[13px] text-slate-600 hover:text-slate-800 flex items-center gap-1 transition-colors">
