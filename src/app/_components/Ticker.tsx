@@ -1,9 +1,6 @@
 'use client'
 
-import Image from 'next/image'
-
 interface TickerItem {
-  thumb: string
   title: string
   href: string
   category?: string
@@ -16,34 +13,41 @@ interface TickerProps {
 
 export default function Ticker({ items }: TickerProps) {
   return (
-    <div className="mt-6 flex gap-3 overflow-x-auto pb-1">
-      {items.map((item, index) => (
-        <a
-          key={index}
-          href={item.href}
-          className="glass-card flex items-center gap-3 p-2.5 min-w-[280px] h-[84px] transition-all duration-150 ease-out"
-        >
-          {/* Thumbnail 64px on left */}
-          <div className="relative w-[64px] h-[64px] rounded-xl overflow-hidden flex-shrink-0">
-            <Image
-              src={item.thumb}
-              alt={item.title}
-              fill
-              className="object-cover saturate-90 brightness-105"
-            />
-          </div>
-          
-          {/* Text content on right */}
-          <div className="flex-1 min-w-0">
-            <p className="meta mb-0.5">
-              {item.category} • {item.time}
-            </p>
-            <p className="text-[14.5px] leading-snug line-clamp-2 text-slate-700/95">
-              {item.title}
-            </p>
-          </div>
-        </a>
-      ))}
+    <div className="mt-8 relative">
+      {/* Horizontal scrolling container with fade effect */}
+      <div className="relative overflow-hidden">
+        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          {items.map((item, index) => (
+            <a
+              key={index}
+              href={item.href}
+              className="relative flex-shrink-0 w-[280px] group cursor-pointer ticker-card"
+              style={{ 
+                opacity: index === 0 ? 1 : index === 1 ? 0.8 : index === 2 ? 0.6 : 0.4,
+                transform: `scale(${index === 0 ? 1 : index === 1 ? 0.98 : 0.96})`
+              }}
+            >
+              {/* Text-only card design */}
+              <div className="bg-white/50 backdrop-blur-xl border border-white/30 rounded-2xl p-5 h-[100px] transition-all duration-300 hover:bg-white/60 hover:scale-[1.02] hover:shadow-xl hover:border-white/40">
+                <div className="flex flex-col justify-between h-full">
+                  {/* Meta - sama dengan referensi */}
+                  <div className="meta">
+                    {item.category} • {item.time}
+                  </div>
+                  
+                  {/* Title - ukuran font sesuai referensi */}
+                  <h3 className="text-[15px] font-semibold leading-[1.3] text-slate-800/90 line-clamp-3 group-hover:text-slate-900 transition-colors">
+                    {item.title}
+                  </h3>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+        
+        {/* Enhanced right fade gradient overlay */}
+        <div className="absolute top-0 right-0 w-32 h-full ticker-fade pointer-events-none"></div>
+      </div>
     </div>
   )
 }

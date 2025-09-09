@@ -28,28 +28,24 @@ export default function Home() {
 
   const tickerItems = [
     {
-      thumb: 'https://picsum.photos/64/64?random=1',
       title: 'Top Analyst Unveils Ethereum Catalyst That Could Trigger Nearly 50% Surge',
       href: '#',
       category: 'Blockchain News',
       time: '4 hours ago',
     },
     {
-      thumb: 'https://picsum.photos/64/64?random=2',
       title: 'Over 65% of Crypto-Related Tweets and 84% of Conversations on Reddit Were Positive',
       href: '#',
       category: 'Blockchain News',
       time: '4 hours ago',
     },
     {
-      thumb: 'https://picsum.photos/64/64?random=3',
       title: 'STX Price Prediction: After 100% Price Jump in December, What\'s in Store',
       href: '#',
       category: 'Blockchain News',
       time: '4 hours ago',
     },
     {
-      thumb: 'https://picsum.photos/64/64?random=4',
       title: 'US-Approved Spot Bitcoin ETFs Could Surpass Entire $50 Million Crypto ETF Market',
       href: '#',
       category: 'Blockchain News',
