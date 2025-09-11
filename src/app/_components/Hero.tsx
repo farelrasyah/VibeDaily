@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronRight } from 'lucide-react'
+import Image from 'next/image'
 
 interface HeroProps {
   category: string
@@ -24,7 +25,7 @@ export default function Hero({
   return (
     <div className="relative min-h-[420px] lg:min-h-[460px] flex items-center">
       {/* Content */}
-      <div className="relative z-10">
+      <div className="relative z-20">
         {/* Meta - 8px margin bottom */}
         <p className="meta mb-2">{category} • {time}</p>
         
@@ -57,15 +58,27 @@ export default function Hero({
         </button>
       </div>
 
-      {/* Multi-layer orb decoration - 340px, right-center, 32px offset */}
+      {/* Oval image decoration - background layer */}
       {orb && (
-        <div className="orb-container">
-          {/* Core orb */}
-          <div className="orb-core"></div>
-          {/* Outer halo */}
-          <div className="orb-halo"></div>
-          {/* Accent ring */}
-          <div className="orb-ring"></div>
+        <div className="absolute left-[420px] top-[260px] transform -translate-y-1/2 pointer-events-none w-[480px] h-[480px] z-10">
+          <div className="relative w-full h-full overflow-hidden rounded-full bg-transparent">
+            <Image 
+              src="/oval.jpg" 
+              alt="Decorative oval" 
+              width={480}
+              height={480}
+              quality={100}
+              priority
+              unoptimized
+              className="w-full h-full object-cover opacity-90 scale-105"
+              style={{ 
+                border: 'none', 
+                outline: 'none',
+                boxShadow: 'none',
+                filter: 'none'
+              }}
+            />
+          </div>
         </div>
       )}
     </div>
