@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sequel+Sans:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 /* Glassmorphism utilities - exact spec values */
@@ -58,9 +59,31 @@
 }
 
 .meta { 
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 1.25rem;
-  color: rgba(100 116 139, 0.8); /* slate-500/80 */
+  color: #00000080; /* slate-500/80 */
+  font-family: 'Sequel Sans', sans-serif;
+}
+
+.hero-category {
+  font-size: 12px;
+  line-height: 1.25rem;
+  color: #567FB0 !important; /* biru untuk category saja */
+  font-family: 'Sequel Sans', sans-serif;
+  font-weight: bold;
+}
+
+.hero-separator {
+  color: #00000080;
+  font-family: 'Sequel Sans', sans-serif;
+  font-size: 12px;
+}
+
+.hero-description {
+  font-size: 14px;
+  font-family: 'Sequel Sans', sans-serif;
+  color: #00000066;
+  line-height: 1.4;
 }
 
 .media-item { 
@@ -160,10 +183,11 @@
 
 /* Typography */
 .hero-title {
+  font-family: 'Sequel Sans', sans-serif;
   font-size: 2.25rem; /* 36px for 1280 */
   line-height: 1.15; /* tight leading */
   font-weight: 600; /* semibold */
-  color: rgba(15 23 42, 0.9); /* slate-900/90 */
+  color: #000000; /* hitam pekat */
   max-width: 28ch; /* width limit */
 }
 

@@ -18,9 +18,9 @@ export default function Home() {
   ]
 
   const heroData = {
-    category: 'Blockchain News',
-    time: '4 hours ago',
-    title: 'Top Analyst Unveils Ethereum Catalyst That Could Trigger Nearly 50% Surge for ETH — Here\'s His Outlook',
+    category: 'Branding',
+    time: 'a year ago',
+    title: 'Corporate identity design that ensures brand recognition',
     tags: ['Ethereum', 'Analytics'],
     ctaText: 'Read article',
     onCta: () => console.log('Hero CTA clicked'),

@@ -23,11 +23,13 @@ export default function Hero({
   orb = true 
 }: HeroProps) {
   return (
-    <div className="relative min-h-[420px] lg:min-h-[460px] flex items-center">
+    <div className="relative min-h-[420px] lg:min-h-[400px] flex items-center">
       {/* Content */}
       <div className="relative z-20">
-        {/* Meta - 8px margin bottom */}
-        <p className="meta mb-2">{category} • {time}</p>
+        {/* Meta - positioned like in reference image */}
+        <p className="mt-4 mb-2">
+          <span className="hero-category">{category}</span> <span className="hero-separator">•</span> <span className="meta">{time}</span>
+        </p>
         
         {/* H1 - 36px/40px, semibold, tight leading, 28ch width */}
         <h1 className="hero-title mb-3">
@@ -35,16 +37,9 @@ export default function Hero({
         </h1>
         
         {/* Tag chips - 12px gap after H1 */}
-        <div className="mt-3 flex gap-2 mb-4">
-          {tags.map((tag, index) => (
-            <span 
-              key={index}
-              className="inline-flex items-center h-7 px-3 rounded-full bg-white/40 border border-white/25 text-xs"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
+        <p className="hero-description mt-3 mb-4">
+          Consistent visual elements (logos, color schemes etc).
+        </p>
         
         {/* CTA with chevron circle - 16-20px gap after tags */}
         <button 
