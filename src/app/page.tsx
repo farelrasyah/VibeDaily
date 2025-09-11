@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import NavChips from './_components/NavChips'
+import NavigationDropdown from './_components/NavigationDropdown'
 import Hero from './_components/Hero'
 import Ticker from './_components/Ticker'
 import SearchRecommendCard from './_components/SearchRecommendCard'
@@ -10,11 +10,31 @@ export default function Home() {
   const [activeChip, setActiveChip] = useState('All')
 
   const navItems = [
-    { label: 'All', active: activeChip === 'All', caret: true },
-    { label: 'News', active: activeChip === 'News' },
-    { label: 'Exclusives', active: activeChip === 'Exclusives' },
-    { label: 'Guides', active: activeChip === 'Guides' },
-    { label: 'Recommended', active: activeChip === 'Recommended' },
+    { 
+      label: 'All', 
+      active: activeChip === 'All',
+      dropdownItems: ['Latest Articles', 'Popular Posts', 'Trending Topics', 'Featured Content']
+    },
+    { 
+      label: 'News', 
+      active: activeChip === 'News',
+      dropdownItems: ['Breaking News', 'Tech News', 'Business Updates', 'World Events']
+    },
+    { 
+      label: 'Exclusives', 
+      active: activeChip === 'Exclusives',
+      dropdownItems: ['Premium Articles', 'Member Only', 'Insider Reports']
+    },
+    { 
+      label: 'Guides', 
+      active: activeChip === 'Guides',
+      dropdownItems: ['How-to Guides', 'Tutorials', 'Best Practices', 'Tips & Tricks']
+    },
+    { 
+      label: 'Recommended', 
+      active: activeChip === 'Recommended',
+      dropdownItems: ['Editor\'s Choice', 'Must Read', 'Top Picks', 'Staff Recommendations']
+    },
   ]
 
   const heroData = {
@@ -108,11 +128,15 @@ export default function Home() {
               <span className="text-xl font-bold text-slate-900">VibeDaily</span>
             </div>
             
-            {/* Navigation Chips */}
+            {/* Navigation Dropdown */}
             <div className="flex-1 min-w-0">
-              <NavChips 
+              <NavigationDropdown 
                 items={navItems} 
-                onChipClick={(item) => setActiveChip(item.label)} 
+                onItemClick={(item) => setActiveChip(item.label)}
+                onDropdownItemClick={(parentLabel, dropdownItem) => {
+                  console.log(`Navigation: ${parentLabel} -> ${dropdownItem}`)
+                  // Bisa ditambah logic untuk filter berdasarkan dropdown item
+                }}
               />
             </div>
           </div>
