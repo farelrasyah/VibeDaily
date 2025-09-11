@@ -13,7 +13,7 @@ interface TickerProps {
 
 export default function Ticker({ items }: TickerProps) {
   return (
-    <div className="mt-8 relative">
+    <div className="mt-32 pt-16 relative">
       {/* Horizontal scrolling container with fade effect */}
       <div className="relative overflow-hidden">
         <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>

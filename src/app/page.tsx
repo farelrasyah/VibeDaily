@@ -122,10 +122,7 @@ export default function Home() {
         <main className="flex flex-col xl:flex-row gap-6 sm:gap-8 xl:items-start">
           {/* Left Column - Main Content (flexible width) */}
           <div className="flex-1 min-w-0">
-            {/* Section Badge */}
-            <div className="mb-4 sm:mb-6">
-              <span className="section-badge">Best of the week</span>
-            </div>
+          
             
             {/* Hero */}
             <Hero {...heroData} />
