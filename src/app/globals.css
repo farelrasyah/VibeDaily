@@ -44,6 +44,44 @@
 .pill:active { transform: scale(0.98); }
 .pill.active { background-color: rgba(255,255,255,0.40); }
 
+/* Header pill buttons with Sequel Sans font */
+.header-pill-button {
+  font-family: 'Sequel Sans', sans-serif !important;
+  font-size: 14px !important;
+  color: #000 !important;
+  font-weight: 700 !important; /* bold */
+}
+
+.header-pill-button span {
+  color: #000 !important;
+  font-family: 'Sequel Sans', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.header-pill-button:hover {
+  color: #000 !important;
+}
+
+.header-pill-button:hover span {
+  color: #000 !important;
+}
+
+/* More specific selectors for navigation buttons */
+nav .header-pill-button {
+  font-family: 'Sequel Sans', sans-serif !important;
+  font-size: 14px !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+
+nav .header-pill-button span {
+  font-family: 'Sequel Sans', sans-serif !important;
+  font-size: 14px !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+
 .meta { 
   font-size: 12px;
   line-height: 1.25rem;
@@ -124,12 +162,17 @@
   padding-left: 1.25rem;
   padding-right: 1.25rem;
   backdrop-filter: blur(16px);
-  background-color: rgba(255,255,255,0.10);
-  border: 1px solid rgba(255,255,255,0.25);
+  background-color: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.30);
   transition: all 0.15s ease-out;
   flex: 1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
-.search-glass:focus-within { border-color: rgba(255,255,255,0.40); box-shadow: 0 0 0 2px rgba(255,255,255,0.15); }
+.search-glass:focus-within { 
+  border-color: rgba(255,255,255,0.50); 
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.20), 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+  background-color: rgba(255,255,255,0.20);
+}
 
 .toolbar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
 

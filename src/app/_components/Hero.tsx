@@ -28,17 +28,21 @@ export default function Hero({
       {orb && (
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-8 -bottom-35 z-10 h-[460px] w-[460px] overflow-hidden rounded-full"
+          className="pointer-events-none absolute -right-50 -bottom-90 -z-10 h-[880px] w-[880px] overflow-hidden rounded-full"
         >
           <Image
-            src="/oval.jpg"
+            src="/oval.gif"
             alt=""
-            width={460}
-            height={460}
+            width={880}
+            height={880}
             quality={100}
             priority
             unoptimized
-            className="h-full w-full scale-110 opacity-90 object-cover"
+            className="h-full w-full scale-110 opacity-100 object-cover animate-pulse"
+            style={{
+              animationDuration: '4s',
+              animationTimingFunction: 'ease-in-out'
+            }}
           />
         </div>
       )}

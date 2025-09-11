@@ -34,13 +34,22 @@ const Header = () => {
                 <button
                   key={item.name}
                   onClick={() => setActiveTab(item.name)}
-                  className={`flex items-center space-x-1 text-sm font-medium transition-colors ${
-                    activeTab === item.name 
-                      ? 'text-gray-900' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                  className="flex items-center space-x-1 header-pill-button"
+                  style={{ 
+                    color: '#000',
+                    fontFamily: 'Sequel Sans, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: '700'
+                  }}
                 >
-                  <span>{item.name}</span>
+                  <span style={{ 
+                    color: '#000',
+                    fontFamily: 'Sequel Sans, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: '700'
+                  }}>
+                    {item.name}
+                  </span>
                   <svg className="w-3 h-3 text-gray-400 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>

@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { Search, ChevronDown } from 'lucide-react'
+import SearchGlass from './SearchGlass'
 
 interface RightRailItem {
   thumb: string
@@ -29,19 +29,9 @@ export default function RightRailList({
 
   return (
     <aside className="w-full xl:w-[380px] flex-shrink-0">
-      {/* Toolbar: EN dropdown + Search capsule */}
-      <div className="toolbar">
-        <button className="text-[13px] text-slate-600 hover:text-slate-800 flex items-center gap-1 transition-colors">
-          EN <ChevronDown className="w-3 h-3" />
-        </button>
-        <div className="search-glass">
-          <input 
-            className="bg-transparent placeholder:text-slate-500/70 text-slate-800 flex-1 focus:outline-none text-sm"
-            placeholder="Article name, tag, category..."
-            onChange={(e) => onSearch?.(e.target.value)}
-          />
-          <Search className="w-5 h-5 opacity-70 stroke-[1.5] flex-shrink-0" />
-        </div>
+      {/* Toolbar: Search with language selector */}
+      <div className="mb-4">
+        <SearchGlass onSearch={onSearch} />
       </div>
 
       {/* Header: Recommended + View all */}
