@@ -4,7 +4,7 @@ import { useState } from 'react'
 import NavChips from './_components/NavChips'
 import Hero from './_components/Hero'
 import Ticker from './_components/Ticker'
-import RightRailList from './_components/RightRailList'
+import SearchRecommendCard from './_components/SearchRecommendCard'
 
 export default function Home() {
   const [activeChip, setActiveChip] = useState('All')
@@ -94,7 +94,7 @@ export default function Home() {
   ]
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden">
+    <div className="min-h-screen w-full">
       <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <div className="max-w-[1440px] mx-auto">
         {/* Header - Logo + Navigation chips only */}
@@ -109,7 +109,7 @@ export default function Home() {
             </div>
             
             {/* Navigation Chips */}
-            <div className="flex-1 min-w-0 overflow-hidden">
+            <div className="flex-1 min-w-0">
               <NavChips 
                 items={navItems} 
                 onChipClick={(item) => setActiveChip(item.label)} 
@@ -133,9 +133,9 @@ export default function Home() {
 
           {/* Right Rail - Responsive: full width mobile, 380px desktop */}
           <div className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px]">
-            <RightRailList 
+            <SearchRecommendCard 
               items={recommendedItems} 
-              onSearch={(query) => console.log('Search:', query)}
+              onSearch={(query: string) => console.log('Search:', query)}
             />
           </div>
         </main>

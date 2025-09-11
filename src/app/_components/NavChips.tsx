@@ -17,7 +17,7 @@ interface NavChipsProps {
 
 export default function NavChips({ items, onChipClick }: NavChipsProps) {
   return (
-    <nav className="flex gap-2 overflow-x-auto">
+    <nav className="flex gap-2 overflow-x-auto scrollbar-hide">
       {items.map((item, index) => (
         <button
           key={index}
