@@ -419,7 +419,7 @@ html::-webkit-scrollbar {
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 1.125rem;
-  padding: 1.25rem 1rem 1.25rem 1.25rem;
+  padding: 1.25rem 0.875rem 1.25rem 0.875rem; /* Space minimal untuk featured article dengan gradient */
   transition: all 0.3s ease-out;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
@@ -435,7 +435,7 @@ html::-webkit-scrollbar {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.75rem;
-  padding-right: 0.25rem;
+  padding-right: 0rem; /* Menghapus padding-right agar konsisten dengan padding card yang lebih lebar */
 }
 
 .recommended-title {
@@ -547,20 +547,20 @@ html::-webkit-scrollbar {
 
 .article-list-item {
   display: grid;
-  grid-template-columns: 1fr 3.75rem;
+  grid-template-columns: 1fr 3.5rem;
   gap: 0.875rem;
-  padding: 0.875rem 1rem 0.875rem 0.875rem;
+  padding: 0.75rem 0.75rem 0.75rem 0.75rem; /* Memperkecil artikel list lebih compact */
   border-radius: 0.75rem;
   background: rgba(255, 255, 255, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(6px);
   transition: all 0.2s ease-out;
-  min-height: 4.75rem;
+  min-height: 4rem; /* Memperkecil tinggi artikel list jadi lebih compact */
 }
 
 .article-list-item:first-child {
-  padding: 1rem 1.125rem 1rem 1rem;
-  min-height: 5rem;
+  padding: 0.875rem 0.875rem 0.875rem 0.875rem; /* Memperkecil first-child artikel list jadi compact */
+  min-height: 4.5rem; /* Memperkecil tinggi first-child artikel list */
   background: rgba(255, 255, 255, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
   grid-template-columns: 1fr 4rem;
@@ -618,18 +618,18 @@ html::-webkit-scrollbar {
 
 .article-thumbnail {
   position: relative;
-  width: 3.75rem;
-  height: 3.75rem;
-  border-radius: 0.625rem;
+  width: 3.5rem; /* Memperkecil thumbnail jadi compact mengikuti artikel list */
+  height: 3.5rem;
+  border-radius: 0.5rem;
   overflow: hidden;
   flex-shrink: 0;
   background: rgba(255, 255, 255, 0.2);
 }
 
 .article-list-item:first-child .article-thumbnail {
-  width: 4rem;
+  width: 4rem; /* Memperkecil first-child thumbnail jadi compact */
   height: 4rem;
-  border-radius: 0.75rem;
+  border-radius: 0.625rem;
 }
 
 .article-img {
