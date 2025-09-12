@@ -648,3 +648,34 @@ html::-webkit-scrollbar {
   font-weight: 600 !important;
   color: #000000;
 }
+
+/* Bleed left utility - makes featured card extend to left edge */
+.bleed-left {
+  margin-left: -1.5rem; /* Extends beyond container padding on mobile */
+  margin-right: 0;
+}
+
+@media (min-width: 640px) {
+  .bleed-left {
+    margin-left: -2rem; /* Extends beyond container padding on sm screens */
+  }
+}
+
+@media (min-width: 1024px) {
+  .bleed-left {
+    margin-left: -3rem; /* Extends beyond container padding on lg screens */
+  }
+}
+
+@media (min-width: 1280px) {
+  .bleed-left {
+    margin-left: -4rem; /* Extends beyond container padding on xl screens */
+  }
+}
+
+/* Alternative: Full viewport bleed */
+.bleed-left-full {
+  margin-left: calc(-50vw + 50%);
+  width: 60vw;
+}
+
