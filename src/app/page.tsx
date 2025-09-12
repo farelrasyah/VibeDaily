@@ -4,6 +4,7 @@ import { useState } from 'react'
 import NavigationDropdown from './_components/NavigationDropdown'
 import Hero from './_components/Hero'
 import Ticker from './_components/Ticker'
+import ArticleGrid from './_components/ArticleGrid'
 import SearchRecommendCard from './_components/SearchRecommendCard'
 
 export default function Home() {
@@ -73,6 +74,92 @@ export default function Home() {
     },
   ]
 
+  const articleGridItems = [
+    {
+      id: '1',
+      title: '10 trends in ecommerce website design that are relevant in 2024',
+      category: 'E-commerce',
+      time: 'a year ago',
+      href: '#',
+      featured: true,
+      description: 'Personalization and AI to offer personalized products; Minimalistic design, simplicity and ease of use; Mobile optimization; Using voice assistants is also important in ecommerce design; Utilizing AR and VR...',
+      tags: ['Design', 'Trends', 'E-commerce']
+    },
+    {
+      id: '2',
+      title: 'Best apps logo ideas',
+      category: 'Logo',
+      time: '3 years ago',
+      href: '#',
+      image: 'https://picsum.photos/400/240?random=2'
+    },
+    {
+      id: '3',
+      title: 'How to make iphone app designs: a guide for beginners',
+      category: 'iOS',
+      time: 'a year ago',
+      href: '#',
+      image: 'https://picsum.photos/400/240?random=3'
+    },
+    {
+      id: '4',
+      title: 'How to make an attractive social media app design',
+      category: 'Mobile app',
+      time: 'a year ago',
+      href: '#',
+      image: 'https://picsum.photos/400/240?random=4'
+    },
+    {
+      id: '5',
+      title: 'The main stages of creating a fitness app ui',
+      category: 'Mobile app',
+      time: 'a year ago',
+      href: '#',
+      image: 'https://picsum.photos/400/240?random=5'
+    },
+    {
+      id: '6',
+      title: 'How to make web application design that users will love',
+      category: 'Mobile app',
+      time: 'a year ago',
+      href: '#',
+      image: 'https://picsum.photos/400/240?random=6'
+    },
+    {
+      id: '7',
+      title: '10 trends in ecommerce website design that are relevant in 2024',
+      category: 'E-commerce',
+      time: 'a year ago',
+      href: '#',
+      featured: true,
+      description: 'Personalization and AI to offer personalized products; Minimalistic design, simplicity and ease of use; Mobile optimization; Using voice assistants is also important in ecommerce design; Utilizing AR and VR...',
+      tags: ['Design', 'Trends', 'E-commerce']
+    },
+    {
+      id: '8',
+      title: 'Advanced UI/UX design patterns',
+      category: 'Design',
+      time: '2 weeks ago',
+      href: '#',
+      image: 'https://picsum.photos/400/240?random=8'
+    },
+    {
+      id: '9',
+      title: 'Modern web development frameworks',
+      category: 'Development',
+      time: '1 week ago',
+      href: '#',
+      image: 'https://picsum.photos/400/240?random=9'
+    },
+    {
+      id: '10',
+      title: 'Digital marketing strategies for 2024',
+      category: 'Marketing',
+      time: '3 days ago',
+      href: '#',
+      image: 'https://picsum.photos/400/240?random=10'
+    }
+  ]
   const recommendedItems = [
     {
       thumb: 'https://picsum.photos/380/214?random=5',
@@ -153,6 +240,9 @@ export default function Home() {
             
             {/* Ticker */}
             <Ticker items={tickerItems} />
+            
+            {/* Article Grid */}
+            <ArticleGrid items={articleGridItems} />
           </div>
 
           {/* Right Rail - Responsive: full width mobile, 380px desktop */}

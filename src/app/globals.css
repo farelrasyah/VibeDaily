@@ -640,3 +640,11 @@ html::-webkit-scrollbar {
 .article-list-item:hover .article-img {
   transform: scale(1.05);
 }
+
+/* Read Article button styles */
+.read-article-button {
+  font-family: 'Sequel Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600 !important;
+  color: #000000;
+}
