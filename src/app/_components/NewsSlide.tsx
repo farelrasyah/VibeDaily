@@ -69,8 +69,8 @@ const newsItems: NewsItem[] = [
   },
 ];
 
-const CARD_W = 320; // px, lebar kartu persis seperti referensi
-const GAP = 56;     // px, jarak antar kartu
+const CARD_W = 310; // px, lebar kartu persis seperti image dan referensi
+const GAP = 0;     // px, hilangkan jarak antar kartu
 
 export default function NewsSlide() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -86,15 +86,15 @@ export default function NewsSlide() {
   return (
     <section className="w-screen max-w-none px-0 mt-12">
       {/* Header */}
-      <header className="mb-6 flex items-center justify-between px-6 sm:px-10">
-        <div className="flex items-center gap-3">
-          <span className="h-1 w-8 rounded bg-violet-500 translate-y-[2px]" />
-          <h2
-            className="uppercase text-[14px] font-semibold text-slate-900"
-            style={{ letterSpacing: '0.06em' }}
-          >
-            Mobile Design
-          </h2>
+
+  <header className="mb-6 flex items-center justify-between px-0">
+        <div className="flex items-center relative">
+          <div className="w-0.5 h-6 bg-violet-600 rounded-full z-10"></div>
+          <div className="relative -ml-0.5">
+            <span className="text-sm font-semibold text-slate-800 uppercase tracking-wide pl-1" style={{letterSpacing: '0.06em'}}>Mobile Design</span>
+            {/* Violet fade effect overlay starting from left */}
+            <div className="absolute inset-0 left-0 bg-gradient-to-r from-violet-600/15 via-violet-500/8 via-violet-400/4 via-violet-300/2 via-violet-200/1 to-transparent pointer-events-none"></div>
+          </div>
         </div>
 
         <a
@@ -126,7 +126,7 @@ export default function NewsSlide() {
           ref={trackRef}
           className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth px-0"
           style={{
-            columnGap: `${GAP}px`,
+            columnGap: 0,
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
           }}
@@ -141,17 +141,20 @@ export default function NewsSlide() {
             <article
               key={item.id}
               className="shrink-0 snap-start"
-              style={{ width: CARD_W }}
+              style={{ width: CARD_W, margin: 0, padding: 0 }}
             >
               <a href={item.href} className="group block">
                 <div
                   className="relative w-full overflow-hidden bg-white shadow-[0_8px_32px_rgba(15,23,42,.06)]"
-                  style={{ borderRadius: 16, aspectRatio: '16 / 9' }}
+                  style={{ borderRadius: 16, width: 271, height: 120 }}
                 >
                   <img
                     src={item.image}
                     alt={item.title}
+                    width={271}
+                    height={120}
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                    style={{ width: 271, height: 125 }}
                   />
                 </div>
                 <div className="mt-3 text-[13px] text-slate-500">
@@ -159,13 +162,36 @@ export default function NewsSlide() {
                   <span className="mx-2">•</span>
                   <span>{item.time}</span>
                 </div>
-                <h3 className="mt-1 text-[20px] leading-[1.25] font-semibold text-slate-900">
+                <h3
+                  className="news-item_title_ir_0Q"
+                  style={{
+                    fontSize: '18px',
+                    fontFamily: 'Sequel Sans, sans-serif',
+                    color: '#000',
+                    marginTop: 16,
+                    marginBottom: 0,
+                    marginLeft: 0,
+                    marginRight: 0,
+                    fontWeight: 600,
+                    lineHeight: '1.2',
+                    width: 271
+                  }}
+                >
                   {item.title}
                 </h3>
                 {item.tags && (
-                  <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-[13px] text-slate-400">
+                  <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1">
                     {item.tags.map((t, i) => (
-                      <span key={i}>#{t}</span>
+                      <span
+                        key={i}
+                        style={{
+                          fontSize: '12px',
+                          fontFamily: 'Sequel Sans, sans-serif',
+                          color: '#00000066',
+                        }}
+                      >
+                        #{t}
+                      </span>
                     ))}
                   </div>
                 )}
