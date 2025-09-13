@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ✨ VibeDaily
 
-## Getting Started
+**“Stay Informed. Stay Inspired. Stay in the Vibe.”**
 
-First, run the development server:
+Selamat datang di **VibeDaily**, sebuah portal berita digital yang lahir dari satu tujuan sederhana: **membawa denyut dunia langsung ke hadapanmu**.
+Di sini, kabar bukan sekadar informasi — tapi **pengalaman**, **vibe**, dan **cerita yang hidup**.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌍 Apa Itu VibeDaily?
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+VibeDaily adalah platform berita **lokal & internasional** yang selalu update, menghubungkan kamu dengan:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* 🔥 **Headline Terkini** — dari breaking news hingga trending topic.
+* 🌐 **Perspektif Global** — biar wawasanmu nggak cuma sebatas layar kaca lokal.
+* 🎯 **Ringkas, Padat, Jelas** — karena hidup terlalu singkat untuk membaca berita yang bertele-tele.
+* 📱 **Desain Kekinian** — enak dibaca, entah di laptop, tablet, atau ponsel.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 💡 Filosofi Kami
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Kami percaya **berita bukan hanya sekadar fakta**, tapi juga **suasana**.
+Itulah kenapa kami menamai platform ini **VibeDaily**:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* **Vibe** → menggambarkan nuansa, energi, dan denyut peristiwa.
+* **Daily** → hadir setiap hari, tanpa henti, tanpa absen.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Mengapa Harus VibeDaily?
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* Karena dunia bergerak cepat, dan kamu layak tahu lebih cepat.
+* Karena informasi seharusnya **ringan, jujur, dan mudah dicerna**.
+* Karena setiap vibe hari ini bisa membentuk keputusanmu esok hari.
+
+---
+
+## 🔮 Masa Depan VibeDaily
+
+VibeDaily bukan berhenti di sini. Ke depan, kami ingin:
+
+* Membawa **fitur personalisasi berita** sesuai minatmu.
+* Menyediakan **analisis mendalam** dari para ahli.
+* Menjadi ruang **komunitas diskusi sehat** untuk pembaca cerdas.
+
+---
+
+### 🎧 Rasakan Vibenya, Setiap Hari.
+
+> **VibeDaily — berita bukan sekadar dibaca, tapi dirasakan.**
+

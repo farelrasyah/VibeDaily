@@ -1,6 +1,8 @@
+
 'use client'
 
 import { useMemo, useState } from 'react'
+import NewsSlide from './NewsSlide';
 
 interface ArticleGridItem {
   id: string
@@ -231,6 +233,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
         </div>
       </div>
     </div>
+
   </section>
   )
 }
