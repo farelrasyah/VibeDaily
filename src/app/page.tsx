@@ -6,6 +6,7 @@ import Hero from './_components/Hero'
 import Ticker from './_components/Ticker'
 import ArticleGrid from './_components/ArticleGrid'
 import NewsSlide from './_components/NewsSlide'
+import ArticleSection from './_components/ArticleSection'
 import SearchRecommendCard from './_components/SearchRecommendCard'
 
 export default function Home() {
@@ -154,6 +155,8 @@ export default function Home() {
               <ArticleGrid items={articleGridItems} />
               {/* News Slide Section (new, below ArticleGrid) */}
               <NewsSlide />
+              {/* Article Section (new, after NewsSlide) */}
+              <ArticleSection />
             </div>
 
             <aside className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px]">

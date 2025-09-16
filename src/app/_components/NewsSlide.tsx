@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 type NewsItem = {
   id: string;
@@ -69,11 +69,19 @@ const newsItems: NewsItem[] = [
   },
 ];
 
-const CARD_W = 310; // px, lebar kartu persis seperti image dan referensi
-const GAP = 0;     // px, hilangkan jarak antar kartu
+const CARD_W = 280; // px, lebar kartu dikurangi
 
 export default function NewsSlide() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const [isAtStart, setIsAtStart] = useState(true);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const handleScroll = () => setIsAtStart(el.scrollLeft === 0);
+    el.addEventListener('scroll', handleScroll);
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const scrollByCards = (dir: -1 | 1) => {
     const el = trackRef.current;
@@ -91,7 +99,7 @@ export default function NewsSlide() {
         <div className="flex items-center relative">
           <div className="w-0.5 h-6 bg-violet-600 rounded-full z-10"></div>
           <div className="relative -ml-0.5">
-            <span className="text-sm font-semibold text-slate-800 uppercase tracking-wide pl-1" style={{letterSpacing: '0.06em'}}>Mobile Design</span>
+            <span className="text-sm font-semibold text-slate-800 uppercase tracking-wide pl-1" style={{letterSpacing: '0.06em'}}>Breaking News</span>
             {/* Violet fade effect overlay starting from left */}
             <div className="absolute inset-0 left-0 bg-gradient-to-r from-violet-600/15 via-violet-500/8 via-violet-400/4 via-violet-300/2 via-violet-200/1 to-transparent pointer-events-none"></div>
           </div>
@@ -146,15 +154,15 @@ export default function NewsSlide() {
               <a href={item.href} className="group block">
                 <div
                   className="relative w-full overflow-hidden bg-white shadow-[0_8px_32px_rgba(15,23,42,.06)]"
-                  style={{ borderRadius: 16, width: 271, height: 120 }}
+                  style={{ borderRadius: 16, width: 250, height: 120 }}
                 >
                   <img
                     src={item.image}
                     alt={item.title}
-                    width={271}
+                    width={250}
                     height={120}
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                    style={{ width: 271, height: 125 }}
+                    style={{ width: 250, height: 125 }}
                   />
                 </div>
                 <div className="mt-3 text-[13px] text-slate-500">
@@ -174,7 +182,7 @@ export default function NewsSlide() {
                     marginRight: 0,
                     fontWeight: 600,
                     lineHeight: '1.2',
-                    width: 271
+                    width: 250
                   }}
                 >
                   {item.title}
@@ -200,37 +208,27 @@ export default function NewsSlide() {
           ))}
         </div>
         {/* Tombol panah tengah-bawah */}
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-4">
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-3">
           <button
             onClick={() => scrollByCards(-1)}
             aria-label="Previous"
-            className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+            className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${
+              isAtStart
+                ? 'bg-white/90 border border-slate-200 text-slate-700 shadow-[0_6px_12px_rgba(15,23,42,0.06)] hover:bg-white'
+                : 'bg-slate-900 text-white shadow-[0_6px_12px_rgba(15,23,42,0.18)] hover:bg-slate-800'
+            }`}
           >
-            <svg width="20" height="20" viewBox="0 0 20 20">
-              <path
-                d="M12.5 6.25L7.5 10L12.5 13.75"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg width="12" height="12" viewBox="0 0 12 12" className="mx-auto">
+              <path d="M7.5 3.25L4.5 6L7.5 8.75" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button
             onClick={() => scrollByCards(1)}
             aria-label="Next"
-            className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-white hover:bg-slate-800 transition"
+            className="w-10 h-10 rounded-full bg-slate-900 text-white shadow-[0_6px_12px_rgba(15,23,42,0.18)] hover:bg-slate-800 transition-all flex items-center justify-center"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20">
-              <path
-                d="M7.5 6.25L12.5 10L7.5 13.75"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg width="12" height="12" viewBox="0 0 12 12" className="mx-auto">
+              <path d="M4.5 3.25L7.5 6L4.5 8.75" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>
