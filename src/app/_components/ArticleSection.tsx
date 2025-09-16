@@ -77,16 +77,23 @@ const ArticleSection: React.FC = () => {
   const rightItems = articles.slice(1, 7);
 
   return (
-    <section className="w-full mx-auto max-w-[1200px] px-6 py-16">
-      {/* Header with purple line and View more button */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="relative">
-          <div className="w-8 h-[3px] bg-accent-purple rounded-full mb-3"></div>
-          <span className="block uppercase text-sm font-bold tracking-wider text-foreground">
-            WEB DESIGN
-          </span>
+    <section className="w-full mx-auto max-w-[1200px] px-6 py-16 relative">
+      {/* Flag "NEWS UPDATE" */}
+      <div className="absolute -top-8 left-0 mb-8 mt-2">
+        <div className="flex items-center relative">
+          <div className="w-0.5 h-6 bg-violet-600 rounded-full z-10"></div>
+          <div className="relative -ml-0.5">
+            <span className="text-sm font-semibold text-gray-800 uppercase tracking-wide pl-1">
+              NEWS UPDATE
+            </span>
+            {/* Violet fade effect overlay starting from left */}
+            <div className="absolute inset-0 left-0 bg-gradient-to-r from-violet-600/15 via-violet-500/8 via-violet-400/4 via-violet-300/2 via-violet-200/1 to-transparent pointer-events-none"></div>
+          </div>
         </div>
+      </div>
 
+      {/* Header with View more button */}
+      <div className="flex items-center justify-end mb-8">
         <button
           type="button"
           className="inline-flex items-center gap-2 text-base font-semibold text-foreground hover:opacity-70 transition-opacity"
@@ -107,7 +114,7 @@ const ArticleSection: React.FC = () => {
               className="absolute inset-0 h-full w-full object-cover"
             />
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-featured-gradient-start/20 via-featured-gradient-mid/60 to-featured-gradient-end/90" />
+            <div className="featured-gradient" />
 
             {/* Content overlay */}
             <div className="relative z-10 h-full flex flex-col justify-end p-6 lg:p-8">
@@ -136,28 +143,30 @@ const ArticleSection: React.FC = () => {
                 {rightItems.map((article, idx) => (
                   <article key={idx} className="group">
                     <a href="#" className="block hover:opacity-80 transition-opacity">
-                      <div className={`flex items-start gap-4 py-6 ${idx < 4 ? 'border-b border-slate-200' : ''}`}>
+                      <div className="flex items-start gap-4 py-6 px-0 min-h-[140px]">
                         {/* Text content on the left */}
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 flex flex-col justify-start">
                           <div className="mb-2 text-sm font-medium">
                             <span className="text-[#567FB0] font-semibold">{article.category}</span>
                             <span className="mx-2 text-slate-400">•</span>
                             <span className="text-slate-500">{article.time}</span>
                           </div>
 
-                          <h3 className="text-lg font-bold text-slate-900 mb-3 leading-tight line-clamp-3">
+                          <h3 className="text-lg font-bold text-slate-900 mb-3 leading-tight line-clamp-3 flex-grow">
                             {article.title}
                           </h3>
 
-                          {article.tags && article.tags.length > 0 ? (
-                            <div className="text-sm text-slate-500">#{article.tags[0]}</div>
-                          ) : (
-                            <div className="text-sm text-slate-500">#{article.category}</div>
-                          )}
+                          <div className="text-sm text-slate-500 mt-auto">
+                            {article.tags && article.tags.length > 0 ? (
+                              <>#{article.tags[0]}</>
+                            ) : (
+                              <>#{article.category}</>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Image on the right - smaller size */}
-                        <div className="flex-shrink-0 w-16 h-16 lg:w-18 lg:h-18 rounded-xl overflow-hidden">
+                        {/* Image on the right - consistent size */}
+                        <div className="flex-shrink-0 w-16 h-16 lg:w-18 lg:h-18 rounded-xl overflow-hidden self-start mt-1">
                           <img
                             src={article.image}
                             alt={article.title}
@@ -165,6 +174,10 @@ const ArticleSection: React.FC = () => {
                           />
                         </div>
                       </div>
+                      {/* Separator line - subtle but visible */}
+                      {idx < rightItems.length - 1 && (
+                        <hr className="border-0 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent mx-4 my-0" />
+                      )}
                     </a>
                   </article>
                 ))}
