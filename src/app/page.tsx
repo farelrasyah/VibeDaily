@@ -7,6 +7,7 @@ import Ticker from './_components/Ticker'
 import ArticleGrid from './_components/ArticleGrid'
 import NewsSlide from './_components/NewsSlide'
 import ArticleSection from './_components/ArticleSection'
+import SocialMediaSection from './_components/SocialMediaSection'
 import SearchRecommendCard from './_components/SearchRecommendCard'
 
 export default function Home() {
@@ -157,6 +158,8 @@ export default function Home() {
               <NewsSlide />
               {/* Article Section (new, after NewsSlide) */}
               <ArticleSection />
+              {/* Social Media Section (new, appears after scrolling ArticleSection) */}
+              <SocialMediaSection />
             </div>
 
             <aside className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px]">

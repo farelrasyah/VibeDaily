@@ -93,14 +93,18 @@ const ArticleSection: React.FC = () => {
       </div>
 
       {/* Header with View more button */}
-      <div className="flex items-center justify-end mb-8">
-        <button
-          type="button"
-          className="inline-flex items-center gap-2 text-base font-semibold text-foreground hover:opacity-70 transition-opacity"
-        >
-          View more →
-        </button>
-      </div>
+<div className="mb-8 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+  <div className="flex justify-end pr-4">
+    <button
+      type="button"
+      className="inline-flex items-center gap-2 text-base font-bold text-black hover:text-gray-700 transition-colors"
+    >
+      View more →
+    </button>
+  </div>
+</div>
+
+
 
       {/* Main grid layout like ArticleGrid */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 lg:gap-4">
@@ -143,20 +147,20 @@ const ArticleSection: React.FC = () => {
                 {rightItems.map((article, idx) => (
                   <article key={idx} className="group">
                     <a href="#" className="block hover:opacity-80 transition-opacity">
-                      <div className="flex items-start gap-4 py-6 px-0 min-h-[140px]">
-                        {/* Text content on the left */}
-                        <div className="flex-1 min-w-0 flex flex-col justify-start">
-                          <div className="mb-2 text-sm font-medium">
-                            <span className="text-[#567FB0] font-semibold">{article.category}</span>
-                            <span className="mx-2 text-slate-400">•</span>
-                            <span className="text-slate-500">{article.time}</span>
+                      <div className="grid grid-cols-[1fr_90px] gap-5 py-6 px-0 min-h-[140px]">
+                        {/* Text content on the left - takes more space */}
+                        <div className="flex flex-col justify-start min-w-0 pr-2">
+                          <div className="mb-2 font-medium" style={{fontSize: '12px'}}>
+                            <span className="text-[#567FB0] font-semibold" style={{fontSize: '12px'}}>{article.category}</span>
+                            <span className="mx-2 text-slate-400" style={{fontSize: '12px'}}>•</span>
+                            <span className="text-slate-500" style={{fontSize: '12px'}}>{article.time}</span>
                           </div>
 
-                          <h3 className="text-lg font-bold text-slate-900 mb-3 leading-tight line-clamp-3 flex-grow">
+                          <h3 className="font-bold text-slate-900 mb-3 leading-tight line-clamp-3" style={{fontSize: '18px'}}>
                             {article.title}
                           </h3>
 
-                          <div className="text-sm text-slate-500 mt-auto">
+                          <div className="text-slate-500 mt-auto" style={{fontSize: '14px'}}>
                             {article.tags && article.tags.length > 0 ? (
                               <>#{article.tags[0]}</>
                             ) : (
@@ -165,8 +169,8 @@ const ArticleSection: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Image on the right - consistent size */}
-                        <div className="flex-shrink-0 w-16 h-16 lg:w-18 lg:h-18 rounded-xl overflow-hidden self-start mt-1">
+                        {/* Image on the right - fixed size */}
+                        <div className="w-[81px] h-[81px] rounded-xl overflow-hidden flex-shrink-0">
                           <img
                             src={article.image}
                             alt={article.title}
