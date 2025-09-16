@@ -95,78 +95,81 @@ const ArticleSection: React.FC = () => {
         </button>
       </div>
 
-      {/* Main grid layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-6">
-        {/* Featured article: span 2 columns, adjusted height */}
-        <div className="relative rounded-3xl overflow-hidden h-[260px] lg:h-[500px] lg:col-span-2">
-          {/* Background image */}
-          <img
-            src={articles[0].image}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-featured-gradient-start/20 via-featured-gradient-mid/60 to-featured-gradient-end/90" />
+      {/* Main grid layout like ArticleGrid */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 lg:gap-4">
+        {/* Featured article: span 3.2 columns (slightly wider) */}
+        <div className="lg:col-span-3 lg:-ml-8">
+          <div className="relative rounded-3xl overflow-hidden h-[260px] lg:h-[500px]">
+            {/* Background image */}
+            <img
+              src={articles[0].image}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-featured-gradient-start/20 via-featured-gradient-mid/60 to-featured-gradient-end/90" />
 
-          {/* Content overlay */}
-          <div className="relative z-10 h-full flex flex-col justify-end p-6 lg:p-8">
-            <div className="mb-2 flex items-center gap-2 text-white/80 text-sm">
-              <span className="font-medium">{articles[0].category}</span>
-              <span>• {articles[0].time}</span>
+            {/* Content overlay */}
+            <div className="relative z-10 h-full flex flex-col justify-end p-6 lg:p-8">
+              <div className="mb-2 flex items-center gap-2 text-white/80 text-sm">
+                <span className="font-medium">{articles[0].category}</span>
+                <span>• {articles[0].time}</span>
+              </div>
+
+              <h2 className="text-white font-bold leading-tight text-xl lg:text-2xl mb-3 max-w-[90%]">
+                {articles[0].title}
+              </h2>
+
+              <p className="text-white/90 text-sm lg:text-base max-w-[95%] leading-relaxed">
+                {articles[0].description}
+              </p>
             </div>
-
-            <h2 className="text-white font-bold leading-tight text-xl lg:text-2xl mb-3 max-w-[90%]">
-              {articles[0].title}
-            </h2>
-
-            <p className="text-white/90 text-sm lg:text-base max-w-[95%] leading-relaxed">
-              {articles[0].description}
-            </p>
           </div>
         </div>
 
-        {/* Right grid: 2 columns x 3 rows */}
-        <div className="lg:col-span-1">
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-x-8">
-            {rightItems.map((article, idx) => (
-              <div
-                key={idx}
-                className={`group flex items-start gap-4 py-6 border-b border-border-light last:border-b-0 ${
-                  idx >= 4 ? "md:border-b-0" : ""
-                }`}
-              >
-                {/* Text content */}
-                <div className="flex-1 min-w-0">
-                  <div className="mb-2 flex items-center gap-2 text-sm text-text-muted">
-                    <span>{article.category}</span>
-                    <span>• {article.time}</span>
-                  </div>
+        {/* Right grid: 2 columns with larger cards - expanded width */}
+        <div className="lg:col-span-2 relative">
+          <div className="lg:pl-6 xl:pl-10 relative">
+            {/* Allow the grid to overflow and be wider than its container */}
+            <div className="relative lg:absolute lg:-top-4 lg:right-0 lg:w-[240%] lg:translate-x-115">
+              <div className="grid grid-cols-2 gap-x-10 gap-y-0">
+                {rightItems.map((article, idx) => (
+                  <article key={idx} className="group">
+                    <a href="#" className="block hover:opacity-80 transition-opacity">
+                      <div className={`flex items-start gap-4 py-6 ${idx < 4 ? 'border-b border-slate-200' : ''}`}>
+                        {/* Text content on the left */}
+                        <div className="flex-1 min-w-0">
+                          <div className="mb-2 text-sm font-medium">
+                            <span className="text-[#567FB0] font-semibold">{article.category}</span>
+                            <span className="mx-2 text-slate-400">•</span>
+                            <span className="text-slate-500">{article.time}</span>
+                          </div>
 
-                  <h3 className="text-lg lg:text-xl font-bold text-foreground leading-tight mb-3 group-hover:opacity-90 transition-opacity line-clamp-2">
-                    {article.title}
-                  </h3>
+                          <h3 className="text-lg font-bold text-slate-900 mb-3 leading-tight line-clamp-3">
+                            {article.title}
+                          </h3>
 
-                  {article.tags && article.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 text-sm text-text-ultra-muted">
-                      {article.tags.map((tag, j) => (
-                        <span key={j} className="hover:text-text-muted transition-colors cursor-pointer">
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                          {article.tags && article.tags.length > 0 ? (
+                            <div className="text-sm text-slate-500">#{article.tags[0]}</div>
+                          ) : (
+                            <div className="text-sm text-slate-500">#{article.category}</div>
+                          )}
+                        </div>
 
-                {/* Thumbnail */}
-                <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-2xl overflow-hidden bg-thumbnail-bg flex-shrink-0">
-                  <img
-                    src={article.image}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                </div>
+                        {/* Image on the right - smaller size */}
+                        <div className="flex-shrink-0 w-16 h-16 lg:w-18 lg:h-18 rounded-xl overflow-hidden">
+                          <img
+                            src={article.image}
+                            alt={article.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    </a>
+                  </article>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>
