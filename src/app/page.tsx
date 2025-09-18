@@ -158,8 +158,7 @@ export default function Home() {
               <NewsSlide />
               {/* Article Section (new, after NewsSlide) */}
               <ArticleSection />
-              {/* Social Media Section (new, appears after scrolling ArticleSection) */}
-              <SocialMediaSection />
+              {/* Social Media Section moved outside the centered max-w container so it can span the page */}
             </div>
 
             <aside className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px]">
@@ -171,6 +170,9 @@ export default function Home() {
           </main>
         </div>
       </div>
+
+      {/* Social Media Section (full-bleed within page padding) */}
+      <SocialMediaSection />
     </div>
   )
 }
