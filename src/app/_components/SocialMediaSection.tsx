@@ -1,12 +1,10 @@
 // SocialMediaSection.tsx
 import React from "react";
-
 /**
- * SocialMediaSection – 3 IG cards berlapis rapi (mirror referensi)
- * - Center besar, kiri/kanan lebih kecil; overlap terukur (bukan saling nutup)
- * - Offset pakai margin dari sumbu tengah (bukan translate-x ganda)
- * - Footer opaque supaya tidak “tembus”
- * - Gutters & max-w konsisten dengan section lain
+ * SocialMediaSection
+ * - IG cards sama seperti sebelumnya
+ * - Featured News: dibuat mengikuti referensi (badge kecil di luar kartu, sudut asimetris,
+ *   shadow halus, meta netral, headline rapat, CTA 2 elemen terpisah)
  */
 
 const BG_URL =
@@ -64,14 +62,11 @@ function InstaCard({ img, blueBar = false, className = "" }: CardProps) {
         <div className="absolute inset-0 ring-1 ring-white/10 pointer-events-none" />
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black/35 to-transparent" />
       </div>
-
       {/* Footer – opaque agar tidak tembus */}
       <div
         className={[
           "h-[92px] border-t border-white/10 flex items-center justify-between px-5",
-          blueBar
-            ? "bg-gradient-to-r from-blue-500/35 to-purple-600/35"
-            : "bg-white/25",
+          blueBar ? "bg-gradient-to-r from-blue-500/35 to-purple-600/35" : "bg-white/25",
           "backdrop-blur-md",
         ].join(" ")}
       >
@@ -93,7 +88,6 @@ function InstaCard({ img, blueBar = false, className = "" }: CardProps) {
     </div>
   );
 }
-
 const SocialMediaSection: React.FC = () => {
   return (
     <section className="relative w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -106,24 +100,74 @@ const SocialMediaSection: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
           <div className="absolute inset-0 ring-1 ring-white/10 rounded-[inherit] pointer-events-none" />
         </div>
+        {/* === FEATURED NEWS (mimik referensi) === */}
+        <div className="absolute left-0 bottom-[-8px] md:bottom-[-12px] z-30 p-0">
+          <article
+            className={[
+              // ukuran dan padding kartu
+              "relative bg-[#EEF2FF]",
+              "px-8 py-7 sm:px-10 sm:py-8",
+              // sudut asimetris: TL besar, yang lain sedang
+              "rounded-[28px] rounded-tl-[56px]",
+              // width mirip referensi
+              "max-w-[520px] min-w-[360px]",
+            ].join(" ")}
+          >
+            {/* Badge KECIL di luar sudut kiri-atas, tanpa shadow */}
+            <span
+              className="absolute -top-6 left-8 inline-flex items-center rounded-[12px] bg-[#EEF2FF] px-4 py-2 text-[11px] font-semibold tracking-[0.06em] text-black/70 uppercase"
+              aria-label="Featured news"
+            >
+              FEATURED NEWS
+            </span>
+            {/* Meta: netral (bukan ungu), bullet kecil & rapat */}
+            <div className="mb-3 flex items-center gap-2 text-[13px] text-black/60">
+              <span className="font-medium">Branding</span>
+              <span className="opacity-60">•</span>
+              <span>a year ago</span>
+            </div>
+
+            {/* Headline: bold, leading tight, max 3 baris */}
+            <h2 className="text-[28px] sm:text-[32px] font-extrabold text-black leading-tight tracking-[-0.01em] max-w-[32ch] mb-3">
+              Corporate identity design that ensures brand recognition
+            </h2>
+
+            {/* Tags: satu blok rapih, abu-abu */}
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 mb-6 text-[13px] text-black/55">
+              <li>#Brand identity design</li>
+              <li>#Corporate website design</li>
+              <li>#Website ui design</li>
+            </ul>
+
+            {/* CTA: tombol pil + icon button terpisah, warna biru muda */}
+            <div className="flex items-center gap-3">
+              <a
+                href="#"
+                className="inline-flex items-center rounded-full border border-black/10 bg-[#E9F0FF] px-5 py-3 text-[15px] font-semibold text-black transition-colors hover:bg-[#dfe8ff]"
+              >
+                Read article
+              </a>
+              <a
+                href="#"
+                aria-label="Open article"
+                className="grid h-11 w-11 place-items-center rounded-full border border-black/10 bg-[#E9F0FF] transition-transform hover:bg-[#dfe8ff] hover:translate-x-[2px]"
+              >
+                <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M13 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </article>
+        </div>
 
         {/* Content */}
         <div className="relative z-10 px-6 md:px-10 xl:px-12 py-10 md:py-14">
           <div className="grid grid-cols-1 gap-y-10">
             {/* Instagram Cards */}
             <div className="flex justify-center items-center">
-              <InstaCard
-                img={IMAGES[0]}
-                className="scale-90 -ml-4 z-10"
-              />
-              <InstaCard
-                img={IMAGES[1]}
-                className="z-20"
-              />
-              <InstaCard
-                img={IMAGES[2]}
-                className="scale-90 -mr-4 z-10"
-              />
+              <InstaCard img={IMAGES[0]} className="scale-90 -ml-4 z-10" />
+              <InstaCard img={IMAGES[1]} className="z-20" />
+              <InstaCard img={IMAGES[2]} className="scale-90 -mr-4 z-10" />
             </div>
           </div>
         </div>
