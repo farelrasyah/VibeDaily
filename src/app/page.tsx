@@ -9,6 +9,7 @@ import NewsSlide from './_components/NewsSlide'
 import ArticleSection from './_components/ArticleSection'
 import SocialMediaSection from './_components/SocialMediaSection'
 import SearchRecommendCard from './_components/SearchRecommendCard'
+import Footer from './_components/Footer'
 
 export default function Home() {
   const [activeChip, setActiveChip] = useState('All')
@@ -173,6 +174,9 @@ export default function Home() {
 
       {/* Social Media Section (full-bleed within page padding) */}
       <SocialMediaSection />
+      
+      {/* Footer Section */}
+      <Footer />
     </div>
   )
 }
