@@ -105,7 +105,7 @@ const SocialMediaSection: React.FC = () => {
           <article
             className={[
               // ukuran dan padding kartu
-              "relative bg-[#EEF2FF]",
+              "relative bg-white/60 backdrop-blur-xl",
               "px-8 py-7 sm:px-10 sm:py-8",
               // sudut asimetris: TL besar, yang lain sedang
               "rounded-[28px] rounded-tl-[56px]",
@@ -113,13 +113,7 @@ const SocialMediaSection: React.FC = () => {
               "max-w-[520px] min-w-[360px]",
             ].join(" ")}
           >
-            {/* Badge KECIL di luar sudut kiri-atas, tanpa shadow */}
-            <span
-              className="absolute -top-6 left-8 inline-flex items-center rounded-[12px] bg-[#EEF2FF] px-4 py-2 text-[11px] font-semibold tracking-[0.06em] text-black/70 uppercase"
-              aria-label="Featured news"
-            >
-              FEATURED NEWS
-            </span>
+          
             {/* Meta: netral (bukan ungu), bullet kecil & rapat */}
             <div className="mb-3 flex items-center gap-2 text-[13px] text-black/60">
               <span className="font-medium">Branding</span>
