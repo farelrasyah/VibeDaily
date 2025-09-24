@@ -162,7 +162,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
         <div className="lg:col-span-2 relative">
           <div className="lg:pl-6 xl:pl-10 relative">
             {/* Container dengan ukuran diperlebar untuk tampilan yang lebih besar */}
-            <div className="relative lg:static lg:w-[240%] xl:w-[260%]">
+            <div className="relative lg:static lg:w-[220%] xl:w-[240%]">
               <div className="grid grid-cols-3 gap-x-8 gap-y-12 lg:gap-y-14">
               {smallItems.map((item, i) => (
                 <article key={`${item.id}-${i}`} className="group">

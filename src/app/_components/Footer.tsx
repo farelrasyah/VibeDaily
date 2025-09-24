@@ -1,7 +1,17 @@
 // components/Footer.tsx
-import React from "react";
+import React, { useState } from "react";
+import SupportPopup from "./ContactUs";
 
 const Footer = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleContactClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
   return (
     <footer className="text-white">
       {/* ================= HEADER PUTIH (FULL WIDTH) ================= */}
@@ -24,9 +34,9 @@ const Footer = () => {
 
           {/* KOL 3: tombol bulat kanan */}
           <div className="flex justify-end">
-            <a
-              href="#contact"
-              aria-label="Go to contact"
+            <button
+              onClick={handleContactClick}
+              aria-label="Open contact modal"
               className="
                 group
                 w-12 h-12 sm:w-16 sm:h-16
@@ -48,7 +58,7 @@ const Footer = () => {
                 <path d="M5 12h14" />
                 <path d="M13 5l7 7-7 7" />
               </svg>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -179,6 +189,9 @@ const Footer = () => {
         </div>
       </div>
       {/* ================= /PANEL GELAP ================= */}
+      
+      {/* Contact Modal */}
+      <SupportPopup open={isModalOpen} onClose={handleCloseModal} />
     </footer>
   );
 };
