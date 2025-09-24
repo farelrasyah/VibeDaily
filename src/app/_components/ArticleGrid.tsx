@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 
 interface ArticleGridItem {
   id: string
@@ -27,6 +27,33 @@ interface ArticleGridProps {
  * - Kanan: 6 thumbnail (3×2) dengan deskripsi lengkap + panah di bawah.
  */
 export default function ArticleGrid({ items }: ArticleGridProps) {
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      {
+        threshold: 0.1, // Trigger when 10% of the section is visible
+        rootMargin: '0px 0px -100px 0px' // Trigger slightly before fully visible
+      }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current)
+      }
+    }
+  }, [])
+
   const featuredPool = useMemo(() => {
     const feats = items.filter(i => i.featured)
     return feats.length ? feats : (items.length ? [items[0]] : [])
@@ -50,7 +77,10 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
     : []
 
   return (
-    <section className="mt-8 pt-4 sm:mt-10 sm:pt-5 md:mt-12 md:pt-6">
+    <section 
+      ref={sectionRef}
+      className="mt-8 pt-4 sm:mt-10 sm:pt-5 md:mt-12 md:pt-6"
+    >
       {/* Header atas: hanya View more (flag pindah ke dalam kartu) */}
     
 
@@ -148,7 +178,9 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                           : 'https://picsum.photos/1400/900?random=34'
                       }
                       alt={featured?.title || 'featured'}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className={`absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out ${
+                        isVisible ? 'zoom-in-image' : ''
+                      }`}
                     />
                   </div>
                 </div>
@@ -172,10 +204,15 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                           <img
                             src={item.image}
                             alt={item.title}
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.035]"
+                            className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035] ${
+                              isVisible ? 'zoom-in-thumbnail' : ''
+                            }`}
+                            style={{ animationDelay: `${i * 150}ms` }}
                           />
                         ) : (
-                          <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-100" />
+                          <div className={`absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-100 transition-transform duration-700 ease-out ${
+                            isVisible ? 'zoom-in-thumbnail' : ''
+                          }`} style={{ animationDelay: `${i * 150}ms` }} />
                         )}
                       </div>
                     </div>

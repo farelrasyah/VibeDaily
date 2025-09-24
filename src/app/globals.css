@@ -755,3 +755,69 @@ html::-webkit-scrollbar {
   width: 60vw;
 }
 
+/* Zoom In Animation for Article Images - Smooth Center Spread */
+@keyframes zoomInImage {
+  0% {
+    transform: scale3d(0.3, 0.3, 1);
+    opacity: 0;
+    filter: blur(8px);
+  }
+  40% {
+    transform: scale3d(1.1, 1.1, 1);
+    opacity: 0.9;
+    filter: blur(1px);
+  }
+  70% {
+    transform: scale3d(0.98, 0.98, 1);
+    opacity: 0.98;
+    filter: blur(0px);
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes zoomInThumbnail {
+  0% {
+    transform: scale3d(0.4, 0.4, 1);
+    opacity: 0;
+    filter: blur(6px);
+  }
+  50% {
+    transform: scale3d(1.05, 1.05, 1);
+    opacity: 0.95;
+    filter: blur(0.5px);
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+.zoom-in-image {
+  animation: zoomInImage 3.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+  transform-origin: center center;
+  will-change: transform, opacity, filter;
+}
+
+.zoom-in-thumbnail {
+  animation: zoomInThumbnail 2.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+  transform-origin: center center;
+  will-change: transform, opacity, filter;
+}
+
+/* Responsive zoom animations for mobile/tablet */
+@media (max-width: 1023.98px) {
+  .zoom-in-image {
+    animation-duration: 2.8s;
+  }
+
+  .zoom-in-thumbnail {
+    animation-duration: 2s;
+  }
+}
