@@ -158,17 +158,17 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
           </article>
         </div>
 
-        {/* KANAN: 6 THUMBNAILS (3×2) dengan deskripsi - offset ke kanan agar tidak mengganggu featured */}
+        {/* KANAN: 6 THUMBNAILS (3×2) dengan deskripsi - layout stabil untuk zoom */}
         <div className="lg:col-span-2 relative">
           <div className="lg:pl-6 xl:pl-10 relative">
-            {/* On large screens, allow the thumbnails grid to overflow right and be wider than its column */}
-            <div className="relative lg:absolute lg:top-3 lg:right-0 lg:w-[180%] lg:translate-x-92 lg:scale-105 xl:w-[200%]">
-              <div className="grid grid-cols-3 gap-x-6 gap-y-14 lg:gap-y-[4.5rem]">
+            {/* Container dengan ukuran diperlebar untuk tampilan yang lebih besar */}
+            <div className="relative lg:static lg:w-[240%] xl:w-[260%]">
+              <div className="grid grid-cols-3 gap-x-8 gap-y-12 lg:gap-y-14">
               {smallItems.map((item, i) => (
                 <article key={`${item.id}-${i}`} className="group">
                   <a href={item.href} className="block">
-                    <div className="rounded-[18px] overflow-hidden bg-white/65 border border-white/35 backdrop-blur-xl shadow-[0_14px_40px_rgba(15,23,42,0.08)] hover:bg-white/75 transition-all duration-300 mb-4">
-                      <div className="relative w-full h-[86px] sm:h-[106px] lg:h-[134px] overflow-hidden">
+                    <div className="rounded-[24px] overflow-hidden bg-white/65 border border-white/35 backdrop-blur-xl shadow-[0_14px_40px_rgba(15,23,42,0.08)] hover:bg-white/75 transition-all duration-300 mb-4">
+                      <div className="relative w-full h-[100px] sm:h-[120px] lg:h-[150px] overflow-hidden">
                         {item.image ? (
                           <img
                             src={item.image}
@@ -182,19 +182,19 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                     </div>
 
                     <div className="px-3">
-                      <div className="mb-2 text-[12px] font-medium">
+                      <div className="mb-1 text-[13px] font-medium">
                         <span className="text-[#567FB0] font-semibold">{item.category}</span>
                         <span className="mx-2 text-slate-300">•</span>
                         <span className="text-slate-500">{item.time}</span>
                       </div>
 
-                      <h3 className="text-[18px] leading-[1.2] font-semibold text-slate-900 mb-2">
+                      <h3 className="text-[19px] leading-[1.2] font-semibold text-slate-900 mb-1">
                         {item.title}
                       </h3>
 
                         {/* show single hashtag like reference; fallback to category if no tags present */}
                         {(item.tags && item.tags.length > 0) || item.category ? (
-                          <div className="mt-1 text-sm text-slate-500">#{item.tags && item.tags.length > 0 ? item.tags[0] : item.category}</div>
+                          <div className="mt-0 text-[15px] text-slate-500">#{item.tags && item.tags.length > 0 ? item.tags[0] : item.category}</div>
                         ) : null}
                     </div>
                   </a>
@@ -205,29 +205,29 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
             {/* Nav arrows */}
             {totalSlides > 1 && (
               <div className="mt-6 flex items-center justify-center gap-3">
-                  <button
-                    aria-label="Previous"
-                    onClick={prev}
-                    className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${
-                      current === 0
-                        ? 'bg-white/90 border border-slate-200 text-slate-700 shadow-[0_6px_12px_rgba(15,23,42,0.06)] hover:bg-white'
-                        : 'bg-slate-900 text-white shadow-[0_6px_12px_rgba(15,23,42,0.18)] hover:bg-slate-800'
-                    }`}
-                  >
-                    <svg width="12" height="12" viewBox="0 0 12 12" className="mx-auto">
-                      <path d="M7.5 3.25L4.5 6L7.5 8.75" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                  <button
-                    aria-label="Next"
-                    onClick={next}
-                    className="w-10 h-10 rounded-full bg-slate-900 text-white shadow-[0_6px_12px_rgba(15,23,42,0.18)] hover:bg-slate-800 transition-all flex items-center justify-center"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 12 12" className="mx-auto">
-                      <path d="M4.5 3.25L7.5 6L4.5 8.75" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                </div>
+                <button
+                  aria-label="Previous"
+                  onClick={prev}
+                  className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${
+                    current === 0
+                      ? 'bg-white/90 border border-slate-200 text-slate-700 shadow-[0_6px_12px_rgba(15,23,42,0.06)] hover:bg-white'
+                      : 'bg-slate-900 text-white shadow-[0_6px_12px_rgba(15,23,42,0.18)] hover:bg-slate-800'
+                  }`}
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" className="mx-auto">
+                    <path d="M7.5 3.25L4.5 6L7.5 8.75" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  aria-label="Next"
+                  onClick={next}
+                  className="w-10 h-10 rounded-full bg-slate-900 text-white shadow-[0_6px_12px_rgba(15,23,42,0.18)] hover:bg-slate-800 transition-all flex items-center justify-center"
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" className="mx-auto">
+                    <path d="M4.5 3.25L7.5 6L4.5 8.75" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
             )}
           </div>
         </div>
