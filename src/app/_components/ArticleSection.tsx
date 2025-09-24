@@ -141,9 +141,9 @@ const ArticleSection: React.FC = () => {
         {/* Right grid: 2 columns with larger cards - expanded width */}
         <div className="lg:col-span-2 relative">
           <div className="lg:pl-6 xl:pl-10 relative">
-            {/* Allow the grid to overflow and be wider than its container */}
-            <div className="relative lg:absolute lg:-top-4 lg:right-0 lg:w-[240%] lg:translate-x-115">
-              <div className="grid grid-cols-2 gap-x-10 gap-y-0">
+            {/* Grid container dengan layout stabil untuk zoom - sejajar dengan featured card */}
+            <div className="relative lg:static lg:w-[260%] lg:-mt-6">
+              <div className="grid grid-cols-2 gap-x-12 gap-y-0">
                 {rightItems.map((article, idx) => (
                   <article key={idx} className="group">
                     <a href="#" className="block hover:opacity-80 transition-opacity">
