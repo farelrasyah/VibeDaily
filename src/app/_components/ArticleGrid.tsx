@@ -50,14 +50,14 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
     : []
 
   return (
-    <section className="mt-12 pt-6">
+    <section className="mt-8 pt-4 sm:mt-10 sm:pt-5 md:mt-12 md:pt-6">
       {/* Header atas: hanya View more (flag pindah ke dalam kartu) */}
     
 
-      {/* GRID: 3/5 Featured – 2/5 Thumbs */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 lg:gap-6">
-        {/* KIRI: FEATURED – nempel kiri viewport (tanpa sisa padding) */}
-        <div className="lg:col-span-3 bleed-left sm:bleed-left lg:bleed-left -ml-6 sm:-ml-8 lg:-ml-12">
+      {/* GRID: Mobile-first responsive grid */}
+      <div className="grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-5 lg:gap-6">
+        {/* KIRI: FEATURED – responsive margins */}
+        <div className="lg:col-span-3 -mx-4 sm:-mx-6 md:-mx-8 lg:bleed-left lg:sm:bleed-left lg:lg:bleed-left lg:-ml-12">
           <article className="group h-full">
             <a href={featured?.href || '#'} className="block h-full">
               <div
@@ -69,13 +69,13 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                 "
               >
                 {/* KONTEN ATAS */}
-                <div className="px-6 md:px-8 pl-12 md:pl-16 pt-6 md:pt-8 pb-5 md:pb-6">
+                <div className="px-4 pt-4 pb-3 sm:px-6 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5 lg:pl-12 lg:pt-6 lg:pb-5 xl:pl-16 xl:pt-8 xl:pb-6">
                   {/* Flag TRENDING NOW */}
-                  <div className="mb-4">
+                  <div className="mb-3 sm:mb-4">
                     <div className="flex items-center relative">
                       <div className="w-0.5 h-6 bg-violet-600 rounded-full z-10"></div>
                       <div className="relative -ml-0.5">
-                        <span className="text-sm font-semibold text-slate-800 uppercase tracking-wide pl-1">
+                        <span className="text-xs sm:text-sm font-semibold text-slate-800 uppercase tracking-wide pl-1">
                           TRENDING NOW
                         </span>
                         {/* Violet fade effect overlay starting from left */}
@@ -85,42 +85,42 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                   </div>
 
                   {/* Meta */}
-                  <div className="mb-3 text-[12px] font-medium">
+                  <div className="mb-2 sm:mb-3 text-[11px] sm:text-[12px] font-medium">
                     <span className="text-[#567FB0] font-semibold">E-commerce</span>
                     <span className="mx-2 text-slate-300">•</span>
                     <span className="text-slate-500">{featured?.time || 'a year ago'}</span>
                   </div>
 
                   {/* Judul */}
-                  <h3 className="text-[26px] leading-[1.06] font-semibold text-slate-900 max-w-[30ch]" style={{ fontFamily: "'Sequel Sans', sans-serif" }}>
+                  <h3 className="text-xl sm:text-2xl md:text-[26px] leading-[1.1] sm:leading-[1.06] font-semibold text-slate-900 max-w-[30ch]" style={{ fontFamily: "'Sequel Sans', sans-serif" }}>
                     {featured?.title}
                   </h3>
 
                   {/* Deskripsi */}
                   {featured?.description && (
-                    <p className="mt-4 text-[15px] leading-[1.6] text-slate-600 max-w-[65ch]">
+                    <p className="mt-3 sm:mt-4 text-sm sm:text-[15px] leading-[1.5] sm:leading-[1.6] text-slate-600 max-w-[65ch]">
                       {featured.description}
                     </p>
                   )}
 
                   {/* CTA segmented */}
-                  <div className="mt-6">
+                  <div className="mt-4 sm:mt-6">
                     <a
                       href={featured?.href || '#'}
                       className="
                         inline-flex items-center rounded-full bg-slate-900/90 text-white
-                        pl-4 pr-1 h-10 text-[14px] font-semibold
+                        pl-3 sm:pl-4 pr-1 h-9 sm:h-10 text-xs sm:text-[14px] font-semibold
                         hover:bg-slate-900 transition-colors
                       "
                     >
                       <span>Read article</span>
                       <span
                         className="
-                          ml-3 inline-flex items-center justify-center w-8 h-8 rounded-full
+                          ml-2 sm:ml-3 inline-flex items-center justify-center w-7 sm:w-8 h-7 sm:h-8 rounded-full
                           bg-white text-slate-900 shadow-[0_2px_8px_rgba(15,23,42,0.15)]
                         "
                       >
-                        <svg width="14" height="14" viewBox="0 0 14 14">
+                        <svg width="12" height="12" viewBox="0 0 14 14" className="sm:w-[14px] sm:h-[14px]">
                           <path d="M5.25 3.5L8.75 7L5.25 10.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </span>
@@ -132,11 +132,11 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                 <div className="h-px bg-slate-200/70" />
 
                 {/* GAMBAR BAWAH – dibentuk seperti referensi */}
-                <div className="px-5 md:px-8 pl-12 md:pl-16 pb-6 md:pb-8">
+                <div className="px-4 pb-4 sm:px-6 sm:pb-5 md:px-8 md:pb-6 lg:pl-12 lg:pb-6 xl:pl-16 xl:pb-8">
                   <div
                     className="
-                      relative h-[240px] md:h-[300px] lg:h-[340px]
-                      rounded-[22px] md:rounded-[24px] overflow-hidden
+                      relative h-[200px] sm:h-[240px] md:h-[280px] lg:h-[340px]
+                      rounded-[18px] sm:rounded-[22px] md:rounded-[24px] overflow-hidden
                       border border-white/55 bg-white/40 backdrop-blur-[2px]
                       shadow-[0_18px_50px_rgba(15,23,42,0.12)]
                     "
@@ -157,17 +157,17 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
           </article>
         </div>
 
-        {/* KANAN: 6 THUMBNAILS (3×2) dengan deskripsi - layout stabil untuk zoom */}
+        {/* KANAN: THUMBNAILS - responsive grid layout */}
         <div className="lg:col-span-2 relative">
           <div className="lg:pl-6 xl:pl-10 relative">
-            {/* Container dengan ukuran diperlebar untuk tampilan yang lebih besar */}
+            {/* Container dengan ukuran responsif */}
             <div className="relative lg:static lg:w-[220%] xl:w-[240%]">
-              <div className="grid grid-cols-3 gap-x-8 gap-y-12 lg:gap-y-14">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-8 sm:gap-y-10 md:gap-y-12 lg:gap-y-14">
               {smallItems.map((item, i) => (
                 <article key={`${item.id}-${i}`} className="group">
                   <a href={item.href} className="block">
-                    <div className="rounded-[24px] overflow-hidden bg-white/65 border border-white/35 backdrop-blur-xl shadow-[0_14px_40px_rgba(15,23,42,0.08)] hover:bg-white/75 transition-all duration-300 mb-4">
-                      <div className="relative w-full h-[100px] sm:h-[120px] lg:h-[150px] overflow-hidden">
+                    <div className="rounded-[20px] sm:rounded-[24px] overflow-hidden bg-white/65 border border-white/35 backdrop-blur-xl shadow-[0_14px_40px_rgba(15,23,42,0.08)] hover:bg-white/75 transition-all duration-300 mb-3 sm:mb-4">
+                      <div className="relative w-full h-[120px] sm:h-[140px] md:h-[120px] lg:h-[150px] overflow-hidden">
                         {item.image ? (
                           <img
                             src={item.image}
@@ -180,20 +180,20 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                       </div>
                     </div>
 
-                    <div className="px-3">
-                      <div className="mb-1 text-[13px] font-medium">
+                    <div className="px-2 sm:px-3">
+                      <div className="mb-1 text-[11px] sm:text-[13px] font-medium">
                         <span className="text-[#567FB0] font-semibold">{item.category}</span>
                         <span className="mx-2 text-slate-300">•</span>
                         <span className="text-slate-500">{item.time}</span>
                       </div>
 
-                      <h3 className="text-[19px] leading-[1.2] font-semibold text-slate-900 mb-1">
+                      <h3 className="text-base sm:text-lg md:text-[19px] leading-[1.2] font-semibold text-slate-900 mb-1">
                         {item.title}
                       </h3>
 
                         {/* show single hashtag like reference; fallback to category if no tags present */}
                         {(item.tags && item.tags.length > 0) || item.category ? (
-                          <div className="mt-0 text-[15px] text-slate-500">#{item.tags && item.tags.length > 0 ? item.tags[0] : item.category}</div>
+                          <div className="mt-0 text-sm sm:text-[15px] text-slate-500">#{item.tags && item.tags.length > 0 ? item.tags[0] : item.category}</div>
                         ) : null}
                     </div>
                   </a>
@@ -203,26 +203,26 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
 
             {/* Nav arrows */}
             {totalSlides > 1 && (
-              <div className="mt-6 flex items-center justify-center gap-3">
+              <div className="mt-4 sm:mt-6 flex items-center justify-center gap-2 sm:gap-3">
                 <button
                   aria-label="Previous"
                   onClick={prev}
-                  className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${
+                  className={`w-8 sm:w-10 h-8 sm:h-10 rounded-full transition-all flex items-center justify-center ${
                     current === 0
                       ? 'bg-white/90 border border-slate-200 text-slate-700 shadow-[0_6px_12px_rgba(15,23,42,0.06)] hover:bg-white'
                       : 'bg-slate-900 text-white shadow-[0_6px_12px_rgba(15,23,42,0.18)] hover:bg-slate-800'
                   }`}
                 >
-                  <svg width="12" height="12" viewBox="0 0 12 12" className="mx-auto">
+                  <svg width="10" height="10" viewBox="0 0 12 12" className="sm:w-3 sm:h-3 mx-auto">
                     <path d="M7.5 3.25L4.5 6L7.5 8.75" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </button>
                 <button
                   aria-label="Next"
                   onClick={next}
-                  className="w-10 h-10 rounded-full bg-slate-900 text-white shadow-[0_6px_12px_rgba(15,23,42,0.18)] hover:bg-slate-800 transition-all flex items-center justify-center"
+                  className="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-slate-900 text-white shadow-[0_6px_12px_rgba(15,23,42,0.18)] hover:bg-slate-800 transition-all flex items-center justify-center"
                 >
-                  <svg width="12" height="12" viewBox="0 0 12 12" className="mx-auto">
+                  <svg width="10" height="10" viewBox="0 0 12 12" className="sm:w-3 sm:h-3 mx-auto">
                     <path d="M4.5 3.25L7.5 6L4.5 8.75" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </button>

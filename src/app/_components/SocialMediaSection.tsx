@@ -26,58 +26,58 @@ function InstaCard({ img, blueBar = false, className = "" }: CardProps) {
   return (
     <div
       className={[
-        "group relative w-[390px] h-[570px] rounded-[28px]",
+        "group relative w-[280px] sm:w-[320px] md:w-[360px] lg:w-[390px] h-[420px] sm:h-[480px] md:h-[520px] lg:h-[570px] rounded-[24px] sm:rounded-[28px]",
         "bg-white/10 backdrop-blur-xl border border-white/20",
         "shadow-[0_28px_110px_-14px_rgba(0,0,0,0.28)]",
         "overflow-hidden",
         className,
       ].join(" ")}
     >
-      {/* Header */}
-      <div className="h-[72px] px-5 flex items-center justify-between bg-white/15 backdrop-blur-md border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="p-[3px] rounded-full bg-gradient-to-tr from-rose-400/80 via-purple-500/80 to-blue-500/80">
-            <div className="p-[3px] bg-white/90 rounded-full">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-500 to-blue-600 grid place-items-center">
-                <span className="text-white font-bold text-[12px]">V</span>
+      {/* Header - responsive */}
+      <div className="h-[60px] sm:h-[68px] md:h-[72px] px-4 sm:px-5 flex items-center justify-between bg-white/15 backdrop-blur-md border-b border-white/10">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="p-[2px] sm:p-[3px] rounded-full bg-gradient-to-tr from-rose-400/80 via-purple-500/80 to-blue-500/80">
+            <div className="p-[2px] sm:p-[3px] bg-white/90 rounded-full">
+              <div className="w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 rounded-full bg-gradient-to-tr from-rose-500 to-blue-600 grid place-items-center">
+                <span className="text-white font-bold text-[10px] sm:text-[11px] md:text-[12px]">V</span>
               </div>
             </div>
           </div>
-          <span className="text-[12px] font-semibold text-white/90 bg-white/10 px-3 py-1.5 rounded-lg border border-white/15">
+          <span className="text-[10px] sm:text-[11px] md:text-[12px] font-semibold text-white/90 bg-white/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-white/15">
             VibeDaily
           </span>
         </div>
-        <svg className="w-5 h-5 text-white/80" viewBox="0 0 20 20" fill="currentColor">
+        <svg className="w-4 sm:w-5 h-4 sm:h-5 text-white/80" viewBox="0 0 20 20" fill="currentColor">
           <path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z" />
         </svg>
       </div>
 
-      {/* Media */}
-      <div className="relative h-[336px] overflow-hidden">
+      {/* Media - responsive */}
+      <div className="relative h-[240px] sm:h-[280px] md:h-[320px] lg:h-[336px] overflow-hidden">
         <img
           src={img}
           alt=""
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 ring-1 ring-white/10 pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black/35 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 sm:h-28 md:h-32 lg:h-36 bg-gradient-to-t from-black/35 to-transparent" />
       </div>
-      {/* Footer – opaque agar tidak tembus */}
+      {/* Footer – responsive */}
       <div
         className={[
-          "h-[92px] border-t border-white/10 flex items-center justify-between px-5",
+          "h-[70px] sm:h-[80px] md:h-[88px] lg:h-[92px] border-t border-white/10 flex items-center justify-between px-4 sm:px-5",
           blueBar ? "bg-gradient-to-r from-blue-500/35 to-purple-600/35" : "bg-white/25",
           "backdrop-blur-md",
         ].join(" ")}
       >
-        <div className="flex items-center gap-6">
-          <svg viewBox="0 0 24 24" className="w-6 h-6 text-rose-500 fill-current">
+        <div className="flex items-center gap-4 sm:gap-5 md:gap-6">
+          <svg viewBox="0 0 24 24" className="w-5 sm:w-6 h-5 sm:h-6 text-rose-500 fill-current">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
           </svg>
-          <svg className="w-6 h-6 text-white/85" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg className="w-5 sm:w-6 h-5 sm:h-6 text-white/85" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.118 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.118-8 9-8s9 3.582 9 8z" />
           </svg>
-          <svg className="w-6 h-6 text-white/85" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg className="w-5 sm:w-6 h-5 sm:h-6 text-white/85" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
           </svg>
         </div>
@@ -90,9 +90,9 @@ function InstaCard({ img, blueBar = false, className = "" }: CardProps) {
 }
 const SocialMediaSection: React.FC = () => {
   return (
-    <section className="relative w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      {/* Glass container */}
-      <div className="relative mx-auto w-full max-w-[1280px] overflow-hidden rounded-[32px] md:rounded-[40px] xl:rounded-[48px] border border-white/15 bg-white/[0.06] backdrop-blur-xl shadow-[0_40px_140px_-30px_rgba(0,0,0,0.5)]">
+    <section className="relative w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
+      {/* Glass container - responsive */}
+      <div className="relative mx-auto w-full max-w-[1280px] overflow-hidden rounded-[24px] sm:rounded-[28px] md:rounded-[32px] lg:rounded-[40px] xl:rounded-[48px] border border-white/15 bg-white/[0.06] backdrop-blur-xl shadow-[0_40px_140px_-30px_rgba(0,0,0,0.5)]">
         {/* Background layers */}
         <div className="absolute inset-0 -z-10">
           <img src={BG_URL} alt="Background" className="w-full h-full object-cover scale-110 blur-[2px]" />

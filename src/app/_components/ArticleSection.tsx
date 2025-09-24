@@ -77,13 +77,13 @@ const ArticleSection: React.FC = () => {
   const rightItems = articles.slice(1, 7);
 
   return (
-    <section className="w-full mx-auto max-w-[1200px] px-6 py-16 relative">
-      {/* Flag "NEWS UPDATE" */}
-      <div className="absolute -top-8 left-0 mb-8 mt-2">
+    <section className="w-full mx-auto max-w-[1200px] px-4 sm:px-6 py-8 sm:py-12 md:py-16 relative">
+      {/* Flag "NEWS UPDATE" - responsive */}
+      <div className="absolute -top-6 sm:-top-7 md:-top-8 left-0 mb-6 sm:mb-7 md:mb-8 mt-2">
         <div className="flex items-center relative">
-          <div className="w-0.5 h-6 bg-violet-600 rounded-full z-10"></div>
+          <div className="w-0.5 h-5 sm:h-6 bg-violet-600 rounded-full z-10"></div>
           <div className="relative -ml-0.5">
-            <span className="text-sm font-semibold text-gray-800 uppercase tracking-wide pl-1">
+            <span className="text-xs sm:text-sm font-semibold text-gray-800 uppercase tracking-wide pl-1">
               NEWS UPDATE
             </span>
             {/* Violet fade effect overlay starting from left */}
@@ -92,12 +92,12 @@ const ArticleSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Header with View more button */}
-<div className="mb-8 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
-  <div className="flex justify-end pr-4">
+      {/* Header with View more button - responsive */}
+<div className="mb-6 sm:mb-7 md:mb-8 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+  <div className="flex justify-end pr-2 sm:pr-4">
     <button
       type="button"
-      className="inline-flex items-center gap-2 text-base font-bold text-black hover:text-gray-700 transition-colors"
+      className="inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base font-bold text-black hover:text-gray-700 transition-colors"
     >
       View more →
     </button>
@@ -106,11 +106,11 @@ const ArticleSection: React.FC = () => {
 
 
 
-      {/* Main grid layout like ArticleGrid */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 lg:gap-4">
-        {/* Featured article: span 3.2 columns (slightly wider) */}
-        <div className="lg:col-span-3 lg:-ml-8">
-          <div className="relative rounded-3xl overflow-hidden h-[260px] lg:h-[500px]">
+      {/* Main grid layout - mobile first responsive */}
+      <div className="grid grid-cols-1 gap-6 md:gap-5 lg:grid-cols-5 lg:gap-4">
+        {/* Featured article - responsive sizing */}
+        <div className="lg:col-span-3 -mx-4 sm:-mx-6 lg:-ml-8">
+          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden h-[240px] sm:h-[320px] md:h-[380px] lg:h-[500px]">
             {/* Background image */}
             <img
               src={articles[0].image}
@@ -138,29 +138,29 @@ const ArticleSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Right grid: 2 columns with larger cards - expanded width */}
+        {/* Right grid - responsive layout */}
         <div className="lg:col-span-2 relative">
           <div className="lg:pl-6 xl:pl-10 relative">
-            {/* Grid container dengan layout stabil untuk zoom - sejajar dengan featured card */}
+            {/* Grid container - responsive for mobile/tablet */}
             <div className="relative lg:static lg:w-[260%] lg:-mt-6">
-              <div className="grid grid-cols-2 gap-x-12 gap-y-0">
+              <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 md:gap-x-8 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-0">
                 {rightItems.map((article, idx) => (
                   <article key={idx} className="group">
                     <a href="#" className="block hover:opacity-80 transition-opacity">
-                      <div className="grid grid-cols-[1fr_90px] gap-5 py-6 px-0 min-h-[140px]">
-                        {/* Text content on the left - takes more space */}
-                        <div className="flex flex-col justify-start min-w-0 pr-2">
-                          <div className="mb-2 font-medium" style={{fontSize: '12px'}}>
-                            <span className="text-[#567FB0] font-semibold" style={{fontSize: '12px'}}>{article.category}</span>
-                            <span className="mx-2 text-slate-400" style={{fontSize: '12px'}}>•</span>
-                            <span className="text-slate-500" style={{fontSize: '12px'}}>{article.time}</span>
+                      <div className="grid grid-cols-[1fr_70px] sm:grid-cols-[1fr_80px] lg:grid-cols-[1fr_90px] gap-3 sm:gap-4 lg:gap-5 py-4 sm:py-5 lg:py-6 px-0 min-h-[120px] sm:min-h-[130px] lg:min-h-[140px]">
+                        {/* Text content on the left - responsive */}
+                        <div className="flex flex-col justify-start min-w-0 pr-1 sm:pr-2">
+                          <div className="mb-1.5 sm:mb-2 font-medium text-[11px] sm:text-[12px]">
+                            <span className="text-[#567FB0] font-semibold">{article.category}</span>
+                            <span className="mx-1.5 sm:mx-2 text-slate-400">•</span>
+                            <span className="text-slate-500">{article.time}</span>
                           </div>
 
-                          <h3 className="font-bold text-slate-900 mb-3 leading-tight line-clamp-3" style={{fontSize: '18px'}}>
+                          <h3 className="font-bold text-slate-900 mb-2 sm:mb-3 leading-tight line-clamp-3 text-base sm:text-lg lg:text-[18px]">
                             {article.title}
                           </h3>
 
-                          <div className="text-slate-500 mt-auto" style={{fontSize: '14px'}}>
+                          <div className="text-slate-500 mt-auto text-xs sm:text-sm lg:text-[14px]">
                             {article.tags && article.tags.length > 0 ? (
                               <>#{article.tags[0]}</>
                             ) : (
@@ -169,8 +169,8 @@ const ArticleSection: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Image on the right - fixed size */}
-                        <div className="w-[81px] h-[81px] rounded-xl overflow-hidden flex-shrink-0">
+                        {/* Image on the right - responsive sizing */}
+                        <div className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] lg:w-[81px] lg:h-[81px] rounded-lg sm:rounded-xl overflow-hidden flex-shrink-0">
                           <img
                             src={article.image}
                             alt={article.title}
@@ -178,9 +178,9 @@ const ArticleSection: React.FC = () => {
                           />
                         </div>
                       </div>
-                      {/* Separator line - subtle but visible */}
+                      {/* Separator line - responsive and only for large screens */}
                       {idx < rightItems.length - 1 && (
-                        <hr className="border-0 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent mx-4 my-0" />
+                        <hr className="hidden lg:block border-0 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent mx-4 my-0" />
                       )}
                     </a>
                   </article>

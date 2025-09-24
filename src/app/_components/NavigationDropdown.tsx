@@ -22,7 +22,7 @@ export default function NavigationDropdown({
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
 
   return (
-    <nav className="flex gap-3" style={{ overflow: 'visible' }}>
+    <nav className="flex flex-wrap gap-2 sm:gap-3 justify-center sm:justify-start" style={{ overflow: 'visible' }}>
       {items.map((item, index) => (
         <div
           key={index}
@@ -37,14 +37,14 @@ export default function NavigationDropdown({
             setHoveredItem(null)
           }}
         >
-          {/* Main Navigation Button - Enhanced Hover */}
+          {/* Main Navigation Button - Enhanced Hover + Responsive */}
           <button
             onClick={() => {
               console.log(`🎯 CLICKED: ${item.label}`)
               onItemClick?.(item)
             }}
             className={`
-              flex items-center gap-2 px-4 py-2 rounded-full
+              flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full
               border transition-all duration-500
               ${item.active 
                 ? 'bg-white/45 border-white/35 shadow-lg' 
@@ -53,7 +53,7 @@ export default function NavigationDropdown({
             `}
             style={{
               fontFamily: 'Sequel Sans, sans-serif',
-              fontSize: '14px',
+              fontSize: 'clamp(12px, 3vw, 14px)',
               fontWeight: '700', // Bold
               color: '#000000', // Hitam pekat
               transform: hoveredItem === item.label ? 'translateY(-1px)' : 'translateY(0px)',
@@ -66,18 +66,18 @@ export default function NavigationDropdown({
             }}
           >
             {item.active && (
-              <span className="w-1.5 h-1.5 bg-black rounded-full"></span>
+              <span className="w-1 sm:w-1.5 h-1 sm:h-1.5 bg-black rounded-full"></span>
             )}
             <span style={{ 
               fontFamily: 'Sequel Sans, sans-serif', 
-              fontSize: '14px', 
+              fontSize: 'clamp(12px, 3vw, 14px)', 
               fontWeight: '700', // Bold
               color: '#000000' 
             }}>
               {item.label}
             </span>
             <svg 
-              className="w-3.5 h-3.5" 
+              className="w-3 sm:w-3.5 h-3 sm:h-3.5" 
               fill="none" 
               stroke="#000000" 
               viewBox="0 0 24 24"
@@ -91,9 +91,9 @@ export default function NavigationDropdown({
             </svg>
           </button>
 
-          {/* Dropdown Menu - ENHANCED SMOOTH ANIMATIONS */}
+          {/* Dropdown Menu - ENHANCED SMOOTH ANIMATIONS + Mobile Responsive */}
           <div
-            className="absolute left-0 w-52 bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
+            className="absolute left-0 w-48 sm:w-52 bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
             style={{
               top: 'calc(100% + 12px)',
               background: 'rgba(255, 255, 255, 0.96)',

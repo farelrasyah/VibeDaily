@@ -306,6 +306,82 @@ html::-webkit-scrollbar {
 .ticker-card { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 .ticker-fade { background: linear-gradient(90deg, transparent 0%, #EEF2FF 100%); }
 
+/* ===== RESPONSIVE OPTIMIZATIONS (MOBILE & TABLET ONLY) ===== */
+/* Mobile-first responsive breakpoints: max-width 1023.98px */
+
+@media (max-width: 1023.98px) {
+  /* Container responsif untuk mobile/tablet */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  /* Hero title responsif */
+  .hero-title {
+    font-size: clamp(2rem, 8vw, 4rem) !important;
+    line-height: 0.9 !important;
+  }
+
+  /* Hero description responsif */
+  .hero-description {
+    font-size: clamp(0.875rem, 3.5vw, 1.125rem) !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Meta text responsif */
+  .meta {
+    font-size: clamp(0.75rem, 3vw, 0.875rem) !important;
+  }
+
+  /* Hero category responsif */
+  .hero-category {
+    font-size: clamp(0.75rem, 3vw, 0.875rem) !important;
+  }
+
+  /* Pill button responsif */
+  .pill {
+    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 4vw, 1.25rem) !important;
+    font-size: clamp(0.875rem, 3.5vw, 1rem) !important;
+  }
+
+  /* Glass card spacing responsif */
+  .glass-card {
+    padding: clamp(1rem, 4vw, 1.5rem) !important;
+    border-radius: clamp(1rem, 4vw, 1.5rem) !important;
+  }
+
+  /* Featured card responsive */
+  .featured-card {
+    border-radius: clamp(1.25rem, 5vw, 1.75rem) !important;
+    padding: clamp(1rem, 4vw, 1.5rem) !important;
+  }
+
+  /* Media item responsive */
+  .media-item {
+    padding: clamp(0.75rem, 3vw, 1.25rem) !important;
+    border-radius: clamp(0.75rem, 3vw, 1.25rem) !important;
+  }
+
+  /* Section badge responsive */
+  .section-badge {
+    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 4vw, 1.5rem) !important;
+    font-size: clamp(0.75rem, 3vw, 0.875rem) !important;
+  }
+
+  /* Search glass responsive */
+  .search-glass {
+    padding: clamp(0.5rem, 2vw, 0.75rem) !important;
+    border-radius: clamp(0.75rem, 3vw, 1rem) !important;
+  }
+}
+
 /* Search Bar Container - Pixel Perfect Match */
 .search-bar-container {
   margin-bottom: 0.75rem;

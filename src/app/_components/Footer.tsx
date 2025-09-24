@@ -14,32 +14,32 @@ const Footer = () => {
   };
   return (
     <footer className="text-white">
-      {/* ================= HEADER PUTIH (FULL WIDTH) ================= */}
+      {/* ================= HEADER PUTIH (FULL WIDTH) - responsive ================= */}
       <div className="bg-white w-full">
         <div
-          className="mx-auto max-w-[1180px] grid grid-cols-[96px_1fr_96px] items-center gap-4 sm:gap-8 px-6 sm:px-8 lg:px-12 py-10 sm:py-14 lg:py-16"
+          className="mx-auto max-w-[1180px] grid grid-cols-1 sm:grid-cols-[80px_1fr_80px] md:grid-cols-[96px_1fr_96px] items-center gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-10 md:py-14 lg:py-16"
         >
-          {/* KOL 1: label kecil */}
-          <div className="text-[10px] tracking-[0.18em] text-neutral-500 font-semibold leading-4">
+          {/* KOL 1: label kecil - responsive */}
+          <div className="text-[9px] sm:text-[10px] tracking-[0.16em] sm:tracking-[0.18em] text-neutral-500 font-semibold leading-4 text-center sm:text-left">
             HEARD<br />ENOUGH? →
           </div>
 
-          {/* KOL 2: judul + underline */}
-          <div className="min-w-0">
-            <h2 className="text-[40px] sm:text-[56px] lg:text-[80px] font-semibold leading-[0.95] text-neutral-900">
+          {/* KOL 2: judul + underline - responsive */}
+          <div className="min-w-0 text-center sm:text-left">
+            <h2 className="text-[32px] sm:text-[40px] md:text-[56px] lg:text-[80px] font-semibold leading-[0.95] text-neutral-900">
               Contact us
             </h2>
-            <span className="block mt-3 h-[6px] w-40 sm:w-48 bg-violet-200 rounded-full" />
+            <span className="block mt-2 sm:mt-3 h-[4px] sm:h-[5px] md:h-[6px] w-32 sm:w-40 md:w-48 bg-violet-200 rounded-full mx-auto sm:mx-0" />
           </div>
 
-          {/* KOL 3: tombol bulat kanan */}
-          <div className="flex justify-end">
+          {/* KOL 3: tombol bulat kanan - responsive */}
+          <div className="flex justify-center sm:justify-end">
             <button
               onClick={handleContactClick}
               aria-label="Open contact modal"
               className="
                 group
-                w-12 h-12 sm:w-16 sm:h-16
+                w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16
                 rounded-full bg-violet-200 text-neutral-900
                 flex items-center justify-center
                 transition-all duration-300 ease-in-out
@@ -47,7 +47,7 @@ const Footer = () => {
               "
             >
               <svg
-                className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-200"
+                className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-transform duration-200"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -63,20 +63,20 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* ================ PANEL GELAP (FULL WIDTH) ================ */}
+      {/* ================ PANEL GELAP (FULL WIDTH) - responsive ================ */}
       <div className="bg-slate-900 [background:linear-gradient(135deg,#1e293b_0%,#334155_55%,#475569_100%)] w-full backdrop-blur-sm">
-        <div className="mx-auto max-w-[1180px] px-6 sm:px-8 lg:px-12 py-12 lg:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-10 items-start text-left align-top">
-            {/* Brand besar */}
-            <div className="min-w-0">
-              <h3 className="text-[26px] sm:text-[34px] font-bold leading-[1.03] tracking-tight text-left mb-8 lg:mb-0">
-                The agency for impatient brands<span className="align-super text-base">®</span>
+        <div className="mx-auto max-w-[1180px] px-4 sm:px-6 md:px-8 lg:px-12 py-10 sm:py-12 lg:py-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 items-start text-left align-top">
+            {/* Brand besar - responsive */}
+            <div className="min-w-0 sm:col-span-2 lg:col-span-1">
+              <h3 className="text-[22px] sm:text-[26px] md:text-[30px] lg:text-[34px] font-bold leading-[1.03] tracking-tight text-left mb-6 sm:mb-8 lg:mb-0">
+                The agency for impatient brands<span className="align-super text-sm sm:text-base">®</span>
               </h3>
             </div>
 
-            {/* Editorial Team */}
+            {/* Editorial Team - responsive */}
             <div id="contact" className="min-w-0">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-white/80 font-semibold mb-2">
+              <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.14em] sm:tracking-[0.16em] text-white/80 font-semibold mb-2">
                 Editorial Team
               </p>
               <div className="space-y-1 text-white/90 text-left">

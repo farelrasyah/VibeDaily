@@ -149,7 +149,7 @@ export default function Home() {
             </div>
           </header>
 
-          {/* Main two-column layout */}
+          {/* Main two-column layout - responsive with proper ordering */}
           <main className="flex flex-col xl:flex-row gap-6 sm:gap-8 xl:items-start">
             <div className="flex-1 min-w-0">
               <Hero {...heroData} />
@@ -162,11 +162,13 @@ export default function Home() {
               {/* Social Media Section moved outside the centered max-w container so it can span the page */}
             </div>
 
-            <aside className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px]">
-              <SearchRecommendCard
-                items={recommendedItems}
-                onSearch={(query: string) => console.log('Search:', query)}
-              />
+            <aside className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px] order-last xl:order-none">
+              <div className="sticky top-4 xl:top-20">
+                <SearchRecommendCard
+                  items={recommendedItems}
+                  onSearch={(query: string) => console.log('Search:', query)}
+                />
+              </div>
             </aside>
           </main>
         </div>

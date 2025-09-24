@@ -50,18 +50,18 @@ export default function SearchRecommendCard({
   }
 
   return (
-    <div className="w-full space-y-3">
-      {/* Search Section - Separated */}
+    <div className="w-full space-y-2 sm:space-y-3">
+      {/* Search Section - Separated + Responsive */}
       <div className="search-bar-container">
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
           {showLanguageSelector && (
-            <div className="relative">
+            <div className="relative order-2 sm:order-1">
               <button 
-                className="language-selector-pill"
+                className="language-selector-pill w-full sm:w-auto justify-center sm:justify-start"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
                 {selectedLanguage}
-                <ChevronDown className="w-4 h-4 opacity-60" />
+                <ChevronDown className="w-3 sm:w-4 h-3 sm:h-4 opacity-60" />
               </button>
               
               {isDropdownOpen && (
@@ -83,19 +83,19 @@ export default function SearchRecommendCard({
             </div>
           )}
           
-          <div className="search-input-pill">
+          <div className="search-input-pill flex-1 order-1 sm:order-2">
             <input 
               className="search-input-field"
               placeholder={placeholder}
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
             />
-            <Search className="search-input-icon" />
+            <Search className="search-input-icon w-4 sm:w-5 h-4 sm:h-5" />
           </div>
         </div>
       </div>
 
-      {/* Recommended Card - Separated */}
+      {/* Recommended Card - Separated + Responsive */}
       <div className="recommended-card">
         {/* Header */}
         <div className="recommended-header">
@@ -105,10 +105,10 @@ export default function SearchRecommendCard({
           </a>
         </div>
 
-        {/* Featured Article */}
+        {/* Featured Article - Responsive */}
         {featuredItem && (
           <a href={featuredItem.href} className="featured-card">
-            <div className="featured-image-wrapper">
+            <div className="featured-image-wrapper h-40 sm:h-48 md:h-56">
               <Image
                 src={featuredItem.thumb}
                 alt={featuredItem.title}
@@ -117,8 +117,8 @@ export default function SearchRecommendCard({
               />
               <div className="featured-gradient"></div>
               <div className="featured-text">
-                <p className="featured-category">{featuredItem.meta}</p>
-                <h4 className="featured-headline">
+                <p className="featured-category text-xs sm:text-sm">{featuredItem.meta}</p>
+                <h4 className="featured-headline text-sm sm:text-base md:text-lg">
                   {featuredItem.title}
                 </h4>
               </div>
@@ -126,21 +126,21 @@ export default function SearchRecommendCard({
           </a>
         )}
 
-        {/* Article List */}
-        <div className="article-list">
+        {/* Article List - Responsive */}
+        <div className="article-list space-y-3 sm:space-y-4">
           {regularItems.map((item, index) => (
             <a
               key={index}
               href={item.href}
-              className="article-list-item"
+              className="article-list-item p-3 sm:p-4"
             >
-              <div className="article-text">
-                <p className="article-category">{item.meta}</p>
-                <h5 className="article-headline">
+              <div className="article-text flex-1">
+                <p className="article-category text-xs sm:text-sm">{item.meta}</p>
+                <h5 className="article-headline text-sm sm:text-base">
                   {item.title}
                 </h5>
               </div>
-              <div className="article-thumbnail">
+              <div className="article-thumbnail w-12 h-12 sm:w-16 sm:h-16">
                 <Image
                   src={item.thumb}
                   alt={item.title}
