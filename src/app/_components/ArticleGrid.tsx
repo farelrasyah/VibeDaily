@@ -2,7 +2,6 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import NewsSlide from './NewsSlide';
 
 interface ArticleGridItem {
   id: string

@@ -17,7 +17,7 @@ export default function Hero({
   category,
   time,
   title,
-  tags,
+  tags: _tags,
   ctaText = 'Read article',
   onCta,
   orb = true,

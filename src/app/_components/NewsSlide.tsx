@@ -138,9 +138,9 @@ export default function NewsSlide() {
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
           }}
-          onWheelCapture={(e) => {
-            if (Math.abs((e as any).deltaX) < Math.abs((e as any).deltaY)) {
-              (e.currentTarget as HTMLDivElement).scrollLeft += (e as any).deltaY;
+          onWheelCapture={(e: React.WheelEvent<HTMLDivElement>) => {
+            if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) {
+              (e.currentTarget as HTMLDivElement).scrollLeft += e.deltaY;
               e.preventDefault();
             }
           }}
