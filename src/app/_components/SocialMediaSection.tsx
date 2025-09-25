@@ -1,5 +1,5 @@
 // SocialMediaSection.tsx
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 /**
  * SocialMediaSection
  * - IG cards sama seperti sebelumnya
@@ -20,9 +20,11 @@ type CardProps = {
   img: string;
   blueBar?: boolean;
   className?: string;
+  isVisible?: boolean;
+  index?: number;
 };
 
-function InstaCard({ img, blueBar = false, className = "" }: CardProps) {
+function InstaCard({ img, blueBar = false, className = "", isVisible = false, index = 0 }: CardProps) {
   return (
     <div
       className={[
@@ -57,7 +59,8 @@ function InstaCard({ img, blueBar = false, className = "" }: CardProps) {
         <img
           src={img}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 ${isVisible ? 'zoom-in-thumbnail' : ''}`}
+          style={{ animationDelay: `${index * 200}ms` }}
         />
         <div className="absolute inset-0 ring-1 ring-white/10 pointer-events-none" />
         <div className="absolute inset-x-0 bottom-0 h-24 sm:h-28 md:h-32 lg:h-36 bg-gradient-to-t from-black/35 to-transparent" />
@@ -89,13 +92,40 @@ function InstaCard({ img, blueBar = false, className = "" }: CardProps) {
   );
 }
 const SocialMediaSection: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      {
+        threshold: 0.1, // Trigger when 10% of the section is visible
+        rootMargin: '0px 0px -100px 0px' // Trigger slightly before fully visible
+      }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current)
+      }
+    }
+  }, [])
+
   return (
-    <section className="relative w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
+    <section ref={sectionRef} className="relative w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
       {/* Glass container - responsive */}
       <div className="relative mx-auto w-full max-w-[1280px] overflow-hidden rounded-[24px] sm:rounded-[28px] md:rounded-[32px] lg:rounded-[40px] xl:rounded-[48px] border border-white/15 bg-white/[0.06] backdrop-blur-xl shadow-[0_40px_140px_-30px_rgba(0,0,0,0.5)]">
         {/* Background layers */}
         <div className="absolute inset-0 -z-10">
-          <img src={BG_URL} alt="Background" className="w-full h-full object-cover scale-110 blur-[2px]" />
+          <img src={BG_URL} alt="Background" className={`w-full h-full object-cover scale-110 blur-[2px] transition-transform duration-1000 ease-out ${isVisible ? 'zoom-in-image' : ''}`} />
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-purple-800/30 to-rose-700/40" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
           <div className="absolute inset-0 ring-1 ring-white/10 rounded-[inherit] pointer-events-none" />
@@ -159,9 +189,9 @@ const SocialMediaSection: React.FC = () => {
           <div className="grid grid-cols-1 gap-y-10">
             {/* Instagram Cards */}
             <div className="flex justify-center items-center">
-              <InstaCard img={IMAGES[0]} className="scale-90 -ml-4 z-10" />
-              <InstaCard img={IMAGES[1]} className="z-20" />
-              <InstaCard img={IMAGES[2]} className="scale-90 -mr-4 z-10" />
+              <InstaCard img={IMAGES[0]} className="scale-90 -ml-4 z-10" isVisible={isVisible} index={0} />
+              <InstaCard img={IMAGES[1]} className="z-20" isVisible={isVisible} index={1} />
+              <InstaCard img={IMAGES[2]} className="scale-90 -mr-4 z-10" isVisible={isVisible} index={2} />
             </div>
           </div>
         </div>

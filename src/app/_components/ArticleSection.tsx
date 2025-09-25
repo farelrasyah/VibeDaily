@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
+import Link from "next/link";
 
 
 // Dummy data with random images from picsum.photos
@@ -73,11 +74,38 @@ const articles = [
 ];
 
 const ArticleSection: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      {
+        threshold: 0.1, // Trigger when 10% of the section is visible
+        rootMargin: '0px 0px -100px 0px' // Trigger slightly before fully visible
+      }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current)
+      }
+    }
+  }, [])
+
   // Right items (6 articles) — take from index 1..6
   const rightItems = articles.slice(1, 7);
 
   return (
-    <section className="w-full mx-auto max-w-[1200px] px-4 sm:px-6 py-8 sm:py-12 md:py-16 relative">
+    <section ref={sectionRef} className="w-full mx-auto max-w-[1200px] px-4 sm:px-6 py-8 sm:py-12 md:py-16 relative">
       {/* Flag "NEWS UPDATE" - responsive */}
       <div className="absolute -top-6 sm:-top-7 md:-top-8 left-0 mb-6 sm:mb-7 md:mb-8 mt-2">
         <div className="flex items-center relative">
@@ -110,12 +138,13 @@ const ArticleSection: React.FC = () => {
       <div className="grid grid-cols-1 gap-6 md:gap-5 lg:grid-cols-5 lg:gap-4">
         {/* Featured article - responsive sizing */}
         <div className="lg:col-span-3 -mx-4 sm:-mx-6 lg:-ml-8">
-          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden h-[240px] sm:h-[320px] md:h-[380px] lg:h-[500px]">
+          <Link href="/article-view" className="block">
+            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden h-[240px] sm:h-[320px] md:h-[380px] lg:h-[500px] cursor-pointer">
             {/* Background image */}
             <img
               src={articles[0].image}
               alt=""
-              className="absolute inset-0 h-full w-full object-cover"
+              className={`absolute inset-0 h-full w-full object-cover transition-transform duration-1000 ease-out ${isVisible ? 'zoom-in-image' : ''}`}
             />
             {/* Gradient overlay */}
             <div className="featured-gradient" />
@@ -136,6 +165,7 @@ const ArticleSection: React.FC = () => {
               </p>
             </div>
           </div>
+          </Link>
         </div>
 
         {/* Right grid - responsive layout */}
@@ -146,7 +176,7 @@ const ArticleSection: React.FC = () => {
               <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 md:gap-x-8 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-0">
                 {rightItems.map((article, idx) => (
                   <article key={idx} className="group">
-                    <a href="#" className="block hover:opacity-80 transition-opacity">
+                    <Link href="/article-view" className="block hover:opacity-80 transition-opacity">
                       <div className="grid grid-cols-[1fr_70px] sm:grid-cols-[1fr_80px] lg:grid-cols-[1fr_90px] gap-3 sm:gap-4 lg:gap-5 py-4 sm:py-5 lg:py-6 px-0 min-h-[120px] sm:min-h-[130px] lg:min-h-[140px]">
                         {/* Text content on the left - responsive */}
                         <div className="flex flex-col justify-start min-w-0 pr-1 sm:pr-2">
@@ -174,7 +204,8 @@ const ArticleSection: React.FC = () => {
                           <img
                             src={article.image}
                             alt={article.title}
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover transition-transform duration-700 ease-out ${isVisible ? 'zoom-in-thumbnail' : ''}`}
+                            style={{ animationDelay: `${idx * 150}ms` }}
                           />
                         </div>
                       </div>
@@ -182,7 +213,7 @@ const ArticleSection: React.FC = () => {
                       {idx < rightItems.length - 1 && (
                         <hr className="hidden lg:block border-0 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent mx-4 my-0" />
                       )}
-                    </a>
+                    </Link>
                   </article>
                 ))}
               </div>
