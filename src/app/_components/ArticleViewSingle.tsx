@@ -138,23 +138,24 @@ const ArticleStats: React.FC = () => {
   );
 };
 
+
 const ArticleView: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-white to-[#e0e7ef]">
-      {/* Main content area */}
+    <div className="min-h-screen bg-gradient-to-br from-[#f5f7fa] via-[#e9eff6] to-[#dbeafe]">
       <main className="w-full min-h-screen flex flex-col items-stretch justify-start">
-        {/* Hero Image - Full width, edge-to-edge, with overlay and floating back button */}
-        <div className="relative w-full h-[38vw] min-h-[260px] max-h-[420px] overflow-hidden shadow-xl rounded-b-3xl">
+        {/* Hero Section */}
+        <section className="relative w-full h-[38vw] min-h-[320px] max-h-[520px] overflow-hidden shadow-2xl rounded-b-[2.5rem] flex items-end">
           <img
-            src="https://picsum.photos/1600/900?random=101"
+            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80"
             alt="Coral colored architectural structure"
             className="w-full h-full object-cover object-center scale-105 transition-transform duration-1000"
+            style={{ filter: 'brightness(0.92) saturate(1.1)' }}
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-          {/* Floating back button, always top-left of hero image */}
-          <div className="absolute top-7 left-7 z-30">
-            <button className="group flex items-center text-slate-600 hover:text-slate-900 transition-all duration-300 hover:scale-105 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-slate-200/60" aria-label="Back to list">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          {/* Floating back button */}
+          <div className="absolute top-8 left-8 z-30">
+            <button className="group flex items-center text-slate-700 hover:text-slate-900 transition-all duration-300 hover:scale-105 bg-white/80 backdrop-blur-lg px-5 py-2.5 rounded-full shadow-xl border border-slate-200/70" aria-label="Back to list">
               <svg
                 className="w-5 h-5 mr-2"
                 fill="none"
@@ -164,77 +165,67 @@ const ArticleView: React.FC = () => {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span className="text-base font-semibold tracking-wide">Back</span>
+              <span className="text-lg font-semibold tracking-wide">Back</span>
             </button>
           </div>
-        </div>
+        </section>
 
-        {/* Header Section - Premium typography */}
-        <header className="w-full px-4 sm:px-8 md:px-16 xl:px-32 -mt-16 z-10 relative">
-          <div className="max-w-4xl mx-auto text-center bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl px-6 py-8 md:px-12 md:py-12 border border-slate-200/60">
+        {/* Header Section */}
+        <header className="w-full px-6 sm:px-12 md:px-24 xl:px-48 -mt-20 z-10 relative">
+          <div className="max-w-4xl mx-auto text-center bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl px-10 py-12 border border-slate-200/70">
             <h1
-              className="serif-font font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-6 tracking-tight drop-shadow-xl mx-auto"
+              className="serif-font font-serif text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-7 tracking-tight drop-shadow-xl mx-auto"
               style={{ fontFamily: `'Playfair Display', 'Merriweather', Georgia, serif` }}
             >
               The Cultural Significance of Greenhouses
             </h1>
             {/* Author info with elegant card */}
-            <div className="flex items-center gap-4 mb-1 justify-center">
+            <div className="flex items-center gap-5 mb-2 justify-center">
               <img
-                src="https://picsum.photos/56/56?random=1"
+                src="https://randomuser.me/api/portraits/men/32.jpg"
                 alt="Jean Doe"
-                className="w-12 h-12 rounded-full ring-2 ring-white shadow-md"
+                className="w-14 h-14 rounded-full ring-4 ring-white shadow-lg"
                 referrerPolicy="no-referrer"
               />
               <div className="text-left">
-                <span className="text-slate-700 font-semibold text-base">Jean Doe</span>
-                <div className="text-slate-500 text-sm">Architecture Writer</div>
+                <span className="text-slate-800 font-semibold text-lg">Jean Doe</span>
+                <div className="text-slate-500 text-base">Architecture Writer</div>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Content Layout - Premium grid */}
-        <section className="w-full px-4 sm:px-8 md:px-16 xl:px-32 mt-8 mb-12">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-5 gap-8 xl:gap-12">
+        {/* Content Layout */}
+        <section className="w-full px-6 sm:px-12 md:px-24 xl:px-48 mt-14 mb-16">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-5 gap-12 xl:gap-16">
             {/* Main Content Column */}
             <div className="xl:col-span-3">
-              <div className="max-w-none xl:max-w-2xl space-y-8 text-slate-800 leading-relaxed">
-                <div className="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-700 font-light">
-                  <p className="mb-6">
+              <div className="max-w-none xl:max-w-2xl space-y-10 text-slate-800 leading-relaxed">
+                <div className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-slate-700 font-light">
+                  <p className="mb-7">
                     The greenhouse is a commonplace architectural typology, a frequent fixture in a host of cities, built to
                     shield plants from the elements – from excess heat or cold or to prolong the growing season of crops.
                   </p>
 
-                  <p className="mb-6">
+                  <p className="mb-7">
                     Evidence of the presence of greenhouses in some form stretches as far back as the 1450s during the Korean
                     Joseon dynasty, but it is in the 1750s that the greenhouse was born as a specific architectural typology.
                   </p>
 
-                  <p className="mb-6">
+                  <p className="mb-7">
                     The greenhouse represents more than just a functional space for cultivation. It embodies the human desire
                     to control and manipulate nature, creating microclimates that defy seasonal constraints and geographical limitations.
                   </p>
 
-                  <p className="mb-6">
+                  <p className="mb-7">
                     In contemporary architecture, the greenhouse typology has evolved beyond its agricultural origins, finding
                     expression in residential designs, public spaces, and even commercial developments. These modern interpretations
                     often blend traditional glass structures with innovative materials and sustainable technologies.
                   </p>
                 </div>
 
-                {/* Quote section */}
-                <div className="my-8">
-                  <blockquote className="relative bg-gradient-to-br from-slate-100/90 to-white/90 rounded-xl p-6 border-l-4 border-slate-300 shadow">
-                    <div className="text-xl lg:text-2xl font-light text-slate-800 italic leading-relaxed">
-                      "Architecture is the learned game, correct and magnificent, of forms assembled in the light."
-                    </div>
-                    <cite className="block mt-3 text-slate-500 font-medium text-base">— Le Corbusier</cite>
-                  </blockquote>
-                </div>
-
-                <div className="text-base sm:text-lg lg:text-xl leading-relaxed text-slate-700 font-light">
-                  <p className="mb-6">
+                <div className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-slate-700 font-light">
+                  <p className="mb-7">
                     The greenhouse is a commonplace architectural typology, a frequent fixture in a host of cities, built to
                     shield plants from the elements – from excess heat or cold or to prolong the growing season of crops.
                   </p>
@@ -248,30 +239,104 @@ const ArticleView: React.FC = () => {
             </div>
 
             {/* Sidebar Images */}
-            <div className="xl:col-span-2 flex flex-col gap-6">
+            <div className="xl:col-span-2 flex flex-col gap-8">
               {/* Wooden stairs image */}
-              <div className="relative h-64 rounded-xl overflow-hidden shadow-lg group">
+              <div className="relative h-72 rounded-2xl overflow-hidden shadow-2xl group">
                 <img
-                  src="https://picsum.photos/500/600?random=102"
+                  src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80"
                   alt="Wooden stairs interior"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
               </div>
 
               {/* White geometric structure */}
-              <div className="relative h-64 rounded-xl overflow-hidden shadow-lg group">
+              <div className="relative h-72 rounded-2xl overflow-hidden shadow-2xl group">
                 <img
-                  src="https://picsum.photos/500/600?random=103"
+                  src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=600&q=80"
                   alt="White geometric architectural structure"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
                 {/* Number overlay */}
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md rounded-full w-12 h-12 flex items-center justify-center shadow">
-                  <span className="text-slate-700 font-bold text-lg">68</span>
+                <div className="absolute top-5 right-5 bg-white/90 backdrop-blur-md rounded-full w-14 h-14 flex items-center justify-center shadow-lg">
+                  <span className="text-slate-700 font-bold text-xl">68</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        {/* Content Hub / Related Articles Section - Styled to match the second image */}
+        <section className="w-full bg-white py-12 px-4 sm:px-8 md:px-16 xl:px-32 border-t border-gray-100">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <button className="bg-black text-white font-bold rounded-full px-7 py-2 text-base shadow-none hover:scale-105 transition-all" style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.04)'}}>Read all articles</button>
+              <div className="flex-1 flex justify-center">
+                <span
+                  style={{
+                    color: '#0F0F0F',
+                    fontSize: '80px',
+                    fontFamily: 'Sequel Sans Disp, Arial, sans-serif',
+                    fontWeight: 700,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1.1,
+                    display: 'block',
+                  }}
+                  className="text-center"
+                >
+                  Content Hub
+                </span>
+              </div>
+              <div className="flex gap-3">
+                <button className="w-11 h-11 rounded-full bg-white border border-gray-300 flex items-center justify-center text-2xl text-gray-700 shadow-none hover:bg-gray-100 transition-all"><span>&#8592;</span></button>
+                <button className="w-11 h-11 rounded-full bg-white border border-gray-300 flex items-center justify-center text-2xl text-gray-700 shadow-none hover:bg-gray-100 transition-all"><span>&#8594;</span></button>
+              </div>
+            </div>
+            <div className="overflow-x-auto pb-2">
+              <div className="flex gap-7 min-w-[900px]">
+                {/* Example Article Card 1 */}
+                <div className="flex-shrink-0 w-[320px] bg-[#f6f6f8] rounded-2xl shadow-none p-5 flex flex-col items-stretch border border-gray-200" style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.04)'}}>
+                  <div className="relative rounded-xl overflow-hidden mb-4">
+                    <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Kranich Hotel" className="w-full h-40 object-cover rounded-xl border border-gray-200" />
+                    <span className="absolute top-3 right-3 bg-white rounded-full p-2 shadow border border-gray-200 text-xl">↗</span>
+                  </div>
+                  <div className="text-gray-500 text-sm mb-1 font-medium">October 16, 2024</div>
+                  <div className="font-bold text-lg leading-tight mb-2 text-gray-900">TOP 10 bright ideas for hotel website...</div>
+                  <div className="bg-white rounded-xl px-4 py-3 text-gray-700 text-sm mt-auto font-medium border border-gray-100">1. Offer virtual tours of the hotel's facilities, rooms, and common areas.</div>
+                </div>
+                {/* Example Article Card 2 */}
+                <div className="flex-shrink-0 w-[320px] bg-[#f6f6f8] rounded-2xl shadow-none p-5 flex flex-col items-stretch border border-gray-200" style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.04)'}}>
+                  <div className="relative rounded-xl overflow-hidden mb-4">
+                    <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80" alt="Skincare Website" className="w-full h-40 object-cover rounded-xl border border-gray-200" />
+                    <span className="absolute top-3 right-3 bg-white rounded-full p-2 shadow border border-gray-200 text-xl">↗</span>
+                  </div>
+                  <div className="text-gray-500 text-sm mb-1 font-medium">October 17, 2024</div>
+                  <div className="font-bold text-lg leading-tight mb-2 text-gray-900">TOP 10 ideas for skincare website...</div>
+                  <div className="bg-white rounded-xl px-4 py-3 text-gray-700 text-sm mt-auto font-medium border border-gray-100">1. Don't underestimate your email list. It can help you build relationships with your audience...</div>
+                </div>
+                {/* Example Article Card 3 */}
+                <div className="flex-shrink-0 w-[320px] bg-[#f6f6f8] rounded-2xl shadow-none p-5 flex flex-col items-stretch border border-gray-200" style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.04)'}}>
+                  <div className="relative rounded-xl overflow-hidden mb-4">
+                    <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="Home App" className="w-full h-40 object-cover rounded-xl border border-gray-200" />
+                    <span className="absolute top-3 right-3 bg-white rounded-full p-2 shadow border border-gray-200 text-xl">↗</span>
+                  </div>
+                  <div className="text-gray-500 text-sm mb-1 font-medium">October 17, 2024</div>
+                  <div className="font-bold text-lg leading-tight mb-2 text-gray-900">TOP 7 steps to create a home...</div>
+                  <div className="bg-white rounded-xl px-4 py-3 text-gray-700 text-sm mt-auto font-medium border border-gray-100">1. Understand the primary goal of the home screen UI. To show app features, provide quic...</div>
+                </div>
+                {/* Example Article Card 4 */}
+                <div className="flex-shrink-0 w-[320px] bg-[#f6f6f8] rounded-2xl shadow-none p-5 flex flex-col items-stretch border border-gray-200" style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.04)'}}>
+                  <div className="relative rounded-xl overflow-hidden mb-4">
+                    <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80" alt="Insurance Website" className="w-full h-40 object-cover rounded-xl border border-gray-200" />
+                    <span className="absolute top-3 right-3 bg-white rounded-full p-2 shadow border border-gray-200 text-xl">↗</span>
+                  </div>
+                  <div className="text-gray-500 text-sm mb-1 font-medium">October 17, 2024</div>
+                  <div className="font-bold text-lg leading-tight mb-2 text-gray-900">TOP the 10: best insurance website...</div>
+                  <div className="bg-white rounded-xl px-4 py-3 text-gray-700 text-sm mt-auto font-medium border border-gray-100">1. The website has interactive chat support for real-time assistance.</div>
                 </div>
               </div>
             </div>
@@ -279,12 +344,12 @@ const ArticleView: React.FC = () => {
         </section>
 
         {/* Article Stats - Premium footer */}
-        <footer className="pt-10 border-t border-slate-200/50 bg-white/90 backdrop-blur-xl">
-          <div className="max-w-6xl mx-auto px-4 sm:px-8 md:px-16 xl:px-32 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div className="flex flex-wrap items-center gap-6">
-              <button className="group flex items-center text-slate-600 hover:text-slate-900 transition-all duration-300 hover:scale-105">
-                <div className="p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-sm border border-slate-200/50 group-hover:shadow-md transition-all duration-300 mr-2">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-label="Likes">
+        <footer className="pt-12 border-t border-slate-200/60 bg-white/80 backdrop-blur-2xl">
+          <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-24 xl:px-48 py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+            <div className="flex flex-wrap items-center gap-8">
+              <button className="group flex items-center text-slate-700 hover:text-slate-900 transition-all duration-300 hover:scale-105">
+                <div className="p-3 rounded-full bg-white/90 backdrop-blur-md shadow-md border border-slate-200/60 group-hover:shadow-lg transition-all duration-300 mr-3">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-label="Likes">
                     <path
                       fillRule="evenodd"
                       d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
@@ -292,13 +357,13 @@ const ArticleView: React.FC = () => {
                     />
                   </svg>
                 </div>
-                <span className="text-base font-semibold">2.1k Likes</span>
+                <span className="text-lg font-semibold">2.1k Likes</span>
               </button>
 
-              <button className="group flex items-center text-slate-600 hover:text-slate-900 transition-all duration-300 hover:scale-105">
-                <div className="p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-sm border border-slate-200/50 group-hover:shadow-md transition-all duration-300 mr-2">
+              <button className="group flex items-center text-slate-700 hover:text-slate-900 transition-all duration-300 hover:scale-105">
+                <div className="p-3 rounded-full bg-white/90 backdrop-blur-md shadow-md border border-slate-200/60 group-hover:shadow-lg transition-all duration-300 mr-3">
                   <svg
-                    className="w-5 h-5"
+                    className="w-6 h-6"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -307,13 +372,13 @@ const ArticleView: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
-                <span className="text-base font-semibold">1.4k Comments</span>
+                <span className="text-lg font-semibold">1.4k Comments</span>
               </button>
 
-              <button className="group flex items-center text-slate-600 hover:text-slate-900 transition-all duration-300 hover:scale-105">
-                <div className="p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-sm border border-slate-200/50 group-hover:shadow-md transition-all duration-300 mr-2">
+              <button className="group flex items-center text-slate-700 hover:text-slate-900 transition-all duration-300 hover:scale-105">
+                <div className="p-3 rounded-full bg-white/90 backdrop-blur-md shadow-md border border-slate-200/60 group-hover:shadow-lg transition-all duration-300 mr-3">
                   <svg
-                    className="w-5 h-5"
+                    className="w-6 h-6"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -322,13 +387,13 @@ const ArticleView: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                   </svg>
                 </div>
-                <span className="text-base font-semibold">Share</span>
+                <span className="text-lg font-semibold">Share</span>
               </button>
             </div>
 
-            <div className="flex items-center bg-white/90 backdrop-blur-md rounded-full px-5 py-2 shadow-sm border border-slate-200/50">
-              <span className="text-slate-600 text-base mr-2">Published</span>
-              <span className="font-semibold text-slate-900 text-base">2 days ago</span>
+            <div className="flex items-center bg-white/95 backdrop-blur-lg rounded-full px-7 py-3 shadow-md border border-slate-200/60">
+              <span className="text-slate-600 text-lg mr-3">Published</span>
+              <span className="font-semibold text-slate-900 text-lg">2 days ago</span>
             </div>
           </div>
         </footer>
