@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { Search, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface RecommendItem {
   thumb: string
@@ -32,6 +33,7 @@ export default function SearchRecommendCard({
   const [selectedLanguage, setSelectedLanguage] = useState('En')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const router = useRouter()
 
   const languages = [
     { code: 'En', name: 'English' },
@@ -107,7 +109,7 @@ export default function SearchRecommendCard({
 
         {/* Featured Article - Responsive */}
         {featuredItem && (
-          <a href={featuredItem.href} className="featured-card">
+          <div onClick={() => router.push('/article-view')} className="featured-card cursor-pointer">
             <div className="featured-image-wrapper h-40 sm:h-48 md:h-56">
               <Image
                 src={featuredItem.thumb}
@@ -123,16 +125,16 @@ export default function SearchRecommendCard({
                 </h4>
               </div>
             </div>
-          </a>
+          </div>
         )}
 
         {/* Article List - Responsive */}
         <div className="article-list space-y-3 sm:space-y-4">
           {regularItems.map((item, index) => (
-            <a
+            <div
               key={index}
-              href={item.href}
-              className="article-list-item p-3 sm:p-4"
+              onClick={() => router.push('/article-view')}
+              className="article-list-item p-3 sm:p-4 cursor-pointer"
             >
               <div className="article-text flex-1">
                 <p className="article-category text-xs sm:text-sm">{item.meta}</p>
@@ -148,7 +150,7 @@ export default function SearchRecommendCard({
                   className="article-img"
                 />
               </div>
-            </a>
+            </div>
           ))}
         </div>
       </div>

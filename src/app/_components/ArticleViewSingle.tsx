@@ -200,8 +200,8 @@ const ArticleView: React.FC = () => {
         </section>
 
         {/* Header Section */}
-        <header className="w-full px-6 sm:px-12 md:px-24 xl:px-48 -mt-20 z-10 relative">
-          <div className="max-w-4xl mx-auto text-center bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl px-10 py-12 border border-slate-200/70">
+        <header className="w-full px-4 sm:px-8 md:px-16 xl:px-24 2xl:px-32 -mt-20 z-10 relative">
+          <div className="max-w-6xl mx-auto text-center bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl px-10 py-12 border border-slate-200/70">
             <h1
               className="serif-font font-serif text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-7 tracking-tight drop-shadow-xl mx-auto"
               style={{ fontFamily: `'Playfair Display', 'Merriweather', Georgia, serif` }}
@@ -225,11 +225,11 @@ const ArticleView: React.FC = () => {
         </header>
 
         {/* Content Layout */}
-        <section className="w-full px-6 sm:px-12 md:px-24 xl:px-48 mt-14 mb-16">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-5 gap-12 xl:gap-16">
+        <section className="w-full px-2 sm:px-6 md:px-12 xl:px-20 2xl:px-32 mt-14 mb-16">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-5 gap-8 xl:gap-12 2xl:gap-16">
             {/* Main Content Column */}
             <div className="xl:col-span-3">
-              <div className="max-w-none xl:max-w-2xl space-y-10 text-slate-800 leading-relaxed">
+              <div className="max-w-none xl:max-w-3xl 2xl:max-w-4xl space-y-10 text-slate-800 leading-relaxed">
                 <div className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-slate-700 font-light">
                   <p className="mb-7">
                     The greenhouse is a commonplace architectural typology, a frequent fixture in a host of cities, built to
@@ -267,32 +267,54 @@ const ArticleView: React.FC = () => {
               </div>
             </div>
 
-            {/* Sidebar Images */}
-            <div className="xl:col-span-2 flex flex-col gap-8">
-              {/* Wooden stairs image */}
-              <div className="relative h-72 rounded-2xl overflow-hidden shadow-2xl group">
+            {/* Sidebar Images - Modern Masonry Grid, refined for clarity */}
+            <div className="xl:col-span-2 grid grid-cols-2 grid-rows-3 gap-4 xl:gap-6 2xl:gap-8 h-full">
+              {/* Tall image left */}
+              <div className="relative row-span-3 col-span-1 rounded-3xl overflow-hidden shadow-2xl group flex flex-col">
                 <img
                   src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80"
                   alt="Wooden stairs interior"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent pointer-events-none"></div>
+                <div className="absolute bottom-3 left-3 bg-white/70 px-3 py-1.5 rounded-full shadow text-slate-800 text-sm font-medium backdrop-blur-sm opacity-90 group-hover:opacity-100 transition-opacity">Wooden Stairs</div>
               </div>
 
-              {/* White geometric structure */}
-              <div className="relative h-72 rounded-2xl overflow-hidden shadow-2xl group">
+              {/* Top right - small image */}
+              <div className="relative row-span-1 col-span-1 rounded-2xl overflow-hidden shadow-xl group">
                 <img
-                  src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=600&q=80"
+                  src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=400&q=80"
                   alt="White geometric architectural structure"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
-                {/* Number overlay */}
-                <div className="absolute top-5 right-5 bg-white/90 backdrop-blur-md rounded-full w-14 h-14 flex items-center justify-center shadow-lg">
-                  <span className="text-slate-700 font-bold text-xl">68</span>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/5 pointer-events-none"></div>
+                <div className="absolute top-2 right-2 bg-white/80 backdrop-blur rounded-full w-8 h-8 flex items-center justify-center shadow text-slate-700 text-base font-bold opacity-90 group-hover:opacity-100 transition-opacity">68</div>
+              </div>
+
+              {/* Middle right - wide image */}
+              <div className="relative row-span-1 col-span-1 rounded-2xl overflow-hidden shadow-xl group flex items-end">
+                <img
+                  src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80"
+                  alt="Modern glass building"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent pointer-events-none"></div>
+                <div className="absolute bottom-2 left-2 bg-white/70 px-2 py-1 rounded-full shadow text-slate-700 text-xs font-medium backdrop-blur-sm opacity-90 group-hover:opacity-100 transition-opacity">Glass Structure</div>
+              </div>
+
+              {/* Bottom right - portrait image */}
+              <div className="relative row-span-1 col-span-1 rounded-2xl overflow-hidden shadow-xl group flex items-center">
+                <img
+                  src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80"
+                  alt="Greenhouse plant detail"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent pointer-events-none"></div>
+                <div className="absolute top-2 left-2 bg-white/70 px-2 py-1 rounded-full shadow text-slate-700 text-xs font-medium backdrop-blur-sm opacity-90 group-hover:opacity-100 transition-opacity">Plant Detail</div>
               </div>
             </div>
           </div>

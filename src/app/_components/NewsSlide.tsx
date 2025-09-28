@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 type NewsItem = {
   id: string;
@@ -74,6 +75,7 @@ const CARD_W = 240; // px, responsive card width
 export default function NewsSlide() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isAtStart, setIsAtStart] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const el = trackRef.current;
@@ -151,7 +153,7 @@ export default function NewsSlide() {
               className="shrink-0 snap-start"
               style={{ width: 'min(280px, 85vw)', margin: 0, padding: 0 }}
             >
-              <a href={item.href} className="group block">
+              <div onClick={() => router.push('/article-view')} className="group block cursor-pointer">
                 <div
                   className="relative w-full overflow-hidden bg-white shadow-[0_8px_32px_rgba(15,23,42,.06)]"
                   style={{ borderRadius: 16, width: 'min(250px, 80vw)', height: 'min(120px, 30vw)' }}
@@ -200,7 +202,7 @@ export default function NewsSlide() {
                     ))}
                   </div>
                 )}
-              </a>
+              </div>
             </article>
           ))}
         </div>

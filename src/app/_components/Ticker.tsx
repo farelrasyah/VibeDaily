@@ -1,5 +1,7 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+
 interface TickerItem {
   title: string
   href: string
@@ -12,15 +14,16 @@ interface TickerProps {
 }
 
 export default function Ticker({ items }: TickerProps) {
+  const router = useRouter()
   return (
     <div className="mt-16 pt-8 sm:mt-20 sm:pt-10 md:mt-24 md:pt-12 lg:mt-32 lg:pt-16 relative">
       {/* Horizontal scrolling container with fade effect - responsive */}
       <div className="relative overflow-hidden">
         <div className="flex gap-3 sm:gap-4 md:gap-5 lg:gap-6 overflow-x-auto scrollbar-hide pb-2 px-4 sm:px-6 lg:px-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {items.map((item, index) => (
-            <a
+            <div
               key={index}
-              href={item.href}
+              onClick={() => router.push('/article-view')}
               className="relative flex-shrink-0 w-[240px] sm:w-[260px] md:w-[280px] group cursor-pointer ticker-card"
               style={{ 
                 opacity: index === 0 ? 1 : index === 1 ? 0.9 : index === 2 ? 0.7 : 0.5,
@@ -41,7 +44,7 @@ export default function Ticker({ items }: TickerProps) {
                   </h3>
                 </div>
               </div>
-            </a>
+            </div>
           ))}
         </div>
         

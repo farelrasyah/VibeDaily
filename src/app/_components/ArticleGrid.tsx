@@ -2,6 +2,7 @@
 'use client'
 
 import { useMemo, useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface ArticleGridItem {
   id: string
@@ -29,6 +30,7 @@ interface ArticleGridProps {
 export default function ArticleGrid({ items }: ArticleGridProps) {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -89,7 +91,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
         {/* KIRI: FEATURED – responsive margins */}
         <div className="lg:col-span-3 -mx-4 sm:-mx-6 md:-mx-8 lg:bleed-left lg:sm:bleed-left lg:lg:bleed-left lg:-ml-12">
           <article className="group h-full">
-            <a href={featured?.href || '#'} className="block h-full">
+            <div onClick={() => router.push('/article-view')} className="block h-full cursor-pointer">
               <div
                 className="
                   h-full flex flex-col overflow-hidden rounded-[28px]
@@ -185,7 +187,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                   </div>
                 </div>
               </div>
-            </a>
+            </div>
           </article>
         </div>
 
@@ -197,7 +199,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-8 sm:gap-y-10 md:gap-y-12 lg:gap-y-14">
               {smallItems.map((item, i) => (
                 <article key={`${item.id}-${i}`} className="group">
-                  <a href={item.href} className="block">
+                  <div onClick={() => router.push('/article-view')} className="block cursor-pointer">
                     <div className="rounded-[20px] sm:rounded-[24px] overflow-hidden bg-white/65 border border-white/35 backdrop-blur-xl shadow-[0_14px_40px_rgba(15,23,42,0.08)] hover:bg-white/75 transition-all duration-300 mb-3 sm:mb-4">
                       <div className="relative w-full h-[120px] sm:h-[140px] md:h-[120px] lg:h-[150px] overflow-hidden">
                         {item.image ? (
@@ -233,7 +235,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                           <div className="mt-0 text-sm sm:text-[15px] text-slate-500">#{item.tags && item.tags.length > 0 ? item.tags[0] : item.category}</div>
                         ) : null}
                     </div>
-                  </a>
+                  </div>
                 </article>
               ))}
             </div>
