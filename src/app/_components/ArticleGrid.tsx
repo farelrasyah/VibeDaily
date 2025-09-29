@@ -103,7 +103,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                 {/* KONTEN ATAS */}
                 <div className="px-4 pt-4 pb-3 sm:px-6 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5 lg:pl-12 lg:pt-6 lg:pb-5 xl:pl-16 xl:pt-8 xl:pb-6">
                   {/* Flag TRENDING NOW */}
-                  <div className="mb-3 sm:mb-4">
+                  <div className="mb-3 sm:mb-4 transition-all duration-1200 ease-in-out" style={{ transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(15%) scale(0.95)', opacity: isVisible ? 1 : 0 }}>
                     <div className="flex items-center relative">
                       <div className="w-0.5 h-6 bg-violet-600 rounded-full z-10"></div>
                       <div className="relative -ml-0.5">
@@ -123,40 +123,72 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                     <span className="text-slate-500">{featured?.time || 'a year ago'}</span>
                   </div>
 
-                  {/* Judul */}
-                  <h3 className="text-xl sm:text-2xl md:text-[26px] leading-[1.1] sm:leading-[1.06] font-semibold text-slate-900 max-w-[30ch]" style={{ fontFamily: "'Sequel Sans', sans-serif" }}>
-                    {featured?.title}
+                    <h3 className="text-2xl sm:text-3xl md:text-[32px] leading-[1.1] sm:leading-[1.06] font-semibold text-slate-900 max-w-[30ch] group" style={{ fontFamily: "'Sequel Sans', sans-serif" }}>
+                    {featured?.title.split('').map((char, index) => (
+                      <span
+                        key={index}
+                        className="inline-block transition-all duration-200 ease-out"
+                        style={{
+                          opacity: isVisible ? 1 : 0,
+                          filter: isVisible ? 'blur(0)' : 'blur(5px)',
+                          transitionDelay: `${index * 20}ms`
+                        }}
+                      >
+                        {char === ' ' ? '\u00A0' : char}
+                      </span>
+                    ))}
                   </h3>
 
                   {/* Deskripsi */}
                   {featured?.description && (
-                    <p className="mt-3 sm:mt-4 text-sm sm:text-[15px] leading-[1.5] sm:leading-[1.6] text-slate-600 max-w-[65ch]">
+                    <p
+                      className="mt-3 sm:mt-4 text-sm sm:text-[15px] leading-[1.5] sm:leading-[1.6] text-slate-600 max-w-[65ch] line-clamp-3 overflow-hidden"
+                      style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        opacity: isVisible ? 1 : 0,
+                        transform: isVisible ? 'translateY(0)' : 'translateY(32px)',
+                        transition: 'transform 0.9s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.9s'
+                      }}
+                    >
                       {featured.description}
                     </p>
                   )}
 
                   {/* CTA segmented */}
                   <div className="mt-4 sm:mt-6">
-                    <a
-                      href={featured?.href || '#'}
-                      className="
-                        inline-flex items-center rounded-full bg-slate-900/90 text-white
-                        pl-3 sm:pl-4 pr-1 h-9 sm:h-10 text-xs sm:text-[14px] font-semibold
-                        hover:bg-slate-900 transition-colors
-                      "
-                    >
-                      <span>Read article</span>
-                      <span
-                        className="
-                          ml-2 sm:ml-3 inline-flex items-center justify-center w-7 sm:w-8 h-7 sm:h-8 rounded-full
-                          bg-white text-slate-900 shadow-[0_2px_8px_rgba(15,23,42,0.15)]
-                        "
+                    <div className="flex gap-2 items-center">
+                      <a
+                        href={featured?.href || '#'}
+                        className="inline-flex items-center rounded-full bg-[#e6eefc] text-slate-900 pl-4 pr-2 h-9 sm:h-10 text-xs sm:text-[14px] font-semibold shadow-none border-none hover:bg-[#dbe7fa] transition-colors"
+                        style={{
+                          boxShadow: 'none',
+                          transition: 'transform 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.7s',
+                          transform: isVisible ? 'scale(1)' : 'scale(0.85)',
+                          opacity: isVisible ? 1 : 0
+                        }}
                       >
-                        <svg width="12" height="12" viewBox="0 0 14 14" className="sm:w-[14px] sm:h-[14px]">
-                          <path d="M5.25 3.5L8.75 7L5.25 10.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                        <span>Read article</span>
+                      </a>
+                      <button
+                        type="button"
+                        className="inline-flex items-center justify-center rounded-full bg-[#e6eefc] w-8 h-8 sm:w-9 sm:h-9 shadow-none border-none ml-0.5 hover:bg-[#dbe7fa] transition-colors"
+                        tabIndex={-1}
+                        aria-label="Go to article"
+                        style={{
+                          boxShadow: 'none',
+                          transition: 'transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.6s',
+                          transform: isVisible ? 'translateX(0)' : 'translateX(-32px)',
+                          opacity: isVisible ? 1 : 0
+                        }}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 18 18" className="text-slate-500">
+                          <path d="M7 4l5 5-5 5" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
-                      </span>
-                    </a>
+                      </button>
+                    </div>
                   </div>
                 </div>
 

@@ -2,7 +2,17 @@ import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 
 
-// Dummy data with random images from picsum.photos
+// Dummy data with random       {/* Header with View more button - responsive */}
+      <div className="mb-6 sm:mb-7 md:mb-8 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+        <div className="flex justify-end pr-0 -mr-8">
+          <button
+            type="button"
+            className="inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base font-bold text-black hover:text-gray-700 transition-colors"
+          >
+            View more →
+          </button>
+        </div>
+      </div>
 const articles = [
   {
     category: "Web design",
@@ -107,7 +117,7 @@ const ArticleSection: React.FC = () => {
   return (
     <section ref={sectionRef} className="w-full mx-auto max-w-[1200px] px-4 sm:px-6 py-8 sm:py-12 md:py-16 relative">
       {/* Flag "NEWS UPDATE" - responsive */}
-      <div className="absolute -top-6 sm:-top-7 md:-top-8 left-0 mb-6 sm:mb-7 md:mb-8 mt-2">
+      <div className="absolute top-10 sm:top-11 md:top-12 left-0 mb-6 sm:mb-7 md:mb-8 mt-2">
         <div className="flex items-center relative">
           <div className="w-0.5 h-5 sm:h-6 bg-violet-600 rounded-full z-10"></div>
           <div className="relative -ml-0.5">
@@ -121,18 +131,16 @@ const ArticleSection: React.FC = () => {
       </div>
 
       {/* Header with View more button - responsive */}
-<div className="mb-6 sm:mb-7 md:mb-8 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
-  <div className="flex justify-end pr-2 sm:pr-4">
-    <button
-      type="button"
-      className="inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base font-bold text-black hover:text-gray-700 transition-colors"
-    >
-      View more →
-    </button>
-  </div>
-</div>
-
-
+      <div className="mb-6 sm:mb-7 md:mb-8 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+        <div className="flex justify-end pr-0 -mr-4">
+          <button
+            type="button"
+            className="inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base font-bold text-black hover:text-gray-700 transition-colors"
+          >
+            View more →
+          </button>
+        </div>
+      </div>
 
       {/* Main grid layout - mobile first responsive */}
       <div className="grid grid-cols-1 gap-6 md:gap-5 lg:grid-cols-5 lg:gap-4">
