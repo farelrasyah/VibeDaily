@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "VibeDaily - Glassmorphism News",
+  title: "VibeDaily - New Generation News",
   description: "Modern news website with glassmorphism design",
 };
 
