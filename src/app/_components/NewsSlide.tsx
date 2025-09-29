@@ -100,7 +100,7 @@ export default function NewsSlide() {
   <header className="mb-4 sm:mb-5 md:mb-6 flex items-center justify-between px-4 sm:px-6 lg:px-0">
         <div className="flex items-center relative">
           <div className="w-0.5 h-5 sm:h-6 bg-violet-600 rounded-full z-10"></div>
-          <div className="relative -ml-0.5">
+          <div className="relative ">
             <span className="text-xs sm:text-sm font-semibold text-slate-800 uppercase tracking-wide pl-1" style={{letterSpacing: '0.06em'}}>Breaking News</span>
             {/* Violet fade effect overlay starting from left */}
             <div className="absolute inset-0 left-0 bg-gradient-to-r from-violet-600/15 via-violet-500/8 via-violet-400/4 via-violet-300/2 via-violet-200/1 to-transparent pointer-events-none"></div>
@@ -109,7 +109,7 @@ export default function NewsSlide() {
 
         <a
           href="#"
-          className="group inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-[15px] font-semibold text-slate-900"
+          className="group inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-[15px] font-semibold text-slate-900 mr-18"
         >
           <span>View more</span>
           <svg

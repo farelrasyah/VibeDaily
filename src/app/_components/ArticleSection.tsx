@@ -131,14 +131,29 @@ const ArticleSection: React.FC = () => {
       </div>
 
       {/* Header with View more button - responsive */}
-      <div className="mb-6 sm:mb-7 md:mb-8 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+      <div className="mb-6 sm:mb-7 md:mb-8 w-screen relative left-1/2 right-1/2 -ml-[100px] -mr-[200px]">
         <div className="flex justify-end pr-0 -mr-4">
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base font-bold text-black hover:text-gray-700 transition-colors"
+          <a
+            href="#"
+            className="group inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-[15px] font-semibold text-slate-900 mr-110"
           >
-            View more →
-          </button>
+            <span>View more</span>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 18 18"
+              className="sm:w-[18px] sm:h-[18px] transition-transform group-hover:translate-x-0.5"
+            >
+              <path
+                d="M7.5 5.25L10.5 9L7.5 12.75"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </a>
         </div>
       </div>
 
