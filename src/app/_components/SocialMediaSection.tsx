@@ -27,8 +27,7 @@ type CardProps = {
 function InstaCard({ img, blueBar = false, className = "", isVisible = false, index = 0 }: CardProps) {
   return (
     <div
-      className={[
-        "group relative w-[280px] sm:w-[320px] md:w-[360px] lg:w-[390px] h-[420px] sm:h-[480px] md:h-[520px] lg:h-[570px] rounded-[24px] sm:rounded-[28px]",
+      className={["group relative w-[280px] sm:w-[320px] md:w-[360px] lg:w-[390px] h-[420px] sm:h-[480px] md:h-[520px] lg:h-[570px] rounded-[24px] sm:rounded-[28px]",
         "bg-white/10 backdrop-blur-xl border border-white/20",
         "shadow-[0_28px_110px_-14px_rgba(0,0,0,0.28)]",
         "overflow-hidden",
@@ -53,7 +52,6 @@ function InstaCard({ img, blueBar = false, className = "", isVisible = false, in
           <path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z" />
         </svg>
       </div>
-
       {/* Media - responsive */}
       <div className="relative h-[240px] sm:h-[280px] md:h-[320px] lg:h-[336px] overflow-hidden">
         <img
@@ -67,8 +65,7 @@ function InstaCard({ img, blueBar = false, className = "", isVisible = false, in
       </div>
       {/* Footer – responsive */}
       <div
-        className={[
-          "h-[70px] sm:h-[80px] md:h-[88px] lg:h-[92px] border-t border-white/10 flex items-center justify-between px-4 sm:px-5",
+        className={["h-[70px] sm:h-[80px] md:h-[88px] lg:h-[92px] border-t border-white/10 flex items-center justify-between px-4 sm:px-5",
           blueBar ? "bg-gradient-to-r from-blue-500/35 to-purple-600/35" : "bg-white/25",
           "backdrop-blur-md",
         ].join(" ")}
@@ -103,15 +100,13 @@ const SocialMediaSection: React.FC = () => {
         }
       },
       {
-        threshold: 0.1, // Trigger when 10% of the section is visible
-        rootMargin: '0px 0px -100px 0px' // Trigger slightly before fully visible
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
       }
     )
-
     if (sectionRef.current) {
       observer.observe(sectionRef.current)
     }
-
     return () => {
       if (sectionRef.current) {
         observer.unobserve(sectionRef.current)
@@ -121,8 +116,11 @@ const SocialMediaSection: React.FC = () => {
 
   return (
     <section ref={sectionRef} className="relative w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
-      {/* Glass container - responsive */}
       <div className="relative mx-auto w-full max-w-[1280px] overflow-hidden rounded-[24px] sm:rounded-[28px] md:rounded-[32px] lg:rounded-[40px] xl:rounded-[48px] border border-white/15 bg-white/[0.06] backdrop-blur-xl shadow-[0_40px_140px_-30px_rgba(0,0,0,0.5)]">
+        {/* Fade ungu identik dengan ArticleSection */}
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-[320px] z-20">
+          <div className="absolute inset-0 bg-gradient-to-l from-violet-600/15 via-violet-500/8 via-violet-400/4 via-violet-300/2 via-violet-200/1 to-transparent" />
+        </div>
         {/* Background layers */}
         <div className="absolute inset-0 -z-10">
           <img src={BG_URL} alt="Background" className={`w-full h-full object-cover scale-110 blur-[2px] transition-transform duration-1000 ease-out ${isVisible ? 'zoom-in-image' : ''}`} />
@@ -133,37 +131,21 @@ const SocialMediaSection: React.FC = () => {
         {/* === FEATURED NEWS (mimik referensi) === */}
         <div className="absolute left-0 bottom-[-8px] md:bottom-[-12px] z-30 p-0">
           <article
-            className={[
-              // ukuran dan padding kartu
-              "relative bg-white/60 backdrop-blur-xl",
-              "px-8 py-7 sm:px-10 sm:py-8",
-              // sudut asimetris: TL besar, yang lain sedang
-              "rounded-[28px] rounded-tl-[56px]",
-              // width mirip referensi
-              "max-w-[520px] min-w-[360px]",
-            ].join(" ")}
+            className={["relative bg-white/60 backdrop-blur-xl","px-8 py-7 sm:px-10 sm:py-8","rounded-[28px] rounded-tl-[56px]","max-w-[520px] min-w-[360px]"].join(" ")}
           >
-          
-            {/* Meta: netral (bukan ungu), bullet kecil & rapat */}
             <div className="mb-3 flex items-center gap-2 text-[13px] text-black/60">
               <span className="font-medium">Branding</span>
               <span className="opacity-60">•</span>
               <span>a year ago</span>
             </div>
-
-            {/* Headline: bold, leading tight, max 3 baris */}
             <h2 className="text-[28px] sm:text-[32px] font-extrabold text-black leading-tight tracking-[-0.01em] max-w-[32ch] mb-3">
               Corporate identity design that ensures brand recognition
             </h2>
-
-            {/* Tags: satu blok rapih, abu-abu */}
             <ul className="flex flex-wrap gap-x-6 gap-y-2 mb-6 text-[13px] text-black/55">
               <li>#Brand identity design</li>
               <li>#Corporate website design</li>
               <li>#Website ui design</li>
             </ul>
-
-            {/* CTA: tombol pil + icon button terpisah, warna biru muda */}
             <div className="flex items-center gap-3">
               <a
                 href="#"
@@ -183,11 +165,103 @@ const SocialMediaSection: React.FC = () => {
             </div>
           </article>
         </div>
+        {/* === NEWS LIST DI POJOK KANAN ATAS === */}
 
-        {/* Content */}
+{/* News Sidebar (tanpa garis kiri, dengan border antar artikel) */}
+<div className="absolute top-0 bottom-0 right-0 w-[320px] pr-6 z-40">
+  <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
+    <div className="w-full h-full bg-gradient-to-l from-violet-600/50 via-violet-500/40 to-transparent" />
+  </div>
+  <div className="relative h-full z-10">
+    {/* Container item: mengisi tinggi dan scrollable jika overflow */}
+    <div className="relative h-full overflow-auto pt-4 pb-6">
+      <div className="flex flex-col">
+        {/* News Item 1 */}
+        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
+          <div className="text-[12px] text-white/60 font-medium mb-1">
+            Web design <span className="opacity-60">•</span> a year ago
+          </div>
+          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
+            Innovative automotive web design based on 2024 trends
+          </div>
+        </div>
+
+        {/* News Item 2 */}
+        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
+          <div className="text-[12px] text-white/60 font-medium mb-1">
+            Web design <span className="opacity-60">•</span> a year ago
+          </div>
+          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
+            How to make a financial website design that reflects reliability and...
+          </div>
+        </div>
+
+        {/* News Item 3 */}
+        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
+          <div className="text-[12px] text-white/60 font-medium mb-1">
+            Web design <span className="opacity-60">•</span> a year ago
+          </div>
+          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
+            Furniture website design: how to create a stylish space in 5 steps
+          </div>
+        </div>
+
+        {/* News Item 4 */}
+        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
+          <div className="text-[12px] text-white/60 font-medium mb-1">
+            Logo <span className="opacity-60">•</span> a year ago
+          </div>
+          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
+            Best apps logo ideas
+          </div>
+        </div>
+
+        {/* News Item 5 */}
+        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
+          <div className="text-[12px] text-white/60 font-medium mb-1">
+            Web design <span className="opacity-60">•</span> a year ago
+          </div>
+          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
+            What should a small business website design contain?
+          </div>
+        </div>
+        {/* News Item 5 */}
+        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
+          <div className="text-[12px] text-white/60 font-medium mb-1">
+            Web design <span className="opacity-60">•</span> a year ago
+          </div>
+          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
+            What should a small business website design contain?
+          </div>
+        </div>
+        {/* News Item 5 */}
+        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
+          <div className="text-[12px] text-white/60 font-medium mb-1">
+            Web design <span className="opacity-60">•</span> a year ago
+          </div>
+          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
+            What should a small business website design contain?
+          </div>
+        </div>
+        {/* News Item 5 */}
+        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
+          <div className="text-[12px] text-white/60 font-medium mb-1">
+            Web design <span className="opacity-60">•</span> a year ago
+          </div>
+          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
+            What should a small business website design contain?
+          </div>
+        </div>
+
+        {/* Spacer bawah */}
+        <div className="h-6" />
+      </div>
+    </div>
+  </div>
+</div>
+
         <div className="relative z-10 px-6 md:px-10 xl:px-12 py-10 md:py-14">
           <div className="grid grid-cols-1 gap-y-10">
-            {/* Instagram Cards */}
             <div className="flex justify-center items-center">
               <InstaCard img={IMAGES[0]} className="scale-90 -ml-4 z-10" isVisible={isVisible} index={0} />
               <InstaCard img={IMAGES[1]} className="z-20" isVisible={isVisible} index={1} />
@@ -198,6 +272,6 @@ const SocialMediaSection: React.FC = () => {
       </div>
     </section>
   );
-};
+}
 
 export default SocialMediaSection;
