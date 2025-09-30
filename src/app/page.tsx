@@ -1,15 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import NavigationDropdown from './_components/NavigationDropdown'
-import Hero from './_components/Hero'
-import Ticker from './_components/Ticker'
-import ArticleGrid from './_components/ArticleGrid'
-import NewsSlide from './_components/NewsSlide'
-import ArticleSection from './_components/ArticleSection'
-import SocialMediaSection from './_components/SocialMediaSection'
-import SearchRecommendCard from './_components/SearchRecommendCard'
-import Footer from './_components/Footer'
+import NavigationDropdown from '../modules/landing-page/NavigationDropdown'
+import Hero from '../modules/landing-page/Hero'
+import Ticker from '../modules/landing-page/Ticker'
+import ArticleGrid from '../modules/landing-page/ArticleGrid'
+import NewsSlide from '../modules/landing-page/NewsSlide'
+import ArticleSection from '../modules/landing-page/ArticleSection'
+import SocialMediaSection from '../modules/landing-page/SocialMediaSection'
+import SearchRecommendCard from '../modules/landing-page/SearchRecommendCard'
+import Footer from '../modules/landing-page/Footer'
 
 export default function Home() {
   const [activeChip, setActiveChip] = useState('All')

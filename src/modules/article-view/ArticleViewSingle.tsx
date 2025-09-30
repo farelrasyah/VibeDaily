@@ -2,6 +2,9 @@
 // This file uses React hooks and must be a client component
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useRef } from "react";
+import ContentHub from "../landing-page/ContentHub";
+import ArticleFooter from "../landing-page/ArticleFooter";
 
 /**
  * Single-file version combining:
@@ -146,10 +149,6 @@ const ArticleStats: React.FC = () => {
   );
 };
 
-
-import { useRef } from "react";
-import ContentHub from "./ContentHub";
-import ArticleFooter from "./ArticleFooter";
 
 const ArticleView: React.FC = () => {
   // Ref untuk container artikel Content Hub

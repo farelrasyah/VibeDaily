@@ -1,11 +1,7 @@
 "use client";
 import React, { useRef } from "react";
 
-interface ContentHubProps {
-  // You can add props if you want to make it dynamic later
-}
-
-const ContentHub: React.FC<ContentHubProps> = () => {
+const ContentHub: React.FC = () => {
   const contentHubRef = useRef<HTMLDivElement>(null);
 
   const scrollContentHub = (dir: "left" | "right") => {
@@ -94,7 +90,7 @@ const ContentHub: React.FC<ContentHubProps> = () => {
               <div className="flex flex-col flex-1 px-7 pt-4 pb-6 items-center text-center">
                 <div className="text-[#222] text-base mb-1 font-normal w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>October 16, 2024</div>
                 <div className="text-2xl leading-tight mb-4 text-[#222] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center', fontWeight: 400}}>TOP 10 bright ideas for hotel website...</div>
-                <div className="bg-white rounded-[18px] px-6 py-4 text-[#6d6d6d] text-base font-normal border border-[#eceaea] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>1. Offer virtual tours of the hotel's facilities, rooms, and common areas.</div>
+                <div className="bg-white rounded-[18px] px-6 py-4 text-[#6d6d6d] text-base font-normal border border-[#eceaea] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>1. Offer virtual tours of the hotel&apos;s facilities, rooms, and common areas.</div>
               </div>
             </div>
             {/* Example Article Card 2 */}
@@ -113,7 +109,7 @@ const ContentHub: React.FC<ContentHubProps> = () => {
               <div className="flex flex-col flex-1 px-7 pt-4 pb-6 items-center text-center">
                 <div className="text-[#222] text-base mb-1 font-normal w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>October 17, 2024</div>
                 <div className="text-2xl leading-tight mb-4 text-[#222] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center', fontWeight: 400}}>TOP 10 ideas for skincare website...</div>
-                <div className="bg-white rounded-[18px] px-6 py-4 text-[#6d6d6d] text-base font-normal border border-[#eceaea] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>1. Don't underestimate your email list. It can help you build relationships with your audience,...</div>
+                <div className="bg-white rounded-[18px] px-6 py-4 text-[#6d6d6d] text-base font-normal border border-[#eceaea] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>1. Don&apos;t underestimate your email list. It can help you build relationships with your audience,...</div>
               </div>
             </div>
             {/* Example Article Card 3 */}
