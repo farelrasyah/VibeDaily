@@ -3,8 +3,8 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
-import ContentHub from "../landing-page/ContentHub";
-import ArticleFooter from "../landing-page/ArticleFooter";
+import ContentHub from "../../common/ContentHub";
+import ArticleFooter from "../../common/ArticleFooter";
 
 /**
  * Single-file version combining:

@@ -1,6 +1,7 @@
 // components/Footer.tsx
 import React, { useState } from "react";
-import SupportPopup from "./ContactUs";
+import SupportPopup from "@/common/ContactUs";
+
 
 const Footer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
