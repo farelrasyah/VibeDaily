@@ -109,7 +109,7 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
             <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden h-[240px] sm:h-[320px] md:h-[380px] lg:h-[500px] cursor-pointer">
             {/* Background image */}
             <img
-              src={featuredArticle.image || 'https://picsum.photos/800/600?random=101'}
+              src={featuredArticle.image}
               alt=""
               className={`absolute inset-0 h-full w-full object-cover transition-transform duration-1000 ease-out ${isVisible ? 'zoom-in-image' : ''}`}
             />
@@ -169,7 +169,7 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
                         {/* Image on the right - responsive sizing */}
                         <div className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] lg:w-[81px] lg:h-[81px] rounded-lg sm:rounded-xl overflow-hidden flex-shrink-0">
                           <img
-                            src={article.image || `https://picsum.photos/200/200?random=${idx}`}
+                            src={article.image}
                             alt={article.title}
                             className={`w-full h-full object-cover transition-transform duration-700 ease-out ${isVisible ? 'zoom-in-thumbnail' : ''}`}
                             style={{ animationDelay: `${idx * 150}ms` }}

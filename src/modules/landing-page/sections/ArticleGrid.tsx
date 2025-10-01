@@ -206,11 +206,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                     "
                   >
                     <img
-                      src={
-                        featured?.image && featured.image.trim() !== ''
-                          ? featured.image
-                          : 'https://picsum.photos/1400/900?random=34'
-                      }
+                      src={featured?.image || ''}
                       alt={featured?.title || 'featured'}
                       className={`absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out ${
                         isVisible ? 'zoom-in-image' : ''
@@ -258,9 +254,23 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                         <span className="text-slate-500">{item.time}</span>
                       </div>
 
-                      <h3 className="text-base sm:text-lg md:text-[19px] leading-[1.2] font-semibold text-slate-900 mb-1">
-                        {item.title}
-                      </h3>
+                      <div className="relative mb-1">
+                        <h3
+                          className="text-base sm:text-lg md:text-[19px] leading-[1.2] font-semibold text-slate-900 max-w-full"
+                          style={{
+                            fontFamily: "'Sequel Sans', sans-serif",
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+                            WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+                          }}
+                        >
+                          {item.title}
+                        </h3>
+                      </div>
 
                         {/* show single hashtag like reference; fallback to category if no tags present */}
                         {(item.tags && item.tags.length > 0) || item.category ? (

@@ -75,9 +75,22 @@ export default function Hero({
 
           {/* Judul - responsive typography */}
             <div className="mb-4 sm:mb-5 md:mb-6">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-[0.95] sm:leading-[0.92] md:leading-[0.9] lg:leading-[0.88] xl:leading-[0.86] text-slate-900 max-w-[20ch] sm:max-w-[18ch] md:max-w-[16ch] tracking-tight" style={{ fontFamily: "'Sequel Sans', sans-serif" }}>
-              {title}
-            </h1>
+            {title.split('\n').length <= 4 && (
+                <h1
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-[0.95] sm:leading-[0.92] md:leading-[0.9] lg:leading-[0.88] xl:leading-[0.86] text-slate-900 max-w-[20ch] sm:max-w-[18ch] md:max-w-[16ch] tracking-tight"
+                  style={{
+                  fontFamily: "'Sequel Sans', sans-serif",
+                  display: '-webkit-box',
+                  WebkitLineClamp: 4,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'clip',
+                  wordBreak: 'break-word'
+                  }}
+                >
+                  {title}
+                </h1>
+            )}
             </div>
 
           {/* Deskripsi singkat - responsive */}

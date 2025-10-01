@@ -1,20 +1,43 @@
 // SocialMediaSection.tsx
 import React, { useRef, useState, useEffect } from "react";
+
 /**
  * SocialMediaSection
  * - IG cards sama seperti sebelumnya
- * - Featured News: dibuat mengikuti referensi (badge kecil di luar kartu, sudut asimetris,
- *   shadow halus, meta netral, headline rapat, CTA 2 elemen terpisah)
+ * - Featured News: menggunakan data real dari API
+ * - News List: menggunakan data real dari API
  */
 
-const BG_URL =
-  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=900&fit=crop&auto=format";
+// NO MORE DUMMY DATA - all removed
 
-const IMAGES = [
-  "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=1200&h=1600&fit=crop&auto=format",
-  "https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea?w=1200&h=1600&fit=crop&auto=format",
-  "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&h=1600&fit=crop&auto=format",
-];
+// Add interfaces for API data
+interface NewsItem {
+  id: string;
+  title: string;
+  category: string;
+  time: string;
+  href: string;
+  description?: string;
+  tags?: string[];
+}
+
+interface SocialMediaSectionProps {
+  featuredNews?: NewsItem;
+  newsList?: NewsItem[];
+  newsImages?: string[]; // Array of news images to replace dummy social media images
+  backgroundImage?: string; // News image for background
+  // Add new prop for all articles with images
+  allArticles?: Array<{
+    id: string;
+    title: string;
+    category: string;
+    time: string;
+    href: string;
+    description?: string;
+    tags?: string[];
+    imageUrl?: string;
+  }>;
+}
 
 type CardProps = {
   img: string;
@@ -22,9 +45,10 @@ type CardProps = {
   className?: string;
   isVisible?: boolean;
   index?: number;
+  fallbackGradient?: string;
 };
 
-function InstaCard({ img, blueBar = false, className = "", isVisible = false, index = 0 }: CardProps) {
+function InstaCard({ img, blueBar = false, className = "", isVisible = false, index = 0, fallbackGradient = "from-gray-500 to-gray-600" }: CardProps) {
   return (
     <div
       className={["group relative w-[280px] sm:w-[320px] md:w-[360px] lg:w-[390px] h-[420px] sm:h-[480px] md:h-[520px] lg:h-[570px] rounded-[24px] sm:rounded-[28px]",
@@ -54,12 +78,19 @@ function InstaCard({ img, blueBar = false, className = "", isVisible = false, in
       </div>
       {/* Media - responsive */}
       <div className="relative h-[240px] sm:h-[280px] md:h-[320px] lg:h-[336px] overflow-hidden">
-        <img
-          src={img}
-          alt=""
-          className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 ${isVisible ? 'zoom-in-thumbnail' : ''}`}
-          style={{ animationDelay: `${index * 200}ms` }}
-        />
+        {img && img.trim() !== '' ? (
+          <img
+            src={img}
+            alt=""
+            className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 ${isVisible ? 'zoom-in-thumbnail' : ''}`}
+            style={{ animationDelay: `${index * 200}ms` }}
+          />
+        ) : (
+          <div 
+            className={`absolute inset-0 w-full h-full bg-gradient-to-br ${fallbackGradient} transition-transform duration-700 ease-out group-hover:scale-110`}
+            style={{ animationDelay: `${index * 200}ms` }}
+          />
+        )}
         <div className="absolute inset-0 ring-1 ring-white/10 pointer-events-none" />
         <div className="absolute inset-x-0 bottom-0 h-24 sm:h-28 md:h-32 lg:h-36 bg-gradient-to-t from-black/35 to-transparent" />
       </div>
@@ -88,9 +119,60 @@ function InstaCard({ img, blueBar = false, className = "", isVisible = false, in
     </div>
   );
 }
-const SocialMediaSection: React.FC = () => {
+const SocialMediaSection: React.FC<SocialMediaSectionProps> = ({ 
+  featuredNews, 
+  newsList = [],
+  newsImages = [],
+  backgroundImage,
+  allArticles = []
+}) => {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
+
+  // Get images from articles with fallback to newsImages
+  const getAvailableImages = () => {
+    // First try to get images from allArticles
+    const articlesWithImages = allArticles
+      .filter(article => article.imageUrl && article.imageUrl.trim() !== '' && !article.imageUrl.includes('picsum.photos'))
+      .map(article => article.imageUrl!);
+    
+    // If we have valid images from articles, use them
+    if (articlesWithImages.length >= 3) {
+      return articlesWithImages.slice(0, 3);
+    }
+    
+    // If not enough from articles, combine with newsImages
+    const allImages = [...articlesWithImages, ...newsImages.filter(img => img && img.trim() !== '')];
+    
+    if (allImages.length >= 3) {
+      return allImages.slice(0, 3);
+    }
+    
+    // If still not enough, fill with available images (repeat if necessary)
+    if (allImages.length > 0) {
+      const result = [...allImages];
+      while (result.length < 3) {
+        result.push(allImages[0]);
+      }
+      return result;
+    }
+    
+    // No valid images, return empty strings (will use fallback gradients)
+    return ['', '', ''];
+  };
+
+  const cardImages = getAvailableImages();
+  const bgImage = backgroundImage || (allArticles.find(article => 
+    article.imageUrl && article.imageUrl.trim() !== '' && !article.imageUrl.includes('picsum.photos')
+  )?.imageUrl);
+
+  // Debug logs
+  console.log('🔍 SocialMediaSection Debug:')
+  console.log('- featuredNews:', featuredNews)
+  console.log('- newsList length:', newsList.length)
+  console.log('- allArticles length:', allArticles.length)
+  console.log('- cardImages:', cardImages)
+  console.log('- backgroundImage:', bgImage)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -123,51 +205,71 @@ const SocialMediaSection: React.FC = () => {
         </div>
         {/* Background layers */}
         <div className="absolute inset-0 -z-10">
-          <img src={BG_URL} alt="Background" className={`w-full h-full object-cover scale-110 blur-[2px] transition-transform duration-1000 ease-out ${isVisible ? 'zoom-in-image' : ''}`} />
+          {bgImage ? (
+            <img src={bgImage} alt="Background" className={`w-full h-full object-cover scale-110 blur-[2px] transition-transform duration-1000 ease-out ${isVisible ? 'zoom-in-image' : ''}`} />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-indigo-900 via-purple-800 to-rose-700" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-purple-800/30 to-rose-700/40" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
           <div className="absolute inset-0 ring-1 ring-white/10 rounded-[inherit] pointer-events-none" />
         </div>
-        {/* === FEATURED NEWS (mimik referensi) === */}
+        {/* === FEATURED NEWS (menggunakan data real dari API) === */}
         <div className="absolute left-0 bottom-[-8px] md:bottom-[-12px] z-30 p-0">
-          <article
-            className={["relative bg-white/60 backdrop-blur-xl","px-8 py-7 sm:px-10 sm:py-8","rounded-[28px] rounded-tl-[56px]","max-w-[520px] min-w-[360px]"].join(" ")}
-          >
-            <div className="mb-3 flex items-center gap-2 text-[13px] text-black/60">
-              <span className="font-medium">Branding</span>
-              <span className="opacity-60">•</span>
-              <span>a year ago</span>
-            </div>
-            <h2 className="text-[28px] sm:text-[32px] font-extrabold text-black leading-tight tracking-[-0.01em] max-w-[32ch] mb-3">
-              Corporate identity design that ensures brand recognition
-            </h2>
-            <ul className="flex flex-wrap gap-x-6 gap-y-2 mb-6 text-[13px] text-black/55">
-              <li>#Brand identity design</li>
-              <li>#Corporate website design</li>
-              <li>#Website ui design</li>
-            </ul>
-            <div className="flex items-center gap-3">
-              <a
-                href="#"
-                className="inline-flex items-center rounded-full border border-black/10 bg-[#E9F0FF] px-5 py-3 text-[15px] font-semibold text-black transition-colors hover:bg-[#dfe8ff]"
+          {featuredNews && (
+            <article
+              className={["relative bg-white/60 backdrop-blur-xl","px-8 py-7 sm:px-10 sm:py-8","rounded-[28px] rounded-tl-[56px]","max-w-[520px] min-w-[360px]"].join(" ")}
+            >
+              <div className="mb-3 flex items-center gap-2 text-[13px] text-black/60">
+                <span className="font-medium">{featuredNews.category}</span>
+                <span className="opacity-60">•</span>
+                <span>{featuredNews.time}</span>
+              </div>
+              <h2 
+                className="text-[28px] sm:text-[32px] font-extrabold text-black leading-tight tracking-[-0.01em] max-w-[32ch] mb-3"
+                style={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
               >
-                Read article
-              </a>
-              <a
-                href="#"
-                aria-label="Open article"
-                className="grid h-11 w-11 place-items-center rounded-full border border-black/10 bg-[#E9F0FF] transition-transform hover:bg-[#dfe8ff] hover:translate-x-[2px]"
-              >
-                <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M5 12h14M13 5l7 7-7 7" />
-                </svg>
-              </a>
-            </div>
-          </article>
+                {featuredNews.title}
+              </h2>
+              {featuredNews.tags && featuredNews.tags.length > 0 && (
+                <ul className="flex flex-wrap gap-x-6 gap-y-2 mb-6 text-[13px] text-black/55">
+                  {featuredNews.tags.slice(0, 3).map((tag, index) => (
+                    <li key={index}>#{tag}</li>
+                  ))}
+                </ul>
+              )}
+              <div className="flex items-center gap-3">
+                <a
+                  href={featuredNews.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-full border border-black/10 bg-[#E9F0FF] px-5 py-3 text-[15px] font-semibold text-black transition-colors hover:bg-[#dfe8ff]"
+                >
+                  Read article
+                </a>
+                <a
+                  href={featuredNews.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Open article"
+                  className="grid h-11 w-11 place-items-center rounded-full border border-black/10 bg-[#E9F0FF] transition-transform hover:bg-[#dfe8ff] hover:translate-x-[2px]"
+                >
+                  <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 12h14M13 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+            </article>
+          )}
         </div>
-        {/* === NEWS LIST DI POJOK KANAN ATAS === */}
+        {/* === NEWS LIST DI POJOK KANAN ATAS (menggunakan data real dari API) === */}
 
-{/* News Sidebar (tanpa garis kiri, dengan border antar artikel) */}
+{/* News Sidebar (dengan data real dari API) */}
 <div className="absolute top-0 bottom-0 right-0 w-[320px] pr-6 z-40">
   <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
     <div className="w-full h-full bg-gradient-to-l from-violet-600/50 via-violet-500/40 to-transparent" />
@@ -176,82 +278,39 @@ const SocialMediaSection: React.FC = () => {
     {/* Container item: mengisi tinggi dan scrollable jika overflow */}
     <div className="relative h-full overflow-auto pt-4 pb-6">
       <div className="flex flex-col">
-        {/* News Item 1 */}
-        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
-          <div className="text-[12px] text-white/60 font-medium mb-1">
-            Web design <span className="opacity-60">•</span> a year ago
+        {newsList.length > 0 ? (
+          newsList.slice(0, 8).map((news, index) => (
+            <a
+              key={news.id}
+              href={news.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500 hover:bg-white/5 cursor-pointer group"
+            >
+              <div className="text-[12px] text-white/60 font-medium mb-1">
+                {news.category} <span className="opacity-60">•</span> {news.time}
+              </div>
+              <div 
+                className="font-bold text-white text-[16px] leading-tight tracking-tight group-hover:text-white/90 transition-colors"
+                style={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {news.title}
+              </div>
+            </a>
+          ))
+        ) : (
+          // Show message if no news data
+          <div className="pl-12 py-6 text-center">
+            <div className="text-white/60 text-[14px]">
+              Loading news...
+            </div>
           </div>
-          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
-            Innovative automotive web design based on 2024 trends
-          </div>
-        </div>
-
-        {/* News Item 2 */}
-        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
-          <div className="text-[12px] text-white/60 font-medium mb-1">
-            Web design <span className="opacity-60">•</span> a year ago
-          </div>
-          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
-            How to make a financial website design that reflects reliability and...
-          </div>
-        </div>
-
-        {/* News Item 3 */}
-        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
-          <div className="text-[12px] text-white/60 font-medium mb-1">
-            Web design <span className="opacity-60">•</span> a year ago
-          </div>
-          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
-            Furniture website design: how to create a stylish space in 5 steps
-          </div>
-        </div>
-
-        {/* News Item 4 */}
-        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
-          <div className="text-[12px] text-white/60 font-medium mb-1">
-            Logo <span className="opacity-60">•</span> a year ago
-          </div>
-          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
-            Best apps logo ideas
-          </div>
-        </div>
-
-        {/* News Item 5 */}
-        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
-          <div className="text-[12px] text-white/60 font-medium mb-1">
-            Web design <span className="opacity-60">•</span> a year ago
-          </div>
-          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
-            What should a small business website design contain?
-          </div>
-        </div>
-        {/* News Item 5 */}
-        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
-          <div className="text-[12px] text-white/60 font-medium mb-1">
-            Web design <span className="opacity-60">•</span> a year ago
-          </div>
-          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
-            What should a small business website design contain?
-          </div>
-        </div>
-        {/* News Item 5 */}
-        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
-          <div className="text-[12px] text-white/60 font-medium mb-1">
-            Web design <span className="opacity-60">•</span> a year ago
-          </div>
-          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
-            What should a small business website design contain?
-          </div>
-        </div>
-        {/* News Item 5 */}
-        <div className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500">
-          <div className="text-[12px] text-white/60 font-medium mb-1">
-            Web design <span className="opacity-60">•</span> a year ago
-          </div>
-          <div className="font-bold text-white text-[16px] leading-tight tracking-tight">
-            What should a small business website design contain?
-          </div>
-        </div>
+        )}
 
         {/* Spacer bawah */}
         <div className="h-6" />
@@ -260,12 +319,31 @@ const SocialMediaSection: React.FC = () => {
   </div>
 </div>
 
+        {/* Instagram Cards - always show, use news images if available, fallback to solid colors */}
         <div className="relative z-10 px-6 md:px-10 xl:px-12 py-10 md:py-14">
           <div className="grid grid-cols-1 gap-y-10">
             <div className="flex justify-center items-center">
-              <InstaCard img={IMAGES[0]} className="scale-90 -ml-4 z-10" isVisible={isVisible} index={0} />
-              <InstaCard img={IMAGES[1]} className="z-20" isVisible={isVisible} index={1} />
-              <InstaCard img={IMAGES[2]} className="scale-90 -mr-4 z-10" isVisible={isVisible} index={2} />
+              <InstaCard 
+                img={cardImages[0] || ""} 
+                className="scale-90 -ml-4 z-10" 
+                isVisible={isVisible} 
+                index={0} 
+                fallbackGradient="from-rose-500 to-pink-600"
+              />
+              <InstaCard 
+                img={cardImages[1] || ""} 
+                className="z-20" 
+                isVisible={isVisible} 
+                index={1} 
+                fallbackGradient="from-blue-500 to-purple-600"
+              />
+              <InstaCard 
+                img={cardImages[2] || ""} 
+                className="scale-90 -mr-4 z-10" 
+                isVisible={isVisible} 
+                index={2} 
+                fallbackGradient="from-green-500 to-teal-600"
+              />
             </div>
           </div>
         </div>

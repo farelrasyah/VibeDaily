@@ -60,7 +60,38 @@ interface HomeClientProps {
     time: string
     href: string
     image: string
+    description?: string
   }>
+  socialMediaSectionData?: {
+    featuredNews?: {
+      id: string
+      title: string
+      category: string
+      time: string
+      href: string
+      description?: string
+      tags?: string[]
+    }
+    newsList?: Array<{
+      id: string
+      title: string
+      category: string
+      time: string
+      href: string
+    }>
+    newsImages?: string[]
+    backgroundImage?: string
+    allArticles?: Array<{
+      id: string
+      title: string
+      category: string
+      time: string
+      href: string
+      description?: string
+      tags?: string[]
+      imageUrl?: string
+    }>
+  }
 }
 
 export default function HomeClient({ 
@@ -69,7 +100,8 @@ export default function HomeClient({
   articleGridItems, 
   recommendedItems,
   newsSlideItems,
-  articleSectionItems
+  articleSectionItems,
+  socialMediaSectionData
 }: HomeClientProps) {
   const [activeChip, setActiveChip] = useState('All')
 
@@ -158,7 +190,13 @@ export default function HomeClient({
       </div>
 
       {/* Social Media Section (full-bleed within page padding) */}
-      <SocialMediaSection />
+      <SocialMediaSection 
+        featuredNews={socialMediaSectionData?.featuredNews}
+        newsList={socialMediaSectionData?.newsList || []}
+        newsImages={socialMediaSectionData?.newsImages || []}
+        backgroundImage={socialMediaSectionData?.backgroundImage}
+        allArticles={socialMediaSectionData?.allArticles || []}
+      />
       
       {/* Footer Section */}
       <Footer />
