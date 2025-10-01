@@ -78,6 +78,7 @@ export default async function Home() {
   const tickerItems = uniqueTrendingArticles.map(article => {
     markAsUsed(article)
     return {
+      id: article.id,
       title: article.title,
       href: article.url,
       category: article.source.name,
@@ -131,6 +132,7 @@ export default async function Home() {
     ? newsForSidebar.map((article, index) => {
         markAsUsed(article)
         return {
+          id: article.id,
           thumb: article.imageUrl || '', // Empty string, bukan picsum dummy
           meta: `${article.source.name} • ${getRelativeTime(article.publishedAt, article.language)}`,
           title: article.title,

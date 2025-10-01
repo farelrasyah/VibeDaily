@@ -21,6 +21,7 @@ interface HomeClientProps {
     articleUrl: string
   }
   tickerItems: Array<{
+    id: string
     title: string
     href: string
     category: string
@@ -38,6 +39,7 @@ interface HomeClientProps {
     image?: string
   }>
   recommendedItems: Array<{
+    id: string
     thumb: string
     meta: string
     title: string

@@ -104,6 +104,26 @@ class BeritaIndoService {
   }
 
   /**
+   * Generate safe ID from URL or title
+   */
+  private generateSafeId(url: string, title: string): string {
+    // Extract last part of URL or use title
+    const urlParts = url.split('/');
+    const lastPart = urlParts[urlParts.length - 1] || urlParts[urlParts.length - 2];
+    
+    if (lastPart && lastPart !== '') {
+      return lastPart.replace(/[^a-zA-Z0-9-_]/g, '-').substring(0, 100);
+    }
+    
+    // Fallback to title-based ID
+    return title
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .replace(/\s+/g, '-')
+      .substring(0, 50) + '-' + Date.now().toString().slice(-6);
+  }
+
+  /**
    * Transform Berita Indo article to unified format
    */
   private transformArticle = (
@@ -111,7 +131,7 @@ class BeritaIndoService {
     source: IndonesiaSource
   ): NewsArticle => {
     return {
-      id: article.link || `${source}-${Date.now()}`,
+      id: this.generateSafeId(article.link, article.title),
       title: article.title || 'No title',
       description: article.contentSnippet || article.description || '',
       content: article.description || article.contentSnippet || '',

@@ -1,5 +1,6 @@
-import ArticleViewSingle from '../../modules/article-view/ArticleViewSingle';
+import { redirect } from 'next/navigation';
 
 export default function ArticleViewPage() {
-  return <ArticleViewSingle />;
+  // Redirect to home if no article ID is provided
+  redirect('/');
 }

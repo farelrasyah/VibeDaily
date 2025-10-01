@@ -102,11 +102,36 @@ class NewsApiOrgService {
   }
 
   /**
+   * Generate safe ID from URL or title
+   */
+  private generateSafeId(url: string, title: string): string {
+    // Extract domain and path from URL
+    try {
+      const urlObj = new URL(url);
+      const pathParts = urlObj.pathname.split('/').filter(part => part);
+      const lastPart = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+      
+      if (lastPart && lastPart !== '') {
+        return lastPart.replace(/[^a-zA-Z0-9-_]/g, '-').substring(0, 100);
+      }
+    } catch (e) {
+      // Invalid URL, fallback to title
+    }
+    
+    // Fallback to title-based ID
+    return title
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .replace(/\s+/g, '-')
+      .substring(0, 50) + '-' + Date.now().toString().slice(-6);
+  }
+
+  /**
    * Transform NewsAPI.org article to unified format
    */
   private transformArticle = (article: any): NewsArticle => {
     return {
-      id: article.url, // Use URL as unique ID
+      id: this.generateSafeId(article.url, article.title),
       title: article.title || 'No title',
       description: article.description || article.content || '',
       content: article.content || article.description || '',
