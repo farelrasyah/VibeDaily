@@ -1,184 +1,143 @@
-'use client'
+import { newsService, newsApiOrg, beritaIndo } from '@/lib/api'
+import { getRelativeTime } from '@/lib/utils/date-formatter'
+import HomeClient from './HomeClient'
 
-import { useState } from 'react'
-import NavigationDropdown from '../modules/landing-page/widgets/NavigationDropdown'
-import Hero from '../modules/landing-page/sections/Hero'
-import Ticker from '../modules/landing-page/widgets/Ticker'
-import ArticleGrid from '../modules/landing-page/sections/ArticleGrid'
-import NewsSlide from '../modules/landing-page/sections/NewsSlide'
-import ArticleSection from '../modules/landing-page/sections/ArticleSection'
-import SocialMediaSection from '../modules/landing-page/sections/SocialMediaSection'
-import SearchRecommendCard from '../modules/landing-page/widgets/SearchRecommendCard'
-import Footer from '../modules/landing-page/sections/Footer'
+export const revalidate = 300 // Revalidate every 5 minutes
 
-export default function Home() {
-  const [activeChip, setActiveChip] = useState('All')
+export default async function Home() {
+  // Fetch real data from APIs
+  const [heroResult, trendingResult, mixedNewsResult, indonesiaNewsResult, internationalNewsResult] = await Promise.allSettled([
+    newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 1 }),
+    newsService.getTrendingNews(6),
+    newsService.getMixedNews(15),
+    beritaIndo.getAllIndonesiaNews(),
+    newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 8 }),
+  ])
 
-  const navItems = [
-    { 
-      label: 'All', 
-      active: activeChip === 'All',
-      dropdownItems: ['Latest Articles', 'Popular Posts', 'Trending Topics', 'Featured Content']
-    },
-    { 
-      label: 'News', 
-      active: activeChip === 'News',
-      dropdownItems: ['Breaking News', 'Tech News', 'Business Updates', 'World Events']
-    },
-    { 
-      label: 'Exclusives', 
-      active: activeChip === 'Exclusives',
-      dropdownItems: ['Premium Articles', 'Member Only', 'Insider Reports']
-    },
-    { 
-      label: 'Guides', 
-      active: activeChip === 'Guides',
-      dropdownItems: ['How-to Guides', 'Tutorials', 'Best Practices', 'Tips & Tricks']
-    },
-    { 
-      label: 'Recommended', 
-      active: activeChip === 'Recommended',
-      dropdownItems: ['Editor\'s Choice', 'Must Read', 'Top Picks', 'Staff Recommendations']
-    },
-  ]
+  // Hero data (first international article)
+  const heroArticle = heroResult.status === 'fulfilled' && heroResult.value.success 
+    ? heroResult.value.data[0] 
+    : null
 
-  const heroData = {
-    category: 'Branding',
-    time: 'a year ago',
-    title: 'Corporate identity design that ensures brand recognition',
-    tags: ['Ethereum', 'Analytics'],
+  const heroData = heroArticle ? {
+    category: heroArticle.source.name,
+    time: getRelativeTime(heroArticle.publishedAt, 'en'),
+    title: heroArticle.title,
+    tags: heroArticle.category ? [heroArticle.category] : ['News'],
     ctaText: 'Read article',
-    onCta: () => console.log('Hero CTA clicked'),
+    articleUrl: heroArticle.url,
+  } : {
+    category: 'News',
+    time: 'Loading...',
+    title: 'Stay informed with the latest news and updates',
+    tags: ['News'],
+    ctaText: 'Read article',
+    articleUrl: '#',
   }
 
-  const tickerItems = [
-    {
-      title: 'Top Analyst Unveils Ethereum Catalyst That Could Trigger Nearly 50% Surge',
-      href: '#',
-      category: 'Blockchain News',
-      time: '4 hours ago',
-    },
-    {
-      title: 'Over 65% of Crypto-Related Tweets and 84% of Conversations on Reddit Were Positive',
-      href: '#',
-      category: 'Blockchain News',
-      time: '4 hours ago',
-    },
-    {
-      title: 'STX Price Prediction: After 100% Price Jump in December, What\'s in Store',
-      href: '#',
-      category: 'Blockchain News',
-      time: '4 hours ago',
-    },
-    {
-      title: 'US-Approved Spot Bitcoin ETFs Could Surpass Entire $50 Million Crypto ETF Market',
-      href: '#',
-      category: 'Blockchain News',
-      time: '2 hours ago',
-    },
-  ]
+  // Ticker items (trending news)
+  const tickerItems = trendingResult.status === 'fulfilled' 
+    ? trendingResult.value.slice(0, 6).map(article => ({
+        title: article.title,
+        href: article.url,
+        category: article.source.name,
+        time: getRelativeTime(article.publishedAt, article.language),
+      }))
+    : []
 
-  // Penting: minimal 1 featured + >=6 thumbs agar slide awal penuh
-  const articleGridItems = [
-    {
-      id: '1',
-      title: '10 trends in ecommerce website design that are relevant in 2024',
-      category: 'E-commerce',
-      time: 'a year ago',
-      href: '#',
-      featured: true,
-      description: 'Personalization and AI to offer personalized products; Minimalistic design, simplicity and ease of use; Mobile optimization; Using voice assistants is also important in ecommerce design; Utilizing AR and VR...',
-      tags: ['Design', 'Trends', 'E-commerce'],
-      image: '' // kosong => kita pakai gambar bawaan di komponen (agar layout cocok)
-    },
-    // 6 thumbs pertama
-    { id: '2',  title: 'Best apps logo ideas', category: 'Logo',        time: '3 years ago', href: '#', image: 'https://picsum.photos/560/315?random=2'  },
-    { id: '3',  title: 'How to make iphone app designs: a guide for beginners', category: 'iOS', time: 'a year ago', href: '#', image: 'https://picsum.photos/560/315?random=3' },
-    { id: '4',  title: 'How to make an attractive social media app design',     category: 'Mobile app', time: 'a year ago', href: '#', image: 'https://picsum.photos/560/315?random=4' },
-    { id: '5',  title: 'The main stages of creating a fitness app ui',          category: 'Mobile app', time: 'a year ago', href: '#', image: 'https://picsum.photos/560/315?random=5' },
-    { id: '6',  title: 'How to make web application design that users will love', category: 'Mobile app', time: 'a year ago', href: '#', image: 'https://picsum.photos/560/315?random=6' },
-    { id: '8',  title: 'Advanced UI/UX design patterns', category: 'Design',    time: '2 weeks ago', href: '#', image: 'https://picsum.photos/560/315?random=8' },
+  // Article Grid items (mixed news with featured)
+  const mixedNews = mixedNewsResult.status === 'fulfilled' ? mixedNewsResult.value : []
+  const articleGridItems = mixedNews.map((article, index) => ({
+    id: article.id,
+    title: article.title,
+    category: article.source.name,
+    time: getRelativeTime(article.publishedAt, article.language),
+    href: article.url,
+    featured: index === 0 || index === 7, // Make first and 8th item featured
+    description: article.description,
+    tags: article.category ? [article.category] : ['News'],
+    image: article.imageUrl || '',
+  }))
 
-    // featured slide 2
-    {
-      id: '7',
-      title: '10 trends in ecommerce website design that are relevant in 2024',
-      category: 'E-commerce',
-      time: 'a year ago',
-      href: '#',
-      featured: true,
-      description: 'Personalization and AI to offer personalized products; Minimalistic design, simplicity and ease of use; Mobile optimization; Using voice assistants is also important in ecommerce design; Utilizing AR and VR...',
-      tags: ['Design', 'Trends', 'E-commerce']
-    },
-    // thumbs tambahan
-    { id: '9',  title: 'Modern web development frameworks', category: 'Development', time: '1 week ago', href: '#', image: 'https://picsum.photos/560/315?random=9'  },
-    { id: '10', title: 'Digital marketing strategies for 2024', category: 'Marketing', time: '3 days ago', href: '#', image: 'https://picsum.photos/560/315?random=10' },
-  ]
+  // Recommended items (Indonesia news for sidebar)
+  const indonesiaNews = indonesiaNewsResult.status === 'fulfilled' && indonesiaNewsResult.value.success
+    ? indonesiaNewsResult.value.data.slice(0, 6)
+    : []
 
-  const recommendedItems = [
-    { thumb: 'https://picsum.photos/380/214?random=5',  meta: 'Blockchain News • 4 hours ago', title: 'US-Approved Spot Bitcoin ETFs Could Surpass Entire $50 Million Crypto ETF Market: Bitwise', href: '#', featured: true },
-    { thumb: 'https://picsum.photos/64/64?random=6',   meta: 'Blockchain News • 4 hours ago', title: 'STX Price Prediction: After 100% Price Jump in December, What\'s in Store for 2024?', href: '#' },
-    { thumb: 'https://picsum.photos/64/64?random=7',   meta: 'Blockchain News • 3 hours ago', title: 'Over 65% of Crypto-Related Tweets and 84% of Conversations on Reddit Were Positive in 2023', href: '#' },
-    { thumb: 'https://picsum.photos/64/64?random=8',   meta: 'Blockchain News • 2 hours ago', title: 'Former FTX CEO Sam Bankman-Fried and Caroline Heads Sentencing Delayed Pending Discovery', href: '#' },
-    { thumb: 'https://picsum.photos/64/64?random=9',   meta: 'Blockchain News • 1 hour ago',  title: 'Bitcoin Mining Difficulty Reaches All-Time High as Network Security Strengthens', href: '#' },
-    { thumb: 'https://picsum.photos/64/64?random=10',  meta: 'Blockchain News • 30 min ago',  title: 'Ethereum Layer 2 Solutions See Record Transaction Volume Growth', href: '#' },
-  ]
+  // Fallback jika Indonesia news kosong - gunakan international news
+  const fallbackNews = indonesiaNews.length === 0 && internationalNewsResult.status === 'fulfilled' && internationalNewsResult.value.success
+    ? internationalNewsResult.value.data.slice(0, 6)
+    : []
+
+  const newsForSidebar = indonesiaNews.length > 0 ? indonesiaNews : fallbackNews
+
+  const recommendedItems = newsForSidebar.length > 0 
+    ? newsForSidebar.map((article, index) => ({
+        thumb: article.imageUrl || `https://picsum.photos/380/214?random=${index}`,
+        meta: `${article.source.name} • ${getRelativeTime(article.publishedAt, article.language)}`,
+        title: article.title,
+        href: article.url,
+        featured: index === 0,
+      }))
+    : [
+        // Fallback dummy data jika semua API gagal
+        {
+          thumb: 'https://picsum.photos/380/214?random=1',
+          meta: 'News • Just now',
+          title: 'Loading latest news...',
+          href: '#',
+          featured: true,
+        },
+        {
+          thumb: 'https://picsum.photos/64/64?random=2',
+          meta: 'News • 1 hour ago',
+          title: 'Stay tuned for updates',
+          href: '#',
+          featured: false,
+        },
+      ]
+
+  console.log(`✅ Recommended items count: ${recommendedItems.length}`);
+
+  // NewsSlide items (international news)
+  const internationalNews = internationalNewsResult.status === 'fulfilled' && internationalNewsResult.value.success
+    ? internationalNewsResult.value.data.slice(0, 8)
+    : []
+
+  const newsSlideItems = internationalNews.map(article => ({
+    id: article.id,
+    title: article.title,
+    category: article.source.name,
+    time: getRelativeTime(article.publishedAt, 'en'),
+    href: article.url,
+    image: article.imageUrl || '/oval.gif',
+    tags: article.category ? [article.category] : [],
+  }))
+
+  // ArticleSection items (trending Indonesia news)
+  const newsForArticleSection = indonesiaNews.length > 0 ? indonesiaNews : fallbackNews
+  
+  const articleSectionItems = newsForArticleSection.slice(0, 8).map(article => ({
+    id: article.id,
+    title: article.title,
+    category: article.source.name,
+    time: getRelativeTime(article.publishedAt, article.language),
+    href: article.url,
+    image: article.imageUrl || 'https://picsum.photos/800/600?random=' + article.id,
+    description: article.description,
+  }))
+
+  console.log(`✅ Article section items count: ${articleSectionItems.length}`);
 
   return (
-    <div className="min-h-screen w-full">
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <div className="max-w-[1440px] mx-auto">
-          {/* Header */}
-          <header className="mb-6 lg:mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-              <div className="flex items-center space-x-2 flex-shrink-0">
-                <div className="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">◉</span>
-                </div>
-                <span className="text-xl font-bold text-slate-900">VibeDaily</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <NavigationDropdown
-                  items={navItems}
-                  onItemClick={(item) => setActiveChip(item.label)}
-                  onDropdownItemClick={(parentLabel, dropdownItem) => {
-                    console.log(`Navigation: ${parentLabel} -> ${dropdownItem}`)
-                  }}
-                />
-              </div>
-            </div>
-          </header>
-
-          {/* Main two-column layout - responsive with proper ordering */}
-          <main className="flex flex-col xl:flex-row gap-6 sm:gap-8 xl:items-start">
-            <div className="flex-1 min-w-0">
-              <Hero {...heroData} />
-              <Ticker items={tickerItems} />
-              <ArticleGrid items={articleGridItems} />
-              {/* News Slide Section (new, below ArticleGrid) */}
-              <NewsSlide />
-              {/* Article Section (new, after NewsSlide) */}
-              <ArticleSection />
-              {/* Social Media Section moved outside the centered max-w container so it can span the page */}
-            </div>
-
-            <aside className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px] order-last xl:order-none">
-              <div className="sticky top-4 xl:top-20">
-                <SearchRecommendCard
-                  items={recommendedItems}
-                  onSearch={(query: string) => console.log('Search:', query)}
-                />
-              </div>
-            </aside>
-          </main>
-        </div>
-      </div>
-
-      {/* Social Media Section (full-bleed within page padding) */}
-      <SocialMediaSection />
-      
-      {/* Footer Section */}
-      <Footer />
-    </div>
+    <HomeClient 
+      heroData={heroData}
+      tickerItems={tickerItems}
+      articleGridItems={articleGridItems}
+      recommendedItems={recommendedItems}
+      newsSlideItems={newsSlideItems}
+      articleSectionItems={articleSectionItems}
+    />
   )
 }
+

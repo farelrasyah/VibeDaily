@@ -43,8 +43,70 @@ export default function SearchRecommendCard({
     { code: 'De', name: 'Deutsch' },
   ]
 
+  // Debug: Log items count
+  console.log('SearchRecommendCard items:', items.length)
+
   const featuredItem = items.find(item => item.featured) || items[0]
   const regularItems = items.filter(item => !item.featured).slice(0, 4)
+
+  // Jika tidak ada items sama sekali, tampilkan pesan
+  if (!items || items.length === 0) {
+    return (
+      <div className="w-full space-y-2 sm:space-y-3">
+        <div className="search-bar-container">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
+            {showLanguageSelector && (
+              <div className="relative order-2 sm:order-1">
+                <button 
+                  className="language-selector-pill w-full sm:w-auto justify-center sm:justify-start"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  {selectedLanguage}
+                  <ChevronDown className="w-3 sm:w-4 h-3 sm:h-4 opacity-60" />
+                </button>
+                
+                {isDropdownOpen && (
+                  <div className="language-dropdown-menu">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        className="language-option-item"
+                        onClick={() => {
+                          setSelectedLanguage(lang.code)
+                          setIsDropdownOpen(false)
+                        }}
+                      >
+                        {lang.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <div className="search-input-pill flex-1 order-1 sm:order-2">
+              <input 
+                className="search-input-field"
+                placeholder={placeholder}
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+              />
+              <Search className="search-input-icon w-4 sm:w-5 h-4 sm:h-5" />
+            </div>
+          </div>
+        </div>
+
+        <div className="recommended-card">
+          <div className="recommended-header">
+            <h3 className="recommended-title">{title}</h3>
+          </div>
+          <div className="p-8 text-center text-slate-500">
+            <p>Loading recommendations...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query)

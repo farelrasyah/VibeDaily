@@ -13,69 +13,19 @@ type NewsItem = {
   tags?: string[];
 };
 
-const newsItems: NewsItem[] = [
-  {
-    id: '1',
-    title: 'Best apps logo ideas',
-    category: 'Logo',
-    time: 'a year ago',
-    href: '#',
-    image: '/file.svg',
-    tags: ['Apps logo', 'Creative logo'],
-  },
-  {
-    id: '2',
-    title: 'How to make iphone app designs: a guide for beginners',
-    category: 'iOS',
-    time: 'a year ago',
-    href: '#',
-    image: '/globe.svg',
-    tags: ['Iphone app designs', 'Ios app design'],
-  },
-  {
-    id: '3',
-    title: 'How to make an attractive social media app design',
-    category: 'Mobile app',
-    time: 'a year ago',
-    href: '#',
-    image: '/next.svg',
-    tags: ['Social media app design', 'App design'],
-  },
-  {
-    id: '4',
-    title: 'The main stages of creating a fitness app ui',
-    category: 'Mobile app',
-    time: 'a year ago',
-    href: '#',
-    image: '/oval.gif',
-    tags: ['Fitness app ui', 'Fitness website design'],
-  },
-  {
-    id: '5',
-    title: 'How to make a design that catches attention',
-    category: 'Mobile app',
-    time: 'a year ago',
-    href: '#',
-    image: '/window.svg',
-    tags: ['Music app ui design'],
-  },
-  {
-    id: '6',
-    title: 'Audio Sphere',
-    category: 'Mobile app',
-    time: 'a year ago',
-    href: '#',
-    image: '/Oval.jpg',
-    tags: ['Music app ui design'],
-  },
-];
+interface NewsSlideProps {
+  items?: NewsItem[];
+}
 
 const CARD_W = 240; // px, responsive card width
 
-export default function NewsSlide() {
+export default function NewsSlide({ items }: NewsSlideProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const router = useRouter();
+
+  // Use provided items or fallback to empty array
+  const newsItems = items || [];
 
   useEffect(() => {
     const el = trackRef.current;
@@ -153,7 +103,7 @@ export default function NewsSlide() {
               className="shrink-0 snap-start"
               style={{ width: 'min(280px, 85vw)', margin: 0, padding: 0 }}
             >
-              <div onClick={() => router.push('/article-view')} className="group block cursor-pointer">
+              <a href={item.href} target="_blank" rel="noopener noreferrer" className="group block cursor-pointer">
                 <div
                   className="relative w-full overflow-hidden bg-white shadow-[0_8px_32px_rgba(15,23,42,.06)]"
                   style={{ borderRadius: 16, width: 'min(250px, 80vw)', height: 'min(120px, 30vw)' }}
@@ -202,7 +152,7 @@ export default function NewsSlide() {
                     ))}
                   </div>
                 )}
-              </div>
+              </a>
             </article>
           ))}
         </div>
