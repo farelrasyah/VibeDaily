@@ -15,10 +15,12 @@ export async function GET(
       );
     }
 
-    console.log('🔍 API route searching for article ID:', id);
+    // Decode URL if it's encoded
+    const decodedId = decodeURIComponent(id);
+    console.log('🔍 API route searching for article ID:', decodedId);
     
     // Fetch article menggunakan server-side untuk menghindari CORS
-    const article = await newsService.getArticleById(id);
+    const article = await newsService.getArticleById(decodedId);
     
     if (!article) {
       console.log('❌ Article not found in API route');

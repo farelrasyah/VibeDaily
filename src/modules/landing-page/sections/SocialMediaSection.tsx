@@ -1,5 +1,6 @@
 // SocialMediaSection.tsx
 import React, { useRef, useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 /**
  * SocialMediaSection
@@ -128,6 +129,7 @@ const SocialMediaSection: React.FC<SocialMediaSectionProps> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
+  const router = useRouter()
 
   // Get images from articles with fallback to newsImages
   const getAvailableImages = () => {
@@ -244,25 +246,21 @@ const SocialMediaSection: React.FC<SocialMediaSectionProps> = ({
                 </ul>
               )}
               <div className="flex items-center gap-3">
-                <a
-                  href={featuredNews.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-full border border-black/10 bg-[#E9F0FF] px-5 py-3 text-[15px] font-semibold text-black transition-colors hover:bg-[#dfe8ff]"
+                <button
+                  onClick={() => router.push(`/article/${featuredNews.id}`)}
+                  className="inline-flex items-center rounded-full border border-black/10 bg-[#E9F0FF] px-5 py-3 text-[15px] font-semibold text-black transition-colors hover:bg-[#dfe8ff] cursor-pointer"
                 >
                   Read article
-                </a>
-                <a
-                  href={featuredNews.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                </button>
+                <button
+                  onClick={() => router.push(`/article/${featuredNews.id}`)}
                   aria-label="Open article"
-                  className="grid h-11 w-11 place-items-center rounded-full border border-black/10 bg-[#E9F0FF] transition-transform hover:bg-[#dfe8ff] hover:translate-x-[2px]"
+                  className="grid h-11 w-11 place-items-center rounded-full border border-black/10 bg-[#E9F0FF] transition-transform hover:bg-[#dfe8ff] hover:translate-x-[2px] cursor-pointer"
                 >
                   <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M5 12h14M13 5l7 7-7 7" />
                   </svg>
-                </a>
+                </button>
               </div>
             </article>
           )}
@@ -280,11 +278,9 @@ const SocialMediaSection: React.FC<SocialMediaSectionProps> = ({
       <div className="flex flex-col">
         {newsList.length > 0 ? (
           newsList.slice(0, 8).map((news, index) => (
-            <a
+            <div
               key={news.id}
-              href={news.href}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={() => router.push(`/article/${news.id}`)}
               className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500 hover:bg-white/5 cursor-pointer group"
             >
               <div className="text-[12px] text-white/60 font-medium mb-1">
@@ -301,7 +297,7 @@ const SocialMediaSection: React.FC<SocialMediaSectionProps> = ({
               >
                 {news.title}
               </div>
-            </a>
+            </div>
           ))
         ) : (
           // Show message if no news data

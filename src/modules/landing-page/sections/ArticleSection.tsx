@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
 type ArticleItem = {
   id: string;
@@ -22,6 +23,7 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set())
   const sectionRef = useRef<HTMLElement>(null)
+  const router = useRouter()
 
   // Use provided items or fallback to empty array, ensure we always have valid data
   const articles = items && Array.isArray(items) && items.length > 0 ? items.filter(item => item && item.id && item.title) : [];
@@ -189,7 +191,10 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
       <div className="grid grid-cols-1 gap-6 md:gap-5 lg:grid-cols-5 lg:gap-4">
         {/* Featured article - responsive sizing */}
         <div className="lg:col-span-3 -mx-4 sm:-mx-6 lg:-ml-8">
-          <a href={featuredArticle.href} target="_blank" rel="noopener noreferrer" className="block">
+          <div 
+            onClick={() => router.push(`/article/${featuredArticle.id}`)}
+            className="block cursor-pointer"
+          >
             <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden h-[240px] sm:h-[320px] md:h-[380px] lg:h-[500px] cursor-pointer">
             {/* Background image with fallback */}
             {featuredArticle.image && !imageErrors.has(featuredArticle.id) ? (
@@ -228,11 +233,9 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
                 {featuredArticle.description || featuredArticle.title}
               </p>
             </div>
+            </div>
           </div>
-          </a>
-        </div>
-
-        {/* Right grid - responsive layout */}
+        </div>        {/* Right grid - responsive layout */}
         <div className="lg:col-span-2 relative">
           <div className="lg:pl-6 xl:pl-10 relative">
             {/* Grid container - responsive for mobile/tablet */}
@@ -240,7 +243,10 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
               <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 md:gap-x-8 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-0">
                 {rightItems.slice(0, 6).map((article, idx) => (
                   <article key={`article-${article.id}-${idx}`} className="group">
-                    <a href={article.href} target="_blank" rel="noopener noreferrer" className="block hover:opacity-80 transition-opacity">
+                    <div 
+                      onClick={() => router.push(`/article/${article.id}`)}
+                      className="block hover:opacity-80 transition-opacity cursor-pointer"
+                    >
                       <div className="grid grid-cols-[1fr_70px] sm:grid-cols-[1fr_80px] lg:grid-cols-[1fr_90px] gap-3 sm:gap-4 lg:gap-5 py-4 sm:py-5 lg:py-6 px-0 min-h-[120px] sm:min-h-[130px] lg:min-h-[140px]">
                         {/* Text content on the left - responsive */}
                         <div className="flex flex-col justify-start min-w-0 pr-1 sm:pr-2">
@@ -290,7 +296,7 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
                       {idx < rightItems.length - 1 && (
                         <hr className="hidden lg:block border-0 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent mx-4 my-0" />
                       )}
-                    </a>
+                    </div>
                   </article>
                 ))}
               </div>

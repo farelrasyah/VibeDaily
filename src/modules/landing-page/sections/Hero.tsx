@@ -2,6 +2,7 @@
 
 import { ChevronRight } from 'lucide-react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 interface HeroProps {
   category: string
@@ -11,6 +12,7 @@ interface HeroProps {
   ctaText?: string
   onCta?: () => void
   orb?: boolean
+  articleId?: string // Add articleId prop for routing
 }
 
 export default function Hero({
@@ -21,7 +23,18 @@ export default function Hero({
   ctaText = 'Read article',
   onCta,
   orb = true,
+  articleId,
 }: HeroProps) {
+  const router = useRouter()
+
+  // Internal navigation function
+  const handleCta = () => {
+    if (articleId) {
+      router.push(`/article/${articleId}`)
+    } else if (onCta) {
+      onCta()
+    }
+  }
   return (
     <section className="relative">
       {/* ORB / dekorasi kanan - responsive positioning */}
@@ -102,7 +115,7 @@ export default function Hero({
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               className="px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 rounded-full bg-white text-slate-900 border border-white shadow-sm hover:shadow transition-all text-sm sm:text-base font-semibold"
-              onClick={onCta}
+              onClick={handleCta}
             >
               {ctaText}
             </button>
@@ -110,7 +123,7 @@ export default function Hero({
             <button
               aria-label="Go"
               className="inline-flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-full border border-white/70 bg-white/80 backdrop-blur hover:bg-white transition-all hover:-translate-y-px"
-              onClick={onCta}
+              onClick={handleCta}
             >
               <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>

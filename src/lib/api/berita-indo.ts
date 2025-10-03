@@ -82,10 +82,10 @@ class BeritaIndoService {
       });
 
       if (allArticles.length > 0) {
-        // Shuffle articles to mix sources and limit to reasonable number
+        // Shuffle articles to mix sources but keep more articles
         const shuffledArticles = allArticles
           .sort(() => Math.random() - 0.5)
-          .slice(0, 50); // Limit to 50 articles max
+          .slice(0, 200); // Increase limit to 200 articles max
 
         console.log(`✅ Successfully fetched ${totalFetched} total articles from ${results.length} sources, showing ${shuffledArticles.length}`);
         
@@ -155,20 +155,38 @@ class BeritaIndoService {
    * Generate safe ID from URL or title
    */
   private generateSafeId(url: string, title: string): string {
-    // Extract last part of URL or use title
+    // Create a more robust hash function
+    const createHash = (str: string): string => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      return Math.abs(hash).toString(36);
+    };
+
+    // Use combination of URL and title for better uniqueness
+    const combined = `${url}|${title}`;
+    const combinedHash = createHash(combined);
+
+    // Extract meaningful part from URL
     const urlParts = url.split('/');
     const lastPart = urlParts[urlParts.length - 1] || urlParts[urlParts.length - 2];
     
-    if (lastPart && lastPart !== '') {
-      return lastPart.replace(/[^a-zA-Z0-9-_]/g, '-').substring(0, 100);
+    if (lastPart && lastPart !== '' && lastPart.length > 3) {
+      // Use URL path part + combined hash for uniqueness
+      const cleanPart = lastPart.replace(/[^a-zA-Z0-9-_]/g, '-').substring(0, 50);
+      return `${cleanPart}-${combinedHash}`;
     }
     
-    // Fallback to title-based ID
-    return title
+    // Fallback to title-based ID with combined hash
+    const titlePart = title
       .toLowerCase()
       .replace(/[^a-zA-Z0-9\s]/g, '')
       .replace(/\s+/g, '-')
-      .substring(0, 50) + '-' + Date.now().toString().slice(-6);
+      .substring(0, 30);
+    return `${titlePart}-${combinedHash}`;
   }
 
   /**

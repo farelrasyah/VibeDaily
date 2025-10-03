@@ -105,25 +105,43 @@ class NewsApiOrgService {
    * Generate safe ID from URL or title
    */
   private generateSafeId(url: string, title: string): string {
+    // Create a more robust hash function
+    const createHash = (str: string): string => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      return Math.abs(hash).toString(36);
+    };
+
+    // Use combination of URL and title for better uniqueness
+    const combined = `${url}|${title}`;
+    const combinedHash = createHash(combined);
+
     // Extract domain and path from URL
     try {
       const urlObj = new URL(url);
       const pathParts = urlObj.pathname.split('/').filter(part => part);
       const lastPart = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
       
-      if (lastPart && lastPart !== '') {
-        return lastPart.replace(/[^a-zA-Z0-9-_]/g, '-').substring(0, 100);
+      if (lastPart && lastPart !== '' && lastPart.length > 3) {
+        // Use URL path part + combined hash for uniqueness
+        const cleanPart = lastPart.replace(/[^a-zA-Z0-9-_]/g, '-').substring(0, 50);
+        return `${cleanPart}-${combinedHash}`;
       }
     } catch (e) {
       // Invalid URL, fallback to title
     }
     
-    // Fallback to title-based ID
-    return title
+    // Fallback to title-based ID with combined hash
+    const titlePart = title
       .toLowerCase()
       .replace(/[^a-zA-Z0-9\s]/g, '')
       .replace(/\s+/g, '-')
-      .substring(0, 50) + '-' + Date.now().toString().slice(-6);
+      .substring(0, 30);
+    return `${titlePart}-${combinedHash}`;
   }
 
   /**

@@ -103,7 +103,10 @@ export default function NewsSlide({ items }: NewsSlideProps) {
               className="shrink-0 snap-start"
               style={{ width: 'min(280px, 85vw)', margin: 0, padding: 0 }}
             >
-              <a href={item.href} target="_blank" rel="noopener noreferrer" className="group block cursor-pointer">
+              <div 
+                onClick={() => router.push(`/article/${item.id}`)}
+                className="group block cursor-pointer"
+              >
                 <div
                   className="relative w-full overflow-hidden bg-white shadow-[0_8px_32px_rgba(15,23,42,.06)]"
                   style={{ borderRadius: 16, width: 'min(250px, 80vw)', height: 'min(120px, 30vw)' }}
@@ -152,7 +155,7 @@ export default function NewsSlide({ items }: NewsSlideProps) {
                     ))}
                   </div>
                 )}
-              </a>
+              </div>
             </article>
           ))}
         </div>

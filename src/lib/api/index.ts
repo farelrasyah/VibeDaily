@@ -2,6 +2,11 @@ import { newsApiOrg } from './newsapi-org';
 import { beritaIndo } from './berita-indo';
 import { NewsArticle } from '@/types/news.types';
 
+// Simple in-memory cache for articles
+const articleCache = new Map<string, NewsArticle>();
+const cacheExpiry = new Map<string, number>();
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
 /**
  * Unified News Service
  * Facade untuk simplify penggunaan kedua API
@@ -12,7 +17,8 @@ class NewsService {
    */
   async getMixedNews(limit: number = 20): Promise<NewsArticle[]> {
     try {
-      const halfLimit = Math.floor(limit / 2);
+      // For larger limits, prioritize Indonesian articles since that's where the missing articles likely are
+      const indonesiaLimit = Math.max(Math.floor(limit * 0.8), limit - 20); // 80% Indonesian, minimum all but 20
       
       // Fetch from multiple international sources
       const [indonesiaResult, usResult, ukResult, generalResult] = await Promise.allSettled([
@@ -24,10 +30,19 @@ class NewsService {
 
       const articles: NewsArticle[] = [];
 
-      // Add Indonesian articles (up to half the limit)
+      // Add Indonesian articles (prioritized for larger searches)
       if (indonesiaResult.status === 'fulfilled' && indonesiaResult.value.success) {
-        articles.push(...indonesiaResult.value.data.slice(0, halfLimit));
-        console.log(`Added ${Math.min(indonesiaResult.value.data.length, halfLimit)} Indonesian articles`);
+        const indonesianArticles = indonesiaResult.value.data.slice(0, indonesiaLimit);
+        articles.push(...indonesianArticles);
+        console.log(`Added ${indonesianArticles.length} Indonesian articles`);
+        
+        // Cache all Indonesian articles since they're more likely to be requested
+        indonesianArticles.forEach(article => {
+          if (!articleCache.has(article.id)) {
+            articleCache.set(article.id, article);
+            cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
+          }
+        });
       }
 
       // Add international articles from various sources
@@ -56,6 +71,14 @@ class NewsService {
       const finalArticles = articles
         .sort(() => Math.random() - 0.5)
         .slice(0, limit);
+
+      // Cache all articles for future lookups
+      finalArticles.forEach(article => {
+        if (!articleCache.has(article.id)) {
+          articleCache.set(article.id, article);
+          cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
+        }
+      });
 
       console.log(`✅ Mixed news: returning ${finalArticles.length} articles total`);
       return finalArticles;
@@ -180,31 +203,113 @@ class NewsService {
     try {
       console.log('🔍 Searching for article with ID:', id);
       
-      // First check if the ID looks like a URL (for backward compatibility)
-      if (id.startsWith('http')) {
-        console.log('📎 ID looks like URL, searching by URL...');
-        return await this.getArticleByUrl(id);
+      // Check cache first
+      const cached = articleCache.get(id);
+      const cacheTime = cacheExpiry.get(id);
+      if (cached && cacheTime && Date.now() < cacheTime) {
+        console.log('💾 Article found in cache!', cached.title);
+        return cached;
       }
-
-      // Try to get all articles and find by ID
-      console.log('📰 Fetching all articles to find by ID...');
-      const allArticles = await this.getMixedNews(200); // Get more articles to find the one
-      console.log(`📊 Total articles fetched: ${allArticles.length}`);
       
-      // Log sample of article IDs for debugging
-      console.log('🔍 Sample article IDs:', allArticles.slice(0, 5).map(a => ({ id: a.id, title: a.title.substring(0, 50) })));
-      
-      const article = allArticles.find(article => article.id === id);
-      
-      if (article) {
-        console.log('✅ Article found by ID!', article.title);
+      // First check if the ID looks like a URL (for backward compatibility)
+      if (id.startsWith('http') || id.includes('%3A%2F%2F')) {
+        console.log('📎 ID looks like URL, searching by URL...');
+        // Decode URL if it's encoded
+        const decodedUrl = id.includes('%3A%2F%2F') ? decodeURIComponent(id) : id;
+        console.log('🔗 Decoded URL:', decodedUrl);
+        const article = await this.getArticleByUrl(decodedUrl);
+        if (article) {
+          // Cache the result
+          articleCache.set(id, article);
+          cacheExpiry.set(id, Date.now() + CACHE_DURATION);
+        }
         return article;
       }
 
-      console.log('❌ Article not found by ID, trying search...');
-      // If not found, try searching by partial match
-      const searchResults = await this.searchArticleById(id);
-      return searchResults.length > 0 ? searchResults[0] : null;
+      // Try multiple fetch attempts with different limits to increase chances
+      const fetchAttempts = [200, 300, 400]; // Increased limits to get more article coverage
+      
+      for (let attempt = 0; attempt < fetchAttempts.length; attempt++) {
+        console.log(`📰 Fetching articles (attempt ${attempt + 1}/${fetchAttempts.length}) with limit ${fetchAttempts[attempt]}...`);
+        
+        const allArticles = await this.getMixedNews(fetchAttempts[attempt]);
+        console.log(`📊 Total articles fetched: ${allArticles.length}`);
+        
+        // Cache all articles for future lookups
+        allArticles.forEach(article => {
+          if (!articleCache.has(article.id)) {
+            articleCache.set(article.id, article);
+            cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
+          }
+        });
+        
+        // Log sample of article IDs for debugging
+        if (attempt === 0) {
+          console.log('🔍 Sample article IDs:', allArticles.slice(0, 5).map(a => ({ id: a.id, title: a.title.substring(0, 50) })));
+        }
+        
+        // First try exact ID match
+        let article = allArticles.find(article => article.id === id);
+        
+        if (article) {
+          console.log('✅ Article found by exact ID!', article.title);
+          return article;
+        }
+
+        // Try to match legacy ID patterns by extracting the meaningful part
+        console.log(`❌ No exact ID match found in attempt ${attempt + 1}, trying legacy ID pattern...`);
+        
+        const idParts = id.split('-');
+        if (idParts.length > 1) {
+          // Extract the main slug without the hash (last part)
+          const slugWithoutHash = idParts.slice(0, -1).join('-');
+          
+          article = allArticles.find(article => {
+            const articleParts = article.id.split('-');
+            if (articleParts.length > 1) {
+              const articleSlugWithoutHash = articleParts.slice(0, -1).join('-');
+              return articleSlugWithoutHash === slugWithoutHash;
+            }
+            return false;
+          });
+          
+          if (article) {
+            console.log('✅ Article found by legacy ID pattern!', article.title);
+            // Cache with the requested ID
+            articleCache.set(id, article);
+            cacheExpiry.set(id, Date.now() + CACHE_DURATION);
+            return article;
+          }
+        }
+      }
+
+      // Final attempt: search in cache for similar articles
+      console.log('🔍 Searching in cache for similar articles...');
+      for (const [cachedId, cachedArticle] of articleCache.entries()) {
+        // Try exact match first
+        if (cachedId === id) {
+          console.log('✅ Article found in cache!', cachedArticle.title);
+          return cachedArticle;
+        }
+        
+        // Try slug match
+        const idParts = id.split('-');
+        const cachedIdParts = cachedId.split('-');
+        if (idParts.length > 1 && cachedIdParts.length > 1) {
+          const slugWithoutHash = idParts.slice(0, -1).join('-');
+          const cachedSlugWithoutHash = cachedIdParts.slice(0, -1).join('-');
+          if (slugWithoutHash === cachedSlugWithoutHash) {
+            console.log('✅ Article found in cache by slug match!', cachedArticle.title);
+            // Cache with the requested ID
+            articleCache.set(id, cachedArticle);
+            cacheExpiry.set(id, Date.now() + CACHE_DURATION);
+            return cachedArticle;
+          }
+        }
+      }
+
+      console.log('❌ No article found with exact or legacy ID matching');
+      return null;
     } catch (error) {
       console.error('Get article by ID error:', error);
       return null;
@@ -221,63 +326,39 @@ class NewsService {
         newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 100 }),
       ]);
 
+      console.log('🔍 Searching for URL:', url);
+
       // Search in Indonesia articles
       if (indonesiaResult.status === 'fulfilled' && indonesiaResult.value.success) {
+        console.log(`📊 Checking ${indonesiaResult.value.data.length} Indonesia articles`);
+        // Log sample URLs for debugging
+        console.log('🔍 Sample Indonesia URLs:', indonesiaResult.value.data.slice(0, 3).map(a => a.url));
+        
         const found = indonesiaResult.value.data.find(article => article.url === url);
-        if (found) return found;
+        if (found) {
+          console.log('✅ Found in Indonesia articles:', found.title);
+          return found;
+        }
       }
 
       // Search in international articles
       if (internationalResult.status === 'fulfilled' && internationalResult.value.success) {
+        console.log(`📊 Checking ${internationalResult.value.data.length} international articles`);
+        // Log sample URLs for debugging
+        console.log('🔍 Sample international URLs:', internationalResult.value.data.slice(0, 3).map(a => a.url));
+        
         const found = internationalResult.value.data.find(article => article.url === url);
-        if (found) return found;
+        if (found) {
+          console.log('✅ Found in international articles:', found.title);
+          return found;
+        }
       }
 
+      console.log('❌ Article not found by exact URL match');
       return null;
     } catch (error) {
       console.error('Get article by URL error:', error);
       return null;
-    }
-  }
-
-  /**
-   * Search article by partial ID match
-   */
-  private async searchArticleById(id: string): Promise<NewsArticle[]> {
-    try {
-      const [indonesiaResult, internationalResult] = await Promise.allSettled([
-        beritaIndo.getAllIndonesiaNews(),
-        newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 100 }),
-      ]);
-
-      const allArticles: NewsArticle[] = [];
-
-      if (indonesiaResult.status === 'fulfilled' && indonesiaResult.value.success) {
-        allArticles.push(...indonesiaResult.value.data);
-      }
-
-      if (internationalResult.status === 'fulfilled' && internationalResult.value.success) {
-        allArticles.push(...internationalResult.value.data);
-      }
-
-      // Find articles with similar ID or title containing keywords from ID
-      const keywords = id.replace(/-/g, ' ').split(' ').filter(word => word.length > 2);
-      
-      return allArticles.filter(article => {
-        // Exact ID match
-        if (article.id === id) return true;
-        
-        // Partial ID match
-        if (article.id.includes(id) || id.includes(article.id)) return true;
-        
-        // Title keyword match
-        return keywords.some(keyword => 
-          article.title.toLowerCase().includes(keyword.toLowerCase())
-        );
-      });
-    } catch (error) {
-      console.error('Search article by ID error:', error);
-      return [];
     }
   }
 }
