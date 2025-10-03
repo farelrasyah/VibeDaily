@@ -8,29 +8,57 @@ import { NewsArticle } from '@/types/news.types';
  */
 class NewsService {
   /**
-   * Get mixed news (Indonesia + International)
+   * Get mixed news (Indonesia + International) from multiple sources
    */
   async getMixedNews(limit: number = 20): Promise<NewsArticle[]> {
     try {
-      const [indonesiaResult, internationalResult] = await Promise.allSettled([
+      const halfLimit = Math.floor(limit / 2);
+      
+      // Fetch from multiple international sources
+      const [indonesiaResult, usResult, ukResult, generalResult] = await Promise.allSettled([
         beritaIndo.getAllIndonesiaNews(),
-        newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 10 }),
+        newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 8 }),
+        newsApiOrg.getTopHeadlines({ country: 'gb', pageSize: 4 }),
+        newsApiOrg.getTopHeadlines({ pageSize: 8 }), // General top headlines
       ]);
 
       const articles: NewsArticle[] = [];
 
+      // Add Indonesian articles (up to half the limit)
       if (indonesiaResult.status === 'fulfilled' && indonesiaResult.value.success) {
-        articles.push(...indonesiaResult.value.data.slice(0, limit / 2));
+        articles.push(...indonesiaResult.value.data.slice(0, halfLimit));
+        console.log(`Added ${Math.min(indonesiaResult.value.data.length, halfLimit)} Indonesian articles`);
       }
 
-      if (internationalResult.status === 'fulfilled' && internationalResult.value.success) {
-        articles.push(...internationalResult.value.data.slice(0, limit / 2));
+      // Add international articles from various sources
+      const internationalArticles: NewsArticle[] = [];
+      
+      if (usResult.status === 'fulfilled' && usResult.value.success) {
+        internationalArticles.push(...usResult.value.data.slice(0, 4));
+      }
+      if (ukResult.status === 'fulfilled' && ukResult.value.success) {
+        internationalArticles.push(...ukResult.value.data.slice(0, 2));
+      }
+      if (generalResult.status === 'fulfilled' && generalResult.value.success) {
+        internationalArticles.push(...generalResult.value.data.slice(0, 4));
       }
 
-      // Shuffle and limit
-      return articles
+      // Shuffle international articles and add up to remaining limit
+      const remainingLimit = limit - articles.length;
+      const shuffledInternational = internationalArticles
+        .sort(() => Math.random() - 0.5)
+        .slice(0, remainingLimit);
+      
+      articles.push(...shuffledInternational);
+      console.log(`Added ${shuffledInternational.length} international articles`);
+
+      // Final shuffle and return
+      const finalArticles = articles
         .sort(() => Math.random() - 0.5)
         .slice(0, limit);
+
+      console.log(`✅ Mixed news: returning ${finalArticles.length} articles total`);
+      return finalArticles;
     } catch (error) {
       console.error('Mixed news error:', error);
       return [];
@@ -93,26 +121,52 @@ class NewsService {
   }
 
   /**
-   * Get trending news (combine both APIs)
+   * Get trending news from multiple sources
    */
   async getTrendingNews(limit: number = 10): Promise<NewsArticle[]> {
     try {
-      const [indonesiaResult, internationalResult] = await Promise.allSettled([
+      const halfLimit = Math.floor(limit / 2);
+      
+      // Fetch trending from multiple international sources
+      const [indonesiaResult, usResult, generalResult, techResult] = await Promise.allSettled([
         beritaIndo.getTrendingNews(),
-        newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 5 }),
+        newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 4 }),
+        newsApiOrg.getTopHeadlines({ pageSize: 4 }),
+        newsApiOrg.getTopHeadlines({ category: 'technology', pageSize: 3 }),
       ]);
 
       const articles: NewsArticle[] = [];
 
+      // Add Indonesian trending articles
       if (indonesiaResult.status === 'fulfilled' && indonesiaResult.value.success) {
-        articles.push(...indonesiaResult.value.data.slice(0, limit / 2));
+        articles.push(...indonesiaResult.value.data.slice(0, halfLimit));
       }
 
-      if (internationalResult.status === 'fulfilled' && internationalResult.value.success) {
-        articles.push(...internationalResult.value.data.slice(0, limit / 2));
+      // Combine international trending articles
+      const internationalArticles: NewsArticle[] = [];
+      
+      if (usResult.status === 'fulfilled' && usResult.value.success) {
+        internationalArticles.push(...usResult.value.data);
+      }
+      if (generalResult.status === 'fulfilled' && generalResult.value.success) {
+        internationalArticles.push(...generalResult.value.data);
+      }
+      if (techResult.status === 'fulfilled' && techResult.value.success) {
+        internationalArticles.push(...techResult.value.data);
       }
 
-      return articles.slice(0, limit);
+      // Add international articles
+      const remainingLimit = limit - articles.length;
+      const shuffledInternational = internationalArticles
+        .sort(() => Math.random() - 0.5)
+        .slice(0, remainingLimit);
+      
+      articles.push(...shuffledInternational);
+
+      // Sort by publish date (most recent first)
+      return articles
+        .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+        .slice(0, limit);
     } catch (error) {
       console.error('Trending news error:', error);
       return [];

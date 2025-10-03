@@ -1,8 +1,70 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { newsService } from "@/lib/api";
+import { NewsArticle } from "@/types/news.types";
 
 const ContentHub: React.FC = () => {
   const contentHubRef = useRef<HTMLDivElement>(null);
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('ContentHub: Fetching articles...');
+        
+        // Use the improved mixed news API that already handles multiple sources
+        const data = await newsService.getMixedNews(8);
+        console.log('ContentHub: Fetched mixed news:', data);
+        
+        if (data && data.length > 0) {
+          setArticles(data);
+          console.log(`ContentHub: Successfully loaded ${data.length} articles from multiple sources`);
+        } else {
+          console.log('ContentHub: No articles from mixed news, trying trending...');
+          // Fallback to trending news
+          const trendingData = await newsService.getTrendingNews(8);
+          if (trendingData && trendingData.length > 0) {
+            setArticles(trendingData);
+            console.log(`ContentHub: Successfully loaded ${trendingData.length} trending articles`);
+          } else {
+            setError('No articles available from any source');
+          }
+        }
+      } catch (err) {
+        console.error('ContentHub: Error fetching articles:', err);
+        setError(`Failed to load articles: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
+  const isValidImageUrl = (url: string | null) => {
+    if (!url || url.trim() === '') return false;
+    // Filter out placeholder/dummy images
+    const invalidPatterns = ['picsum.photos', 'oval.gif', 'placeholder', 'dummy', 'example.com'];
+    return !invalidPatterns.some(pattern => url.toLowerCase().includes(pattern));
+  };
 
   const scrollContentHub = (dir: "left" | "right") => {
     const container = contentHubRef.current;
@@ -73,84 +135,86 @@ const ContentHub: React.FC = () => {
           </div>
         </div>
         <div className="overflow-x-auto pb-2 px-4 md:px-8 lg:px-8" ref={contentHubRef} style={{scrollBehavior:'smooth'}}>
-          <div className="flex gap-4 md:gap-6 lg:gap-8">
-            {/* Example Article Card 1 */}
-            <div className="flex-shrink-0 w-[280px] md:w-[320px] lg:w-[350px] bg-[#f6f6f8] rounded-[28px] shadow-none p-0 flex flex-col items-stretch border border-[#eceaea]" style={{boxShadow:'0 2px 16px 0 rgba(0,0,0,0.06)'}}>
-              <div className="flex items-center justify-center pt-5">
-                <div className="relative bg-[#bdb1a6] rounded-[22px] w-full max-w-[250px] md:max-w-[280px] lg:max-w-[310px] h-[200px] flex items-center justify-center mx-auto" style={{border: '10px solid #cfc5bb'}}>
-                  <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Kranich Hotel" className="w-full h-full object-cover rounded-[14px]" />
-                  <span className="absolute top-3 right-3 bg-white rounded-[12px] p-2 flex items-center justify-center" style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.08)', border: 'none', width: '36px', height: '36px', padding: 0}}>
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="0" y="0" width="28" height="28" rx="8" fill="white"/>
-                      <path d="M9 19L19 9M19 9H11M19 9V17" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-col flex-1 px-7 pt-4 pb-6 items-center text-center">
-                <div className="text-[#222] text-base mb-1 font-normal w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>October 16, 2024</div>
-                <div className="text-2xl leading-tight mb-4 text-[#222] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center', fontWeight: 400}}>TOP 10 bright ideas for hotel website...</div>
-                <div className="bg-white rounded-[18px] px-6 py-4 text-[#6d6d6d] text-base font-normal border border-[#eceaea] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>1. Offer virtual tours of the hotel&apos;s facilities, rooms, and common areas.</div>
-              </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-gray-500 text-lg" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif'}}>Loading articles...</div>
             </div>
-            {/* Example Article Card 2 */}
-            <div className="flex-shrink-0 w-[280px] md:w-[320px] lg:w-[350px] bg-[#f6f6f8] rounded-[28px] shadow-none p-0 flex flex-col items-stretch border border-[#eceaea]" style={{boxShadow:'0 2px 16px 0 rgba(0,0,0,0.06)'}}>
-              <div className="flex items-center justify-center pt-5">
-                <div className="relative bg-[#d6cfc9] rounded-[22px] w-full max-w-[250px] md:max-w-[280px] lg:max-w-[310px] h-[200px] flex items-center justify-center mx-auto" style={{border: '10px solid #e2ddd7'}}>
-                  <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80" alt="Skincare Website" className="w-full h-full object-cover rounded-[14px]" />
-                  <span className="absolute top-3 right-3 bg-white rounded-[12px] p-2 flex items-center justify-center" style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.08)', border: 'none', width: '36px', height: '36px', padding: 0}}>
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="0" y="0" width="28" height="28" rx="8" fill="white"/>
-                      <path d="M9 19L19 9M19 9H11M19 9V17" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-col flex-1 px-7 pt-4 pb-6 items-center text-center">
-                <div className="text-[#222] text-base mb-1 font-normal w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>October 17, 2024</div>
-                <div className="text-2xl leading-tight mb-4 text-[#222] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center', fontWeight: 400}}>TOP 10 ideas for skincare website...</div>
-                <div className="bg-white rounded-[18px] px-6 py-4 text-[#6d6d6d] text-base font-normal border border-[#eceaea] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>1. Don&apos;t underestimate your email list. It can help you build relationships with your audience,...</div>
-              </div>
+          ) : error ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-red-500 text-lg" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif'}}>{error}</div>
             </div>
-            {/* Example Article Card 3 */}
-            <div className="flex-shrink-0 w-[280px] md:w-[320px] lg:w-[350px] bg-[#f6f6f8] rounded-[28px] shadow-none p-0 flex flex-col items-stretch border border-[#eceaea]" style={{boxShadow:'0 2px 16px 0 rgba(0,0,0,0.06)'}}>
-              <div className="flex items-center justify-center pt-5">
-                <div className="relative bg-[#eaeaea] rounded-[22px] w-full max-w-[250px] md:max-w-[280px] lg:max-w-[310px] h-[200px] flex items-center justify-center mx-auto" style={{border: '10px solid #e5e5e5'}}>
-                  <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="Home App" className="w-full h-full object-cover rounded-[14px]" />
-                  <span className="absolute top-3 right-3 bg-white rounded-[12px] p-2 flex items-center justify-center" style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.08)', border: 'none', width: '36px', height: '36px', padding: 0}}>
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="0" y="0" width="28" height="28" rx="8" fill="white"/>
-                      <path d="M9 19L19 9M19 9H11M19 9V17" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-col flex-1 px-7 pt-4 pb-6 items-center text-center">
-                <div className="text-[#222] text-base mb-1 font-normal w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>October 17, 2024</div>
-                <div className="text-2xl leading-tight mb-4 text-[#222] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center', fontWeight: 400}}>TOP 7 steps to create a home...</div>
-                <div className="bg-white rounded-[18px] px-6 py-4 text-[#6d6d6d] text-base font-normal border border-[#eceaea] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>1. Understand the primary goal of the home screen UI. To show app features, provide quic...</div>
-              </div>
+          ) : articles.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-gray-500 text-lg" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif'}}>No articles found</div>
             </div>
-            {/* Example Article Card 4 */}
-            <div className="flex-shrink-0 w-[280px] md:w-[320px] lg:w-[350px] bg-[#f6f6f8] rounded-[28px] shadow-none p-0 flex flex-col items-stretch border border-[#eceaea]" style={{boxShadow:'0 2px 16px 0 rgba(0,0,0,0.06)'}}>
-              <div className="flex items-center justify-center pt-5">
-                <div className="relative bg-[#eaeaea] rounded-[22px] w-full max-w-[250px] md:max-w-[280px] lg:max-w-[310px] h-[200px] flex items-center justify-center mx-auto" style={{border: '10px solid #e5e5e5'}}>
-                  <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80" alt="Insurance Website" className="w-full h-full object-cover rounded-[14px]" />
-                  <span className="absolute top-3 right-3 bg-white rounded-[12px] p-2 flex items-center justify-center" style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.08)', border: 'none', width: '36px', height: '36px', padding: 0}}>
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="0" y="0" width="28" height="28" rx="8" fill="white"/>
-                      <path d="M9 19L19 9M19 9H11M19 9V17" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-col flex-1 px-7 pt-4 pb-6 items-center text-center">
-                <div className="text-[#222] text-base mb-1 font-normal w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>October 17, 2024</div>
-                <div className="text-2xl leading-tight mb-4 text-[#222] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center', fontWeight: 400}}>TOP the 10: best insurance website...</div>
-                <div className="bg-white rounded-[18px] px-6 py-4 text-[#6d6d6d] text-base font-normal border border-[#eceaea] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>1. The website has interactive chat support for real-time assistance.</div>
-              </div>
+          ) : (
+            <div className="flex gap-4 md:gap-6 lg:gap-8">
+              {articles.map((article, index) => {
+                const colorVariants = [
+                  { bg: '#bdb1a6', border: '#cfc5bb' },
+                  { bg: '#d6cfc9', border: '#e2ddd7' },
+                  { bg: '#eaeaea', border: '#e5e5e5' },
+                  { bg: '#c9d6cf', border: '#d7e2dd' }
+                ];
+                const colors = colorVariants[index % colorVariants.length];
+                
+                return (
+                  <div key={article.id} className="flex-shrink-0 w-[280px] md:w-[320px] lg:w-[350px] bg-[#f6f6f8] rounded-[28px] shadow-none p-0 flex flex-col items-stretch border border-[#eceaea]" style={{boxShadow:'0 2px 16px 0 rgba(0,0,0,0.06)'}}>
+                    <div className="flex items-center justify-center pt-5">
+                      <div className="relative rounded-[22px] w-full max-w-[250px] md:max-w-[280px] lg:max-w-[310px] h-[200px] flex items-center justify-center mx-auto" style={{backgroundColor: colors.bg, border: `10px solid ${colors.border}`}}>
+                        {isValidImageUrl(article.imageUrl) ? (
+                          <img 
+                            src={article.imageUrl!} 
+                            alt={article.title}
+                            className="w-full h-full object-cover rounded-[14px]" 
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              // Show fallback
+                              target.parentElement?.appendChild(
+                                Object.assign(document.createElement('div'), {
+                                  className: 'w-full h-full bg-gray-300 rounded-[14px] flex items-center justify-center absolute inset-0',
+                                  innerHTML: '<span class="text-gray-500 text-sm">Image Error</span>'
+                                })
+                              );
+                            }}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-300 rounded-[14px] flex items-center justify-center">
+                            <span className="text-gray-500 text-sm">No Image</span>
+                          </div>
+                        )}
+                        <a 
+                          href={article.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="absolute top-3 right-3 bg-white rounded-[12px] p-2 flex items-center justify-center hover:bg-gray-50 transition-colors" 
+                          style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.08)', border: 'none', width: '36px', height: '36px', padding: 0}}
+                        >
+                          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="0" y="0" width="28" height="28" rx="8" fill="white"/>
+                            <path d="M9 19L19 9M19 9H11M19 9V17" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                    <div className="flex flex-col flex-1 px-7 pt-4 pb-6 items-center text-center">
+                      <div className="text-[#222] text-base mb-1 font-normal w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>
+                        {formatDate(article.publishedAt)}
+                      </div>
+                      <div className="text-2xl leading-tight mb-4 text-[#222] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center', fontWeight: 400}}>
+                        {truncateText(article.title, 50)}
+                      </div>
+                      <div className="bg-white rounded-[18px] px-6 py-4 text-[#6d6d6d] text-base font-normal border border-[#eceaea] w-full" style={{fontFamily:'Sequel Sans Disp, Arial, sans-serif', textAlign:'center'}}>
+                        {truncateText(article.description || article.content || 'No description available', 120)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </div>
+          )}
         </div>
       </div>
     </section>

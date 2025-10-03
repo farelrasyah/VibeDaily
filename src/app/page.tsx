@@ -1,18 +1,16 @@
-import { newsService, newsApiOrg, beritaIndo } from '@/lib/api'
+import { newsService } from '@/lib/api'
 import { getRelativeTime } from '@/lib/utils/date-formatter'
 import HomeClient from './HomeClient'
 
 export const revalidate = 300 // Revalidate every 5 minutes
 
 export default async function Home() {
-  // Fetch real data from APIs with larger datasets to avoid duplicates
-  const [heroResult, trendingResult, mixedNewsResult, indonesiaNewsResult, internationalNewsResult, extraInternationalResult] = await Promise.allSettled([
-    newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 10 }), // Fetch more for variety
-    newsService.getTrendingNews(25), // Fetch more for deduplication
-    newsService.getMixedNews(35), // Fetch more articles
-    beritaIndo.getAllIndonesiaNews(),
-    newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 30 }), // Fetch more
-    newsApiOrg.searchNews({ query: 'news', pageSize: 25 }), // Additional source for social media
+  // Use the improved API services that already handle multiple sources
+  const [heroResult, trendingResult, mixedNewsResult, socialMediaResult] = await Promise.allSettled([
+    newsService.getMixedNews(15), // For hero section - already includes multiple sources
+    newsService.getTrendingNews(25), // For trending section - already includes multiple sources  
+    newsService.getMixedNews(40), // For main grid - larger dataset for deduplication
+    newsService.getMixedNews(30), // For social media section
   ])
 
   // Deduplication tracker - track used articles by URL, title, and ID
@@ -48,10 +46,9 @@ export default async function Home() {
     if (articleId) usedArticles.add(articleId)
   }
 
-  // Hero data (first unique international article)
-  const heroArticle = heroResult.status === 'fulfilled' && heroResult.value.success 
-    ? heroResult.value.data.find(article => isUnique(article)) || heroResult.value.data[0]
-    : null
+  // Hero data (first unique article from mixed news)
+  const heroArticles = heroResult.status === 'fulfilled' ? heroResult.value : []
+  const heroArticle = heroArticles.find((article: any) => isUnique(article)) || heroArticles[0] || null
   
   if (heroArticle) markAsUsed(heroArticle)
 
@@ -108,21 +105,19 @@ export default async function Home() {
     }
   })
 
-  // Recommended items (Indonesia news for sidebar - filter duplicates and ensure valid images)
-  const indonesiaNews = indonesiaNewsResult.status === 'fulfilled' && indonesiaNewsResult.value.success
-    ? indonesiaNewsResult.value.data
-        .filter(article => isUnique(article))
-        .filter(article => !article.imageUrl || article.imageUrl.trim() === '' || !article.imageUrl.includes('picsum.photos'))
-        .slice(0, 6)
-    : []
+  // Recommended items (from mixed news for sidebar - filter duplicates and ensure valid images)
+  const allMixedNews = mixedNewsResult.status === 'fulfilled' ? mixedNewsResult.value : []
+  const indonesiaNews = allMixedNews
+    .filter((article: any) => isUnique(article))
+    .filter((article: any) => !article.imageUrl || article.imageUrl.trim() === '' || !article.imageUrl.includes('picsum.photos'))
+    .slice(0, 6)
 
-  // Fallback jika Indonesia news kosong - gunakan international news (filter duplicates and dummy images)
-  const internationalForFallback = internationalNewsResult.status === 'fulfilled' && internationalNewsResult.value.success
-    ? internationalNewsResult.value.data
-        .filter(article => isUnique(article))
-        .filter(article => article.imageUrl && article.imageUrl.trim() !== '' && !article.imageUrl.includes('picsum.photos'))
-        .slice(0, 6)
-    : []
+  // Fallback from social media result if needed
+  const socialMediaNews = socialMediaResult.status === 'fulfilled' ? socialMediaResult.value : []
+  const internationalForFallback = socialMediaNews
+    .filter((article: any) => isUnique(article))
+    .filter((article: any) => article.imageUrl && article.imageUrl.trim() !== '' && !article.imageUrl.includes('picsum.photos'))
+    .slice(0, 6)
   
   const fallbackNews = indonesiaNews.length === 0 ? internationalForFallback : []
 
@@ -144,13 +139,11 @@ export default async function Home() {
 
   console.log(`✅ Recommended items count: ${recommendedItems.length}`);
 
-  // NewsSlide items (international news - filter duplicates and invalid images)
-  const internationalNews = internationalNewsResult.status === 'fulfilled' && internationalNewsResult.value.success
-    ? internationalNewsResult.value.data
-        .filter(article => isUnique(article))
-        .filter(article => article.imageUrl && article.imageUrl.trim() !== '' && !article.imageUrl.includes('oval.gif'))
-        .slice(0, 8)
-    : []
+  // NewsSlide items (from social media news - filter duplicates and invalid images)
+  const internationalNews = socialMediaNews
+    .filter((article: any) => isUnique(article))
+    .filter((article: any) => article.imageUrl && article.imageUrl.trim() !== '' && !article.imageUrl.includes('oval.gif'))
+    .slice(0, 8)
 
   const newsSlideItems = internationalNews.map(article => {
     markAsUsed(article)
@@ -165,20 +158,17 @@ export default async function Home() {
     }
   })
 
-  // ArticleSection items (trending Indonesia news - filter duplicates and dummy images)
-  // Use remaining Indonesia news that haven't been used
-  const remainingIndonesiaNews = indonesiaNewsResult.status === 'fulfilled' && indonesiaNewsResult.value.success
-    ? indonesiaNewsResult.value.data
-        .filter(article => isUnique(article))
-        .filter(article => !article.imageUrl || article.imageUrl.trim() === '' || !article.imageUrl.includes('picsum.photos'))
-        .slice(0, 8)
-    : []
+  // ArticleSection items (use remaining mixed news)
+  const remainingMixedNews = allMixedNews
+    .filter((article: any) => isUnique(article))
+    .filter((article: any) => !article.imageUrl || article.imageUrl.trim() === '' || !article.imageUrl.includes('picsum.photos'))
+    .slice(0, 8)
   
-  const newsForArticleSection = remainingIndonesiaNews.length > 0 
-    ? remainingIndonesiaNews 
+  const newsForArticleSection = remainingMixedNews.length > 0 
+    ? remainingMixedNews 
     : internationalForFallback
-        .filter(article => isUnique(article))
-        .filter(article => !article.imageUrl || !article.imageUrl.includes('picsum.photos'))
+        .filter((article: any) => isUnique(article))
+        .filter((article: any) => !article.imageUrl || !article.imageUrl.includes('picsum.photos'))
         .slice(0, 8)
   
   const articleSectionItems = newsForArticleSection.map(article => {
@@ -197,19 +187,13 @@ export default async function Home() {
   console.log(`✅ Article section items count: ${articleSectionItems.length}`)
   console.log(`✅ Total unique articles used: ${usedArticles.size}`)
 
-  // Social Media Section data (ambil artikel baru dari multiple sources yang belum terpakai)
-  const allInternationalArticles = internationalNewsResult.status === 'fulfilled' && internationalNewsResult.value.success
-    ? internationalNewsResult.value.data
-    : []
-  
-  const extraInternationalArticles = extraInternationalResult.status === 'fulfilled' && extraInternationalResult.value.success
-    ? extraInternationalResult.value.data
-    : []
-  
-  // Combine multiple sources for social media section
+  // Social Media Section data (from social media news)
+  const allSocialArticles = socialMediaNews
+  const extraSocialArticles = socialMediaNews
+    .slice(10) // Take remaining articles  // Combine multiple sources for social media section
   const combinedArticlesForSocial = [
-    ...allInternationalArticles,
-    ...extraInternationalArticles,
+    ...allSocialArticles,
+    ...extraSocialArticles,
     ...(mixedNewsResult.status === 'fulfilled' ? mixedNewsResult.value : []),
   ]
   
@@ -219,8 +203,8 @@ export default async function Home() {
     .slice(0, 20) // Ambil 20 artikel untuk social media section
 
   console.log(`🔍 Debug Social Media Section:`)
-  console.log(`- Total international articles: ${allInternationalArticles.length}`)
-  console.log(`- Extra international articles: ${extraInternationalArticles.length}`)
+  console.log(`- Total social articles: ${allSocialArticles.length}`)
+  console.log(`- Extra social articles: ${extraSocialArticles.length}`)
   console.log(`- Combined articles for social: ${combinedArticlesForSocial.length}`)
   console.log(`- Remaining articles for social: ${remainingNewsForSocial.length}`)
   console.log(`- Used articles so far: ${usedArticles.size}`)
@@ -287,19 +271,19 @@ export default async function Home() {
     })),
   } : {
     // Fallback: create from any available articles if no remaining articles
-    featuredNews: allInternationalArticles.length > 0 ? {
-      id: allInternationalArticles[0].id,
-      title: allInternationalArticles[0].title,
-      category: allInternationalArticles[0].source.name,
-      time: getRelativeTime(allInternationalArticles[0].publishedAt, 'en'),
-      href: allInternationalArticles[0].url,
-      description: allInternationalArticles[0].description,
+    featuredNews: allSocialArticles.length > 0 ? {
+      id: allSocialArticles[0].id,
+      title: allSocialArticles[0].title,
+      category: allSocialArticles[0].source.name,
+      time: getRelativeTime(allSocialArticles[0].publishedAt, 'en'),
+      href: allSocialArticles[0].url,
+      description: allSocialArticles[0].description,
       tags: ['News', 'Tech', 'Business'],
     } : undefined,
     newsList: [],
     newsImages: ['', '', ''],
     backgroundImage: undefined,
-    allArticles: allInternationalArticles.slice(0, 10).map(article => ({
+    allArticles: allSocialArticles.slice(0, 10).map((article: any) => ({
       id: article.id,
       title: article.title,
       category: article.source.name,

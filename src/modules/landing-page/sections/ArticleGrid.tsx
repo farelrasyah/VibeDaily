@@ -29,8 +29,13 @@ interface ArticleGridProps {
  */
 export default function ArticleGrid({ items }: ArticleGridProps) {
   const [isVisible, setIsVisible] = useState(false)
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set())
   const sectionRef = useRef<HTMLElement>(null)
   const router = useRouter()
+
+  const handleImageError = (articleId: string) => {
+    setImageErrors(prev => new Set([...prev, articleId]))
+  }
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -57,11 +62,16 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
   }, [])
 
   const featuredPool = useMemo(() => {
-    const feats = items.filter(i => i.featured)
-    return feats.length ? feats : (items.length ? [items[0]] : [])
+    const feats = items.filter(i => i && i.featured && i.id && i.title)
+    console.log('ArticleGrid featured pool:', feats.length)
+    return feats.length ? feats : (items.length ? [items[0]].filter(i => i && i.id && i.title) : [])
   }, [items])
 
-  const thumbsPool = useMemo(() => items.filter(i => !i.featured), [items])
+  const thumbsPool = useMemo(() => {
+    const thumbs = items.filter(i => i && !i.featured && i.id && i.title)
+    console.log('ArticleGrid thumbs pool:', thumbs.length)
+    return thumbs
+  }, [items])
 
   const [current, setCurrent] = useState(0)
   const totalSlides = useMemo(() => {
@@ -77,6 +87,17 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
   const smallItems = thumbsPool.length
     ? Array.from({ length: 6 }, (_, i) => thumbsPool[(start + i) % thumbsPool.length])
     : []
+
+  // Debug logging
+  console.log('ArticleGrid render:', {
+    totalItems: items.length,
+    featuredPool: featuredPool.length,
+    thumbsPool: thumbsPool.length,
+    currentSlide: current,
+    totalSlides,
+    smallItemsCount: smallItems.length,
+    featuredHasImage: featured?.image ? 'yes' : 'no'
+  })
 
   return (
     <section 
@@ -205,13 +226,23 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                       shadow-[0_18px_50px_rgba(15,23,42,0.12)]
                     "
                   >
-                    <img
-                      src={featured?.image || ''}
-                      alt={featured?.title || 'featured'}
-                      className={`absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out ${
+                    {featured?.image && !imageErrors.has(featured.id) ? (
+                      <img
+                        src={featured.image}
+                        alt={featured.title || 'featured'}
+                        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out ${
+                          isVisible ? 'zoom-in-image' : ''
+                        }`}
+                        onError={() => handleImageError(featured.id)}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className={`absolute inset-0 w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center transition-transform duration-1000 ease-out ${
                         isVisible ? 'zoom-in-image' : ''
-                      }`}
-                    />
+                      }`}>
+                        <span className="text-gray-500 text-sm">No Image Available</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -230,7 +261,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                   <div onClick={() => router.push(`/article/${item.id}`)} className="block cursor-pointer">
                     <div className="rounded-[20px] sm:rounded-[24px] overflow-hidden bg-white/65 border border-white/35 backdrop-blur-xl shadow-[0_14px_40px_rgba(15,23,42,0.08)] hover:bg-white/75 transition-all duration-300 mb-3 sm:mb-4">
                       <div className="relative w-full h-[120px] sm:h-[140px] md:h-[120px] lg:h-[150px] overflow-hidden">
-                        {item.image ? (
+                        {item.image && !imageErrors.has(item.id) ? (
                           <img
                             src={item.image}
                             alt={item.title}
@@ -238,11 +269,18 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                               isVisible ? 'zoom-in-thumbnail' : ''
                             }`}
                             style={{ animationDelay: `${i * 150}ms` }}
+                            onError={() => handleImageError(item.id)}
+                            loading="lazy"
                           />
                         ) : (
-                          <div className={`absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-100 transition-transform duration-700 ease-out ${
-                            isVisible ? 'zoom-in-thumbnail' : ''
-                          }`} style={{ animationDelay: `${i * 150}ms` }} />
+                          <div 
+                            className={`absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-100 flex items-center justify-center transition-transform duration-700 ease-out ${
+                              isVisible ? 'zoom-in-thumbnail' : ''
+                            }`} 
+                            style={{ animationDelay: `${i * 150}ms` }}
+                          >
+                            <span className="text-gray-500 text-xs">No Image</span>
+                          </div>
                         )}
                       </div>
                     </div>

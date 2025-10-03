@@ -1,7 +1,7 @@
 import { BeritaIndoResponse, NewsArticle, ApiResponse } from '@/types/news.types';
 
-type IndonesiaSource = 'cnn' | 'cnbc' | 'republika' | 'tempo' | 'antara' | 
-  'kumparan' | 'okezone' | 'bbc' | 'tribun' | 'jawa-pos' | 'vice' | 'suara' | 'voa';
+type IndonesiaSource = 'cnn' | 'cnbc' | 'republika' | 'tempo' | 
+  'kumparan' | 'okezone' | 'bbc' | 'jawa-pos' | 'vice' | 'suara' | 'voa';
 
 class BeritaIndoService {
   private baseUrl: string;
@@ -54,28 +54,49 @@ class BeritaIndoService {
   }
 
   /**
-   * Get all Indonesia news (aggregate dari multiple sources)
+   * Get all Indonesia news from multiple sources
    */
   async getAllIndonesiaNews(): Promise<ApiResponse<NewsArticle>> {
     try {
-      // Coba fetch dari CNN dulu
-      const cnnResult = await this.getNewsBySource('cnn');
-      
-      if (cnnResult.success && cnnResult.data.length > 0) {
-        console.log(`✅ Successfully fetched ${cnnResult.data.length} articles from CNN Indonesia`);
-        return cnnResult;
+      // Fetch from multiple sources simultaneously
+      const sources: IndonesiaSource[] = ['cnn', 'cnbc', 'tempo', 'republika', 'okezone'];
+      const allArticles: NewsArticle[] = [];
+      let totalFetched = 0;
+
+      // Use Promise.allSettled to fetch from all sources at once
+      const results = await Promise.allSettled(
+        sources.map(source => this.getNewsBySource(source))
+      );
+
+      results.forEach((result, index) => {
+        const source = sources[index];
+        if (result.status === 'fulfilled' && result.value.success) {
+          const articles = result.value.data;
+          allArticles.push(...articles);
+          totalFetched += articles.length;
+          console.log(`✅ Successfully fetched ${articles.length} articles from ${source}`);
+        } else {
+          console.warn(`❌ Failed to fetch from ${source}:`, 
+            result.status === 'rejected' ? result.reason : result.value.error);
+        }
+      });
+
+      if (allArticles.length > 0) {
+        // Shuffle articles to mix sources and limit to reasonable number
+        const shuffledArticles = allArticles
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 50); // Limit to 50 articles max
+
+        console.log(`✅ Successfully fetched ${totalFetched} total articles from ${results.length} sources, showing ${shuffledArticles.length}`);
+        
+        return {
+          success: true,
+          data: shuffledArticles,
+          totalResults: shuffledArticles.length,
+        };
       }
 
-      // Jika CNN gagal, coba Tempo
-      console.log('CNN failed, trying Tempo...');
-      const tempoResult = await this.getNewsBySource('tempo');
-      
-      if (tempoResult.success && tempoResult.data.length > 0) {
-        console.log(`✅ Successfully fetched ${tempoResult.data.length} articles from Tempo`);
-        return tempoResult;
-      }
-
-      // Jika semua gagal, return empty
+      // If all sources failed
       console.warn('All Indonesia news sources failed');
       return {
         success: false,
@@ -89,18 +110,45 @@ class BeritaIndoService {
   }
 
   /**
-   * Get trending Indonesia news (from CNN)
+   * Get trending Indonesia news from multiple top sources
    */
   async getTrendingNews(): Promise<ApiResponse<NewsArticle>> {
-    // Coba CNN terkini dulu
-    const result = await this.getNewsBySource('cnn');
-    
-    if (result.success && result.data.length > 0) {
-      return result;
+    try {
+      // Get trending articles from top 3 sources
+      const topSources: IndonesiaSource[] = ['cnn', 'tempo', 'cnbc'];
+      const allArticles: NewsArticle[] = [];
+
+      const results = await Promise.allSettled(
+        topSources.map(source => this.getNewsBySource(source))
+      );
+
+      results.forEach((result, index) => {
+        const source = topSources[index];
+        if (result.status === 'fulfilled' && result.value.success) {
+          // Take only the first 5 articles from each source (most recent/trending)
+          allArticles.push(...result.value.data.slice(0, 5));
+          console.log(`✅ Got trending articles from ${source}`);
+        }
+      });
+
+      if (allArticles.length > 0) {
+        // Sort by publish date (most recent first) and limit to 10
+        const trendingArticles = allArticles
+          .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+          .slice(0, 10);
+
+        return {
+          success: true,
+          data: trendingArticles,
+          totalResults: trendingArticles.length,
+        };
+      }
+
+      // Fallback to all Indonesia news
+      return this.getAllIndonesiaNews();
+    } catch (error) {
+      return this.handleError(error);
     }
-    
-    // Fallback ke semua berita Indonesia
-    return this.getAllIndonesiaNews();
   }
 
   /**
@@ -157,11 +205,9 @@ class BeritaIndoService {
       'cnbc': 'CNBC Indonesia',
       'republika': 'Republika',
       'tempo': 'Tempo',
-      'antara': 'Antara News',
       'kumparan': 'Kumparan',
       'okezone': 'Okezone',
       'bbc': 'BBC Indonesia',
-      'tribun': 'Tribun News',
       'jawa-pos': 'Jawa Pos',
       'vice': 'Vice Indonesia',
       'suara': 'Suara.com',
