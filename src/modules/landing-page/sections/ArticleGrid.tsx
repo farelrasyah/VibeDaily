@@ -68,10 +68,36 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
   }, [items])
 
   const thumbsPool = useMemo(() => {
+    // Get non-featured items and ensure uniqueness
     const thumbs = items.filter(i => i && !i.featured && i.id && i.title)
-    console.log('ArticleGrid thumbs pool:', thumbs.length)
-    return thumbs
-  }, [items])
+    
+    // Remove duplicates based on URL and title
+    const uniqueThumbs: ArticleGridItem[] = []
+    const usedUrls = new Set<string>()
+    const usedTitles = new Set<string>()
+    
+    // Also exclude featured articles from thumbnails to prevent duplication
+    const featuredUrls = new Set(featuredPool.map(f => f.href))
+    const featuredTitles = new Set(featuredPool.map(f => f.title.toLowerCase().trim()))
+    
+    for (const thumb of thumbs) {
+      const thumbUrl = thumb.href
+      const thumbTitle = thumb.title.toLowerCase().trim()
+      
+      // Skip if already used or if it matches a featured article
+      if (!usedUrls.has(thumbUrl) && 
+          !usedTitles.has(thumbTitle) && 
+          !featuredUrls.has(thumbUrl) && 
+          !featuredTitles.has(thumbTitle)) {
+        uniqueThumbs.push(thumb)
+        usedUrls.add(thumbUrl)
+        usedTitles.add(thumbTitle)
+      }
+    }
+    
+    console.log('ArticleGrid thumbs pool (unique):', uniqueThumbs.length)
+    return uniqueThumbs
+  }, [items, featuredPool])
 
   const [current, setCurrent] = useState(0)
   const totalSlides = useMemo(() => {
@@ -83,9 +109,47 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
   const prev = () => setCurrent(v => (v - 1 + totalSlides) % totalSlides)
 
   const featured = featuredPool.length ? featuredPool[current % featuredPool.length] : undefined
-  const start = ((current % totalSlides) * 6) % (thumbsPool.length || 1)
-  const smallItems = thumbsPool.length
-    ? Array.from({ length: 6 }, (_, i) => thumbsPool[(start + i) % thumbsPool.length])
+  
+  // Improved small items selection to ensure no duplicates
+  const start = ((current % totalSlides) * 6) % Math.max(1, thumbsPool.length)
+  const smallItems = thumbsPool.length >= 6
+    ? thumbsPool.slice(start, start + 6)
+    : thumbsPool.length > 0
+    ? (() => {
+        // If we have fewer than 6 unique articles, cycle through them uniquely
+        const result: ArticleGridItem[] = []
+        for (let i = 0; i < 6; i++) {
+          if (thumbsPool.length > 0) {
+            const index = (start + i) % thumbsPool.length
+            const article = thumbsPool[index]
+            
+            // Only add if not already in result (prevent immediate duplicates)
+            if (!result.some(item => item.href === article.href || item.title.toLowerCase().trim() === article.title.toLowerCase().trim())) {
+              result.push(article)
+            } else if (result.length < 6) {
+              // If we can't avoid duplication and still need items, add with modified data
+              result.push({
+                ...article,
+                id: `${article.id}-cycle-${i}`,
+                title: `${article.title} (${i + 1})`
+              })
+            }
+          }
+        }
+        
+        // Fill remaining slots if needed
+        while (result.length < 6 && thumbsPool.length > 0) {
+          const fallbackIndex = result.length % thumbsPool.length
+          const fallbackArticle = thumbsPool[fallbackIndex]
+          result.push({
+            ...fallbackArticle,
+            id: `${fallbackArticle.id}-fill-${result.length}`,
+            title: `Loading more articles...`
+          })
+        }
+        
+        return result
+      })()
     : []
 
   // Debug logging
@@ -96,7 +160,9 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
     currentSlide: current,
     totalSlides,
     smallItemsCount: smallItems.length,
-    featuredHasImage: featured?.image ? 'yes' : 'no'
+    featuredHasImage: featured?.image ? 'yes' : 'no',
+    uniqueSmallItems: new Set(smallItems.map(item => item.href)).size,
+    duplicatesInSmallItems: smallItems.length - new Set(smallItems.map(item => item.href)).size
   })
 
   return (
@@ -237,10 +303,15 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                         loading="lazy"
                       />
                     ) : (
-                      <div className={`absolute inset-0 w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center transition-transform duration-1000 ease-out ${
+                      <div className={`absolute inset-0 w-full h-full bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center transition-transform duration-1000 ease-out ${
                         isVisible ? 'zoom-in-image' : ''
                       }`}>
-                        <span className="text-gray-500 text-sm">No Image Available</span>
+                        <div className="text-center text-white/80">
+                          <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-sm font-medium">News Image</span>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -274,12 +345,14 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                           />
                         ) : (
                           <div 
-                            className={`absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-100 flex items-center justify-center transition-transform duration-700 ease-out ${
+                            className={`absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center transition-transform duration-700 ease-out ${
                               isVisible ? 'zoom-in-thumbnail' : ''
                             }`} 
                             style={{ animationDelay: `${i * 150}ms` }}
                           >
-                            <span className="text-gray-500 text-xs">No Image</span>
+                            <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                            </svg>
                           </div>
                         )}
                       </div>

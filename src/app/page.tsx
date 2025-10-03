@@ -158,33 +158,31 @@ export default async function Home() {
     }
   })
 
-  // ArticleSection items (use remaining mixed news)
-  const remainingMixedNews = allMixedNews
-    .filter((article: any) => isUnique(article))
-    .filter((article: any) => !article.imageUrl || article.imageUrl.trim() === '' || !article.imageUrl.includes('picsum.photos'))
-    .slice(0, 8)
+  // ArticleSection items (fresh data from multiple sources - NOT from remaining)
+  const articleSectionResult = await Promise.allSettled([
+    newsService.getMixedNews(20), // Fresh mixed news for ArticleSection
+  ])
   
-  const newsForArticleSection = remainingMixedNews.length > 0 
-    ? remainingMixedNews 
-    : internationalForFallback
-        .filter((article: any) => isUnique(article))
-        .filter((article: any) => !article.imageUrl || !article.imageUrl.includes('picsum.photos'))
-        .slice(0, 8)
+  const articleSectionRawData = articleSectionResult[0].status === 'fulfilled' ? articleSectionResult[0].value : []
   
-  const articleSectionItems = newsForArticleSection.map(article => {
-    markAsUsed(article)
-    return {
+  // For ArticleSection, we want diverse articles from different sources
+  // Don't use the global deduplication since we want variety
+  const articleSectionItems = articleSectionRawData
+    .filter(article => article && article.title && article.url)
+    .slice(0, 15) // Get more articles for better selection
+    .map(article => ({
       id: article.id,
       title: article.title,
-      category: article.source.name,
+      category: article.source?.name || 'News',
       time: getRelativeTime(article.publishedAt, article.language),
       href: article.url,
-      image: article.imageUrl || '', // Empty string, bukan picsum dummy
+      image: article.imageUrl || '',
       description: article.description,
-    }
-  })
+      tags: article.category ? [article.category] : [],
+    }))
 
   console.log(`✅ Article section items count: ${articleSectionItems.length}`)
+  console.log(`✅ Article section sources:`, [...new Set(articleSectionItems.map(item => item.category))])
   console.log(`✅ Total unique articles used: ${usedArticles.size}`)
 
   // Social Media Section data (from social media news)

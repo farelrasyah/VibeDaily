@@ -70,63 +70,68 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
 
   // Right items (6 articles) — ensure we always get exactly 6 UNIQUE articles
   const validArticles = articles.filter(item => item && item.id && item.title);
-  
-  // Remove featured article from pool to avoid duplication
-  const availableForGrid = validArticles.slice(1); // Skip featured article
-  
-  // Get unique articles only - no duplicates allowed
-  const rightItems: ArticleItem[] = [];
-  const usedIds = new Set<string>();
-  
-  // Add featured article ID to used set to avoid duplication
-  if (validArticles[0]) {
-    usedIds.add(validArticles[0].id);
-  }
-  
-  // Collect unique articles for the grid
-  for (const article of availableForGrid) {
-    if (!usedIds.has(article.id) && rightItems.length < 6) {
-      rightItems.push(article);
-      usedIds.add(article.id);
-    }
-  }
-  
-  // If we don't have 6 unique articles, repeat from available articles but maintain uniqueness
-  // This ensures we always have 6 articles while avoiding duplication within the same render
-  if (rightItems.length < 6 && availableForGrid.length > 0) {
-    let attempts = 0;
-    while (rightItems.length < 6 && attempts < 10) { // Prevent infinite loop
-      for (const article of availableForGrid) {
-        if (rightItems.length >= 6) break;
-        
-        // Create a unique identifier for this specific position to avoid exact duplicates
-        const positionId = `${article.id}-pos-${rightItems.length}`;
-        
-        // Allow reuse but with different position identifier
-        if (!rightItems.some(item => item.id === article.id && rightItems.indexOf(item) === rightItems.length)) {
-          // Create a copy with a modified ID for React key uniqueness
-          const articleCopy = { ...article, id: positionId };
-          rightItems.push(articleCopy);
-        }
-      }
-      attempts++;
-    }
-  }
-  
-  // Ensure exactly 6 articles by filling with available articles if still needed
-  while (rightItems.length < 6 && availableForGrid.length > 0) {
-    const sourceIndex = rightItems.length % availableForGrid.length;
-    const sourceArticle = availableForGrid[sourceIndex];
-    const uniqueId = `${sourceArticle.id}-fill-${rightItems.length}`;
-    rightItems.push({ ...sourceArticle, id: uniqueId });
-  }
-  
-  const featuredArticle = validArticles[0];
 
-  console.log('ArticleSection: Featured article:', featuredArticle?.title)
+  const featuredArticle = validArticles[0];
+  const availableForGrid = validArticles.slice(1); // Skip featured article
+
+  // Create a pool of unique articles based on URL + title combination
+  const uniqueArticlePool: ArticleItem[] = [];
+  const seenCombinations = new Set<string>();
+
+  // Add featured article to seen combinations to prevent duplication
+  if (featuredArticle) {
+    seenCombinations.add(`${featuredArticle.href}|${featuredArticle.title.toLowerCase().trim()}`);
+  }
+
+  // Collect all unique articles from available pool
+  for (const article of availableForGrid) {
+    const combination = `${article.href}|${article.title.toLowerCase().trim()}`;
+    if (!seenCombinations.has(combination)) {
+      uniqueArticlePool.push(article);
+      seenCombinations.add(combination);
+    }
+  }
+
+  // Now select exactly 6 articles for the grid
+  const rightItems: ArticleItem[] = [];
+
+  // First, take as many unique articles as possible
+  for (let i = 0; i < Math.min(6, uniqueArticlePool.length); i++) {
+    rightItems.push(uniqueArticlePool[i]);
+  }
+
+  // If we still need more articles, create modified versions of existing articles
+  while (rightItems.length < 6 && uniqueArticlePool.length > 0) {
+    const sourceIndex = rightItems.length % uniqueArticlePool.length;
+    const sourceArticle = uniqueArticlePool[sourceIndex];
+
+    // Create a clearly marked additional article
+    const additionalArticle: ArticleItem = {
+      ...sourceArticle,
+      id: `additional-${rightItems.length}-${Date.now()}`,
+      title: `${sourceArticle.title} [More]`,
+      // Keep original URL and other properties
+    };
+
+    rightItems.push(additionalArticle);
+  }  console.log('ArticleSection: Featured article:', featuredArticle?.title)
   console.log('ArticleSection: Right items count (must be 6):', rightItems.length)
   console.log('ArticleSection: Valid articles total:', validArticles.length)
   console.log('ArticleSection: Available for grid (excluding featured):', availableForGrid.length)
+  console.log('ArticleSection: Unique article pool size:', uniqueArticlePool.length)
+  console.log('ArticleSection: Additional articles in grid:', rightItems.filter(item => item.id.includes('additional')).length)
+
+  // Verify uniqueness
+  const urlTitleCombinations = rightItems.map(item => `${item.href}|${item.title.toLowerCase().trim()}`);
+  const uniqueCombinations = new Set(urlTitleCombinations);
+
+  console.log('ArticleSection: Total combinations in grid:', urlTitleCombinations.length)
+  console.log('ArticleSection: Unique combinations in grid:', uniqueCombinations.size)
+
+  if (urlTitleCombinations.length !== uniqueCombinations.size) {
+    console.error('ArticleSection: CRITICAL - Duplicate URL+title combinations found!')
+    console.log('Duplicate combinations:', urlTitleCombinations.filter((combo, index) => urlTitleCombinations.indexOf(combo) !== index))
+  }
 
   // If no featured article or not enough articles for a meaningful display, show loading state
   if (!featuredArticle || validArticles.length < 2) {
@@ -196,7 +201,14 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
                 loading="lazy"
               />
             ) : (
-              <div className={`absolute inset-0 h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 transition-transform duration-1000 ease-out ${isVisible ? 'zoom-in-image' : ''}`} />
+              <div className={`absolute inset-0 h-full w-full bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center transition-transform duration-1000 ease-out ${isVisible ? 'zoom-in-image' : ''}`}>
+                <div className="text-center text-white/80">
+                  <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm font-medium">News Image</span>
+                </div>
+              </div>
             )}
             {/* Gradient overlay */}
             <div className="featured-gradient" />
@@ -264,10 +276,12 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
                             />
                           ) : (
                             <div 
-                              className={`w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center transition-transform duration-700 ease-out ${isVisible ? 'zoom-in-thumbnail' : ''}`}
+                              className={`w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center transition-transform duration-700 ease-out ${isVisible ? 'zoom-in-thumbnail' : ''}`}
                               style={{ animationDelay: `${idx * 150}ms` }}
                             >
-                              <span className="text-gray-500 text-xs">No Image</span>
+                              <svg className="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                              </svg>
                             </div>
                           )}
                         </div>
