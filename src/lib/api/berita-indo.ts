@@ -22,6 +22,12 @@ class BeritaIndoService {
     category?: string
   ): Promise<ApiResponse<NewsArticle>> {
     try {
+      // Force some sources to use RSS for better image support
+      if (source === 'okezone') {
+        console.log(`📰 Forcing ${source} to use RSS feed for better image support`);
+        return await this.getNewsFromRSS(source);
+      }
+
       // First try the original API
       const endpoint = `/api/${source}-news/${category ? category : ''}`;
       const fullUrl = `${this.baseUrl}${endpoint}`;
@@ -257,13 +263,60 @@ class BeritaIndoService {
     article: any,
     source: IndonesiaSource
   ): NewsArticle => {
+
+    // Extract content from various possible fields
+    let content = '';
+    let description = '';
+
+    // Different sources have content in different fields
+    if (source === 'okezone' || source === 'vice') {
+      // Okezone and Vice put content in 'content' field
+      content = article.content || '';
+      description = article.contentSnippet || article.description || article.content || '';
+    } else if (source === 'kumparan') {
+      // Kumparan puts content in 'description' field
+      content = article.description || '';
+      description = article.description || '';
+    } else {
+      // Default behavior for other sources
+      content = article.contentSnippet || article.description || article.content || '';
+      description = article.contentSnippet || article.description || '';
+    }
+
+    // Handle image URLs - some are just query parameters
+    let imageUrl = null;
+    if (article.image?.large) {
+      imageUrl = article.image.large;
+    } else if (article.image?.small) {
+      imageUrl = article.image.small;
+    } else if (article.image?.url) {
+      imageUrl = article.image.url;
+    } else if (article.image?.medium) {
+      imageUrl = article.image.medium;
+    } else if (article.image?.extraLarge) {
+      imageUrl = article.image.extraLarge;
+    }
+
+    // Only try to construct full URL if it's clearly a query parameter
+    if (imageUrl && imageUrl.startsWith('?') && source !== 'okezone') {
+      // For some sources, we might need to prepend the article URL or a base URL
+      // For now, let's try prepending the article's domain
+      try {
+        const articleUrl = new URL(article.link);
+        imageUrl = articleUrl.origin + imageUrl;
+      } catch (e) {
+        // If URL parsing fails, keep the original
+        console.log(`⚠️ Could not construct full image URL for ${source}: ${imageUrl}`);
+      }
+    }
+
     return {
       id: this.generateSafeId(article.link, article.title),
       title: article.title || 'No title',
-      description: article.contentSnippet || article.description || '',
-      content: article.description || article.contentSnippet || '',
+      description: description,
+      content: content,
       url: article.link,
-      imageUrl: article.image?.large || article.image?.small || null,
+      imageUrl: imageUrl,
       source: {
         id: source,
         name: this.getSourceName(source),

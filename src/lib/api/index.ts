@@ -154,7 +154,7 @@ class NewsService {
         // Decode URL if it's encoded
         const decodedUrl = id.includes('%3A%2F%2F') ? decodeURIComponent(id) : id;
         console.log('🔗 Decoded URL:', decodedUrl);
-        const article = await this.getArticleByUrl(decodedUrl);
+        const article = await this.getArticleById(decodedUrl);
         if (article) {
           // Cache the result
           articleCache.set(id, article);
@@ -163,82 +163,78 @@ class NewsService {
         return article;
       }
 
-      // Try multiple fetch attempts with different limits to increase chances
-      const fetchAttempts = [500, 800, 1000]; // Increased limits significantly to get more article coverage
+      // Always fetch fresh data to ensure we have the latest articles
+      console.log(`📰 Fetching fresh articles to find ID: ${id}...`);
       
-      for (let attempt = 0; attempt < fetchAttempts.length; attempt++) {
-        console.log(`📰 Fetching articles (attempt ${attempt + 1}/${fetchAttempts.length}) with limit ${fetchAttempts[attempt]}...`);
-        
-        // Fetch directly from Berita Indo to get maximum articles
-        const indonesiaResult = await beritaIndo.getAllIndonesiaNews();
-        let allArticles: NewsArticle[] = [];
-        
-        if (indonesiaResult.success) {
-          allArticles = indonesiaResult.data.slice(0, fetchAttempts[attempt]);
+      // Fetch directly from Berita Indo to get maximum articles
+      const indonesiaResult = await beritaIndo.getAllIndonesiaNews();
+      let allArticles: NewsArticle[] = [];
+      
+      if (indonesiaResult.success) {
+        allArticles = indonesiaResult.data.slice(0, 1000); // Get more articles for better coverage
+      }
+      
+      console.log(`📊 Total fresh articles fetched: ${allArticles.length}`);
+      
+      // Cache all articles for future lookups
+      allArticles.forEach(article => {
+        if (!articleCache.has(article.id)) {
+          articleCache.set(article.id, article);
+          cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
         }
+      });
+      
+      // Log sample of article IDs for debugging
+      if (allArticles.length > 0) {
+        console.log('🔍 Sample article IDs:', allArticles.slice(0, 5).map(a => ({ id: a.id, title: a.title.substring(0, 30) })));
+      }
+      
+      // First try exact ID match
+      let article = allArticles.find(article => article.id === id);
+      
+      if (article) {
+        console.log('✅ Article found by exact ID!', article.title);
+        return article;
+      }
+
+      // Try to match legacy ID patterns by extracting the meaningful part
+      console.log(`❌ No exact ID match found, trying legacy ID pattern...`);
+      
+      const idParts = id.split('-');
+      if (idParts.length > 1) {
+        // Extract the main slug without the hash (last part)
+        const slugWithoutHash = idParts.slice(0, -1).join('-');
         
-        console.log(`📊 Total articles fetched: ${allArticles.length}`);
-        
-        // Cache all articles for future lookups
-        allArticles.forEach(article => {
-          if (!articleCache.has(article.id)) {
-            articleCache.set(article.id, article);
-            cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
+        article = allArticles.find(article => {
+          const articleParts = article.id.split('-');
+          if (articleParts.length > 1) {
+            const articleSlugWithoutHash = articleParts.slice(0, -1).join('-');
+            return articleSlugWithoutHash === slugWithoutHash;
           }
+          return false;
         });
         
-        // Log sample of article IDs for debugging
-        if (attempt === 0) {
-          console.log('🔍 Sample article IDs:', allArticles.slice(0, 10).map(a => ({ id: a.id, title: a.title.substring(0, 50) })));
-        }
-        
-        // First try exact ID match
-        let article = allArticles.find(article => article.id === id);
-        
         if (article) {
-          console.log('✅ Article found by exact ID!', article.title);
+          console.log('✅ Article found by legacy ID pattern!', article.title);
+          // Cache with the requested ID
+          articleCache.set(id, article);
+          cacheExpiry.set(id, Date.now() + CACHE_DURATION);
           return article;
         }
 
-        // Try to match legacy ID patterns by extracting the meaningful part
-        console.log(`❌ No exact ID match found in attempt ${attempt + 1}, trying legacy ID pattern...`);
+        // Try partial slug matching (first few words)
+        const partialSlug = idParts.slice(0, Math.min(5, idParts.length - 1)).join('-');
+        article = allArticles.find(article => {
+          const articleId = article.id.toLowerCase();
+          return articleId.includes(partialSlug.toLowerCase());
+        });
         
-        const idParts = id.split('-');
-        if (idParts.length > 1) {
-          // Extract the main slug without the hash (last part)
-          const slugWithoutHash = idParts.slice(0, -1).join('-');
-          
-          article = allArticles.find(article => {
-            const articleParts = article.id.split('-');
-            if (articleParts.length > 1) {
-              const articleSlugWithoutHash = articleParts.slice(0, -1).join('-');
-              return articleSlugWithoutHash === slugWithoutHash;
-            }
-            return false;
-          });
-          
-          if (article) {
-            console.log('✅ Article found by legacy ID pattern!', article.title);
-            // Cache with the requested ID
-            articleCache.set(id, article);
-            cacheExpiry.set(id, Date.now() + CACHE_DURATION);
-            return article;
-          }
-
-          // Try partial slug matching (first few words)
-          const partialSlug = idParts.slice(0, Math.min(5, idParts.length - 1)).join('-');
-          article = allArticles.find(article => {
-            const articleId = article.id.toLowerCase();
-            return articleId.includes(partialSlug.toLowerCase());
-          });
-          
-          if (article) {
-            console.log('✅ Article found by partial slug match!', article.title);
-            // Cache with the requested ID
-            articleCache.set(id, article);
-            cacheExpiry.set(id, Date.now() + CACHE_DURATION);
-            return article;
-          }
+        if (article) {
+          console.log('✅ Article found by partial slug match!', article.title);
+          // Cache with the requested ID
+          articleCache.set(id, article);
+          cacheExpiry.set(id, Date.now() + CACHE_DURATION);
+          return article;
         }
       }
 

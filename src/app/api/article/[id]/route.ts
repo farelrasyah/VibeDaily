@@ -22,8 +22,11 @@ export async function GET(
     // Fetch article menggunakan server-side untuk menghindari CORS
     const article = await newsService.getArticleById(decodedId);
     
+    console.log('🔍 Article search result:', article ? 'FOUND' : 'NOT FOUND');
+    
     if (!article) {
       console.log('❌ Article not found in API route - may be too old or no longer available');
+      console.log('📊 Cache stats:', newsService.getArticleStats());
       return NextResponse.json(
         { 
           error: 'Article not found', 
@@ -34,6 +37,9 @@ export async function GET(
     }
 
     console.log('✅ Article found in API route:', article.title);
+    console.log('📝 Article content length:', article.content?.length || 0);
+    console.log('📝 Article description length:', article.description?.length || 0);
+    console.log('🖼️ Article image URL:', article.imageUrl);
     
     return NextResponse.json({ article });
   } catch (error) {

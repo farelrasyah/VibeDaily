@@ -72,6 +72,8 @@ const ArticleView: React.FC<ArticleViewSingleProps> = ({ articleId }) => {
         // Use internal API route to avoid CORS issues
         const response = await fetch(`/api/article/${articleId}`);
         
+        console.log('📡 API response status:', response.status);
+        
         if (!response.ok) {
           if (response.status === 404) {
             setError('Article not found');
@@ -82,9 +84,13 @@ const ArticleView: React.FC<ArticleViewSingleProps> = ({ articleId }) => {
         }
         
         const data = await response.json();
+        console.log('📦 API response data:', data);
         
         if (data.article) {
           console.log('✅ Article fetched successfully:', data.article.title);
+          console.log('📝 Article content length:', data.article.content?.length || 0);
+          console.log('📝 Article description length:', data.article.description?.length || 0);
+          console.log('🖼️ Article image URL:', data.article.imageUrl);
           setArticle(data.article);
         } else {
           setError('Article not found');
@@ -223,24 +229,35 @@ const ArticleView: React.FC<ArticleViewSingleProps> = ({ articleId }) => {
             <div className={`${article.imageUrl ? 'xl:col-span-3' : ''}`}>
               <div className="max-w-none xl:max-w-3xl 2xl:max-w-4xl space-y-10 text-slate-800 leading-relaxed">
                 <div className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-slate-700 font-light">
-                  <p className="mb-7">
-                    {article.description}
-                  </p>
+                  {/* Show description if available */}
+                  {article.description && article.description.trim() && (
+                    <p className="mb-7">
+                      {article.description}
+                    </p>
+                  )}
 
-                  {article.content && (
+                  {/* Show content if it's different from description and available */}
+                  {article.content && article.content.trim() && article.content !== article.description && (
                     <div className="mb-7" dangerouslySetInnerHTML={{ __html: article.content }} />
                   )}
 
+                  {/* If no content or description, show a message */}
+                  {(!article.description || !article.description.trim()) && (!article.content || !article.content.trim()) && (
+                    <p className="mb-7 text-slate-600 italic">
+                      Full article content is not available from this source.
+                    </p>
+                  )}
+
                   <p className="mb-7">
-                    This article was originally published by {article.source.name}. 
+                    This article was originally published by {article.source.name}.
                     {article.url && (
                       <>
                         {" "}
-                        <a 
-                          href={article.url} 
-                          target="_blank" 
+                        <a
+                          href={article.url}
+                          target="_blank"
                           rel="noopener noreferrer"
-                          className="text-violet-600 hover:text-violet-800 underline"
+                          className="text-violet-600 hover:text-violet-800 underline font-medium"
                         >
                           Read the full article here
                         </a>

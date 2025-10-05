@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
+import Link from "next/link";
 import { newsService } from "@/lib/api";
 import { NewsArticle } from "@/types/news.types";
 
@@ -197,10 +198,8 @@ const ContentHub: React.FC = () => {
                             </div>
                           </div>
                         )}
-                        <a 
-                          href={article.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <Link 
+                          href={`/article/${article.id}`}
                           className="absolute top-3 right-3 bg-white rounded-[12px] p-2 flex items-center justify-center hover:bg-gray-50 transition-colors" 
                           style={{boxShadow:'0 2px 8px 0 rgba(0,0,0,0.08)', border: 'none', width: '36px', height: '36px', padding: 0}}
                         >
@@ -208,7 +207,7 @@ const ContentHub: React.FC = () => {
                             <rect x="0" y="0" width="28" height="28" rx="8" fill="white"/>
                             <path d="M9 19L19 9M19 9H11M19 9V17" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
-                        </a>
+                        </Link>
                       </div>
                     </div>
                     <div className="flex flex-col flex-1 px-7 pt-4 pb-6 items-center text-center">
