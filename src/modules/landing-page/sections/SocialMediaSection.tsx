@@ -64,9 +64,9 @@ function InstaCard({ img, blueBar = false, className = "", isVisible = false, in
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="p-[2px] sm:p-[3px] rounded-full bg-gradient-to-tr from-rose-400/80 via-purple-500/80 to-blue-500/80">
             <div className="p-[2px] sm:p-[3px] bg-white/90 rounded-full">
-              <div className="w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 rounded-full bg-gradient-to-tr from-rose-500 to-blue-600 grid place-items-center">
-                <span className="text-white font-bold text-[10px] sm:text-[11px] md:text-[12px]">V</span>
-              </div>
+             <div className="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">◉</span>
+                </div>
             </div>
           </div>
           <span className="text-[10px] sm:text-[11px] md:text-[12px] font-semibold text-white/90 bg-white/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-white/15">

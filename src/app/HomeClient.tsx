@@ -18,7 +18,7 @@ interface HomeClientProps {
     title: string
     tags: string[]
     ctaText: string
-    articleUrl: string
+    articleId: string | null
   }
   tickerItems: Array<{
     id: string
@@ -136,8 +136,8 @@ export default function HomeClient({
   ]
 
   const handleHeroCta = () => {
-    if (heroData.articleUrl && heroData.articleUrl !== '#') {
-      window.open(heroData.articleUrl, '_blank', 'noopener,noreferrer')
+    if (heroData.articleId) {
+      window.location.href = `/article/${heroData.articleId}`;
     }
   }
 

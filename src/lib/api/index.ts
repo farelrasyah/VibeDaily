@@ -1,4 +1,3 @@
-import { newsApiOrg } from './newsapi-org';
 import { beritaIndo } from './berita-indo';
 import { NewsArticle } from '@/types/news.types';
 
@@ -13,75 +12,30 @@ const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
  */
 class NewsService {
   /**
-   * Get mixed news (Indonesia + International) from multiple sources
+   * Get mixed news (Indonesia only - NewsAPI.org removed due to API key requirements)
    */
   async getMixedNews(limit: number = 20): Promise<NewsArticle[]> {
     try {
-      // For larger limits, prioritize Indonesian articles since that's where the missing articles likely are
-      const indonesiaLimit = Math.max(Math.floor(limit * 0.8), limit - 20); // 80% Indonesian, minimum all but 20
-      
-      // Fetch from multiple international sources
-      const [indonesiaResult, usResult, ukResult, generalResult] = await Promise.allSettled([
-        beritaIndo.getAllIndonesiaNews(),
-        newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 8 }),
-        newsApiOrg.getTopHeadlines({ country: 'gb', pageSize: 4 }),
-        newsApiOrg.getTopHeadlines({ pageSize: 8 }), // General top headlines
-      ]);
+      // Only use Berita Indo API since NewsAPI.org requires paid API key
+      const indonesiaResult = await beritaIndo.getAllIndonesiaNews();
 
-      const articles: NewsArticle[] = [];
+      if (indonesiaResult.success) {
+        const articles = indonesiaResult.data.slice(0, limit);
 
-      // Add Indonesian articles (prioritized for larger searches)
-      if (indonesiaResult.status === 'fulfilled' && indonesiaResult.value.success) {
-        const indonesianArticles = indonesiaResult.value.data.slice(0, indonesiaLimit);
-        articles.push(...indonesianArticles);
-        console.log(`Added ${indonesianArticles.length} Indonesian articles`);
-        
-        // Cache all Indonesian articles since they're more likely to be requested
-        indonesianArticles.forEach(article => {
+        // Cache all articles for future lookups
+        articles.forEach(article => {
           if (!articleCache.has(article.id)) {
             articleCache.set(article.id, article);
             cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
           }
         });
+
+        console.log(`✅ Mixed news: returning ${articles.length} Indonesian articles`);
+        return articles;
+      } else {
+        console.error('Failed to fetch Indonesian news:', indonesiaResult.error);
+        return [];
       }
-
-      // Add international articles from various sources
-      const internationalArticles: NewsArticle[] = [];
-      
-      if (usResult.status === 'fulfilled' && usResult.value.success) {
-        internationalArticles.push(...usResult.value.data.slice(0, 4));
-      }
-      if (ukResult.status === 'fulfilled' && ukResult.value.success) {
-        internationalArticles.push(...ukResult.value.data.slice(0, 2));
-      }
-      if (generalResult.status === 'fulfilled' && generalResult.value.success) {
-        internationalArticles.push(...generalResult.value.data.slice(0, 4));
-      }
-
-      // Shuffle international articles and add up to remaining limit
-      const remainingLimit = limit - articles.length;
-      const shuffledInternational = internationalArticles
-        .sort(() => Math.random() - 0.5)
-        .slice(0, remainingLimit);
-      
-      articles.push(...shuffledInternational);
-      console.log(`Added ${shuffledInternational.length} international articles`);
-
-      // Final shuffle and return
-      const finalArticles = articles
-        .sort(() => Math.random() - 0.5)
-        .slice(0, limit);
-
-      // Cache all articles for future lookups
-      finalArticles.forEach(article => {
-        if (!articleCache.has(article.id)) {
-          articleCache.set(article.id, article);
-          cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
-        }
-      });
-
-      console.log(`✅ Mixed news: returning ${finalArticles.length} articles total`);
-      return finalArticles;
     } catch (error) {
       console.error('Mixed news error:', error);
       return [];
@@ -89,7 +43,7 @@ class NewsService {
   }
 
   /**
-   * Get news by language
+   * Get news by language (Indonesia only - NewsAPI.org removed due to API key requirements)
    */
   async getNewsByLanguage(
     language: 'id' | 'en',
@@ -100,11 +54,9 @@ class NewsService {
         const result = await beritaIndo.getAllIndonesiaNews();
         return result.success ? result.data.slice(0, limit) : [];
       } else {
-        const result = await newsApiOrg.getTopHeadlines({
-          country: 'us',
-          pageSize: limit,
-        });
-        return result.success ? result.data : [];
+        // For English, return empty array since NewsAPI.org requires paid API key
+        console.log('⚠️ English news not available - NewsAPI.org requires paid API key');
+        return [];
       }
     } catch (error) {
       console.error('Get news by language error:', error);
@@ -113,30 +65,36 @@ class NewsService {
   }
 
   /**
-   * Search across both APIs
+   * Search across Indonesian news only (NewsAPI.org removed due to API key requirements)
    */
   async searchAllNews(query: string, limit: number = 20): Promise<NewsArticle[]> {
     try {
-      const [indonesiaResult, internationalResult] = await Promise.allSettled([
-        beritaIndo.getAllIndonesiaNews(),
-        newsApiOrg.searchNews({ query, pageSize: limit }),
-      ]);
+      // Only search in Indonesian news since NewsAPI.org requires paid API key
+      const indonesiaResult = await beritaIndo.getAllIndonesiaNews();
 
-      const articles: NewsArticle[] = [];
-
-      if (indonesiaResult.status === 'fulfilled' && indonesiaResult.value.success) {
-        // Filter Indonesia news by query
-        const filtered = indonesiaResult.value.data.filter((article) =>
-          article.title.toLowerCase().includes(query.toLowerCase())
+      if (indonesiaResult.success) {
+        // Filter Indonesia news by query (title and description)
+        const filtered = indonesiaResult.data.filter((article) =>
+          article.title.toLowerCase().includes(query.toLowerCase()) ||
+          (article.description && article.description.toLowerCase().includes(query.toLowerCase()))
         );
-        articles.push(...filtered);
-      }
 
-      if (internationalResult.status === 'fulfilled' && internationalResult.value.success) {
-        articles.push(...internationalResult.value.data);
-      }
+        const articles = filtered.slice(0, limit);
 
-      return articles.slice(0, limit);
+        // Cache search results
+        articles.forEach(article => {
+          if (!articleCache.has(article.id)) {
+            articleCache.set(article.id, article);
+            cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
+          }
+        });
+
+        console.log(`🔍 Search "${query}": found ${articles.length} Indonesian articles`);
+        return articles;
+      } else {
+        console.error('Failed to fetch Indonesian news for search:', indonesiaResult.error);
+        return [];
+      }
     } catch (error) {
       console.error('Search all news error:', error);
       return [];
@@ -144,52 +102,31 @@ class NewsService {
   }
 
   /**
-   * Get trending news from multiple sources
+   * Get trending news (Indonesia only - NewsAPI.org removed due to API key requirements)
    */
   async getTrendingNews(limit: number = 10): Promise<NewsArticle[]> {
     try {
-      const halfLimit = Math.floor(limit / 2);
-      
-      // Fetch trending from multiple international sources
-      const [indonesiaResult, usResult, generalResult, techResult] = await Promise.allSettled([
-        beritaIndo.getTrendingNews(),
-        newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 4 }),
-        newsApiOrg.getTopHeadlines({ pageSize: 4 }),
-        newsApiOrg.getTopHeadlines({ category: 'technology', pageSize: 3 }),
-      ]);
+      // Only use Berita Indo API since NewsAPI.org requires paid API key
+      const indonesiaResult = await beritaIndo.getTrendingNews();
 
-      const articles: NewsArticle[] = [];
+      if (indonesiaResult.success) {
+        const articles = indonesiaResult.data.slice(0, limit);
 
-      // Add Indonesian trending articles
-      if (indonesiaResult.status === 'fulfilled' && indonesiaResult.value.success) {
-        articles.push(...indonesiaResult.value.data.slice(0, halfLimit));
+        // Cache all articles for future lookups
+        articles.forEach(article => {
+          if (!articleCache.has(article.id)) {
+            articleCache.set(article.id, article);
+            cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
+          }
+        });
+
+        // Sort by publish date (most recent first)
+        return articles
+          .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+      } else {
+        console.error('Failed to fetch trending Indonesian news:', indonesiaResult.error);
+        return [];
       }
-
-      // Combine international trending articles
-      const internationalArticles: NewsArticle[] = [];
-      
-      if (usResult.status === 'fulfilled' && usResult.value.success) {
-        internationalArticles.push(...usResult.value.data);
-      }
-      if (generalResult.status === 'fulfilled' && generalResult.value.success) {
-        internationalArticles.push(...generalResult.value.data);
-      }
-      if (techResult.status === 'fulfilled' && techResult.value.success) {
-        internationalArticles.push(...techResult.value.data);
-      }
-
-      // Add international articles
-      const remainingLimit = limit - articles.length;
-      const shuffledInternational = internationalArticles
-        .sort(() => Math.random() - 0.5)
-        .slice(0, remainingLimit);
-      
-      articles.push(...shuffledInternational);
-
-      // Sort by publish date (most recent first)
-      return articles
-        .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-        .slice(0, limit);
     } catch (error) {
       console.error('Trending news error:', error);
       return [];
@@ -227,12 +164,19 @@ class NewsService {
       }
 
       // Try multiple fetch attempts with different limits to increase chances
-      const fetchAttempts = [200, 300, 400]; // Increased limits to get more article coverage
+      const fetchAttempts = [500, 800, 1000]; // Increased limits significantly to get more article coverage
       
       for (let attempt = 0; attempt < fetchAttempts.length; attempt++) {
         console.log(`📰 Fetching articles (attempt ${attempt + 1}/${fetchAttempts.length}) with limit ${fetchAttempts[attempt]}...`);
         
-        const allArticles = await this.getMixedNews(fetchAttempts[attempt]);
+        // Fetch directly from Berita Indo to get maximum articles
+        const indonesiaResult = await beritaIndo.getAllIndonesiaNews();
+        let allArticles: NewsArticle[] = [];
+        
+        if (indonesiaResult.success) {
+          allArticles = indonesiaResult.data.slice(0, fetchAttempts[attempt]);
+        }
+        
         console.log(`📊 Total articles fetched: ${allArticles.length}`);
         
         // Cache all articles for future lookups
@@ -245,7 +189,7 @@ class NewsService {
         
         // Log sample of article IDs for debugging
         if (attempt === 0) {
-          console.log('🔍 Sample article IDs:', allArticles.slice(0, 5).map(a => ({ id: a.id, title: a.title.substring(0, 50) })));
+          console.log('🔍 Sample article IDs:', allArticles.slice(0, 10).map(a => ({ id: a.id, title: a.title.substring(0, 50) })));
         }
         
         // First try exact ID match
@@ -280,6 +224,21 @@ class NewsService {
             cacheExpiry.set(id, Date.now() + CACHE_DURATION);
             return article;
           }
+
+          // Try partial slug matching (first few words)
+          const partialSlug = idParts.slice(0, Math.min(5, idParts.length - 1)).join('-');
+          article = allArticles.find(article => {
+            const articleId = article.id.toLowerCase();
+            return articleId.includes(partialSlug.toLowerCase());
+          });
+          
+          if (article) {
+            console.log('✅ Article found by partial slug match!', article.title);
+            // Cache with the requested ID
+            articleCache.set(id, article);
+            cacheExpiry.set(id, Date.now() + CACHE_DURATION);
+            return article;
+          }
         }
       }
 
@@ -305,6 +264,37 @@ class NewsService {
             cacheExpiry.set(id, Date.now() + CACHE_DURATION);
             return cachedArticle;
           }
+
+          // Try partial slug match
+          const partialSlug = idParts.slice(0, Math.min(5, idParts.length - 1)).join('-');
+          if (cachedId.toLowerCase().includes(partialSlug.toLowerCase())) {
+            console.log('✅ Article found in cache by partial slug match!', cachedArticle.title);
+            // Cache with the requested ID
+            articleCache.set(id, cachedArticle);
+            cacheExpiry.set(id, Date.now() + CACHE_DURATION);
+            return cachedArticle;
+          }
+        }
+      }
+
+      // Last resort: try to find articles with similar titles or content
+      console.log('🔍 Last resort: searching for articles with similar content...');
+      const searchTerms = id.replace(/-/g, ' ').split(' ').filter(word => word.length > 3);
+      for (const [cachedId, cachedArticle] of articleCache.entries()) {
+        const title = cachedArticle.title.toLowerCase();
+        const description = (cachedArticle.description || '').toLowerCase();
+        
+        // Check if any search terms appear in title or description
+        const matches = searchTerms.filter(term => 
+          title.includes(term.toLowerCase()) || description.includes(term.toLowerCase())
+        );
+        
+        if (matches.length >= 2) { // At least 2 matching terms
+          console.log(`✅ Article found by content similarity (${matches.length} matches):`, cachedArticle.title);
+          // Cache with the requested ID
+          articleCache.set(id, cachedArticle);
+          cacheExpiry.set(id, Date.now() + CACHE_DURATION);
+          return cachedArticle;
         }
       }
 
@@ -317,53 +307,26 @@ class NewsService {
   }
 
   /**
-   * Get article by original URL (for backward compatibility)
+   * Get article statistics for debugging
    */
-  private async getArticleByUrl(url: string): Promise<NewsArticle | null> {
-    try {
-      const [indonesiaResult, internationalResult] = await Promise.allSettled([
-        beritaIndo.getAllIndonesiaNews(),
-        newsApiOrg.getTopHeadlines({ country: 'us', pageSize: 100 }),
-      ]);
-
-      console.log('🔍 Searching for URL:', url);
-
-      // Search in Indonesia articles
-      if (indonesiaResult.status === 'fulfilled' && indonesiaResult.value.success) {
-        console.log(`📊 Checking ${indonesiaResult.value.data.length} Indonesia articles`);
-        // Log sample URLs for debugging
-        console.log('🔍 Sample Indonesia URLs:', indonesiaResult.value.data.slice(0, 3).map(a => a.url));
-        
-        const found = indonesiaResult.value.data.find(article => article.url === url);
-        if (found) {
-          console.log('✅ Found in Indonesia articles:', found.title);
-          return found;
-        }
-      }
-
-      // Search in international articles
-      if (internationalResult.status === 'fulfilled' && internationalResult.value.success) {
-        console.log(`📊 Checking ${internationalResult.value.data.length} international articles`);
-        // Log sample URLs for debugging
-        console.log('🔍 Sample international URLs:', internationalResult.value.data.slice(0, 3).map(a => a.url));
-        
-        const found = internationalResult.value.data.find(article => article.url === url);
-        if (found) {
-          console.log('✅ Found in international articles:', found.title);
-          return found;
-        }
-      }
-
-      console.log('❌ Article not found by exact URL match');
-      return null;
-    } catch (error) {
-      console.error('Get article by URL error:', error);
-      return null;
+  getArticleStats(): { totalCached: number; cacheSize: number; oldestArticle: Date | null; newestArticle: Date | null } {
+    const cachedArticles = Array.from(articleCache.values());
+    const totalCached = cachedArticles.length;
+    const cacheSize = articleCache.size;
+    
+    if (cachedArticles.length === 0) {
+      return { totalCached: 0, cacheSize: 0, oldestArticle: null, newestArticle: null };
     }
+    
+    const sortedByDate = cachedArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    const newestArticle = new Date(sortedByDate[0].publishedAt);
+    const oldestArticle = new Date(sortedByDate[sortedByDate.length - 1].publishedAt);
+    
+    return { totalCached, cacheSize, oldestArticle, newestArticle };
   }
 }
 
 export const newsService = new NewsService();
 
 // Export individual services
-export { newsApiOrg, beritaIndo };
+export { beritaIndo };

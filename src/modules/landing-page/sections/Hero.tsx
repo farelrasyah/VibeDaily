@@ -12,7 +12,7 @@ interface HeroProps {
   ctaText?: string
   onCta?: () => void
   orb?: boolean
-  articleId?: string // Add articleId prop for routing
+  articleId?: string | null // Allow null values
 }
 
 export default function Hero({

@@ -16,23 +16,16 @@ const ContentHub: React.FC = () => {
         setError(null);
         console.log('ContentHub: Fetching articles...');
         
-        // Use the improved mixed news API that already handles multiple sources
+        // Use the improved mixed news API (only Berita Indo now)
         const data = await newsService.getMixedNews(8);
         console.log('ContentHub: Fetched mixed news:', data);
         
         if (data && data.length > 0) {
           setArticles(data);
-          console.log(`ContentHub: Successfully loaded ${data.length} articles from multiple sources`);
+          console.log(`ContentHub: Successfully loaded ${data.length} articles from Berita Indo API`);
         } else {
-          console.log('ContentHub: No articles from mixed news, trying trending...');
-          // Fallback to trending news
-          const trendingData = await newsService.getTrendingNews(8);
-          if (trendingData && trendingData.length > 0) {
-            setArticles(trendingData);
-            console.log(`ContentHub: Successfully loaded ${trendingData.length} trending articles`);
-          } else {
-            setError('No articles available from any source');
-          }
+          console.log('ContentHub: No articles from Berita Indo API');
+          setError('No articles available from Berita Indo API. Please try again later.');
         }
       } catch (err) {
         console.error('ContentHub: Error fetching articles:', err);
@@ -61,9 +54,22 @@ const ContentHub: React.FC = () => {
 
   const isValidImageUrl = (url: string | null) => {
     if (!url || url.trim() === '') return false;
+
     // Filter out placeholder/dummy images
     const invalidPatterns = ['picsum.photos', 'oval.gif', 'placeholder', 'dummy', 'example.com'];
-    return !invalidPatterns.some(pattern => url.toLowerCase().includes(pattern));
+    if (invalidPatterns.some(pattern => url.toLowerCase().includes(pattern))) {
+      return false;
+    }
+
+    // Check if URL is a valid image URL (has image extension or common image hosting domains)
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
+    const imageDomains = ['cdn', 'img', 'image', 'media', 'static', 'assets'];
+
+    const hasImageExtension = imageExtensions.some(ext => url.toLowerCase().includes(ext));
+    const hasImageDomain = imageDomains.some(domain => url.toLowerCase().includes(domain));
+
+    // Allow URLs that have image extensions or are from known image domains
+    return hasImageExtension || hasImageDomain || url.includes('http');
   };
 
   const scrollContentHub = (dir: "left" | "right") => {
@@ -163,26 +169,32 @@ const ContentHub: React.FC = () => {
                     <div className="flex items-center justify-center pt-5">
                       <div className="relative rounded-[22px] w-full max-w-[250px] md:max-w-[280px] lg:max-w-[310px] h-[200px] flex items-center justify-center mx-auto" style={{backgroundColor: colors.bg, border: `10px solid ${colors.border}`}}>
                         {isValidImageUrl(article.imageUrl) ? (
-                          <img 
-                            src={article.imageUrl!} 
+                          <img
+                            src={article.imageUrl!}
                             alt={article.title}
-                            className="w-full h-full object-cover rounded-[14px]" 
+                            className="w-full h-full object-cover rounded-[14px]"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
-                              // Show fallback
-                              target.parentElement?.appendChild(
-                                Object.assign(document.createElement('div'), {
-                                  className: 'w-full h-full bg-gray-300 rounded-[14px] flex items-center justify-center absolute inset-0',
-                                  innerHTML: '<span class="text-gray-500 text-sm">Image Error</span>'
-                                })
-                              );
+                              // Show better fallback with article source icon
+                              const fallbackDiv = document.createElement('div');
+                              fallbackDiv.className = 'w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-[14px] flex flex-col items-center justify-center';
+                              fallbackDiv.innerHTML = `
+                                <div class="text-2xl mb-2">📰</div>
+                                <div class="text-xs text-gray-600 text-center px-2">
+                                  ${article.source?.name || 'News'}
+                                </div>
+                              `;
+                              target.parentElement?.appendChild(fallbackDiv);
                             }}
                             loading="lazy"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gray-300 rounded-[14px] flex items-center justify-center">
-                            <span className="text-gray-500 text-sm">No Image</span>
+                          <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-[14px] flex flex-col items-center justify-center">
+                            <div className="text-2xl mb-2">📰</div>
+                            <div className="text-xs text-gray-600 text-center px-2">
+                              {article.source?.name || 'News'}
+                            </div>
                           </div>
                         )}
                         <a 

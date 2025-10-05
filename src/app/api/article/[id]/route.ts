@@ -23,9 +23,12 @@ export async function GET(
     const article = await newsService.getArticleById(decodedId);
     
     if (!article) {
-      console.log('❌ Article not found in API route');
+      console.log('❌ Article not found in API route - may be too old or no longer available');
       return NextResponse.json(
-        { error: 'Article not found' },
+        { 
+          error: 'Article not found', 
+          message: 'This article may be too old or no longer available. Only recent articles from the last few days are currently supported.' 
+        },
         { status: 404 }
       );
     }

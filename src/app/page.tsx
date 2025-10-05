@@ -58,14 +58,14 @@ export default async function Home() {
     title: heroArticle.title,
     tags: heroArticle.category ? [heroArticle.category] : ['News'],
     ctaText: 'Read article',
-    articleUrl: heroArticle.url,
+    articleId: heroArticle.id, // Use article ID for internal routing
   } : {
     category: 'News',
     time: 'Loading...',
     title: 'Stay informed with the latest news and updates',
     tags: ['News'],
     ctaText: 'Read article',
-    articleUrl: '#',
+    articleId: null,
   }
 
   // Ticker items (trending news - filter out used articles)
