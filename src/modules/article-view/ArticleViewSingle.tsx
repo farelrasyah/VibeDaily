@@ -6,6 +6,7 @@ import { useRef } from "react";
 import ContentHub from "../../common/ContentHub";
 import ArticleFooter from "../../common/ArticleFooter";
 import { NewsArticle } from "@/types/news.types";
+import { useEnhancedImage, generateImageSrcSet, generateImageFallbacks } from "../../lib/utils/image-enhancer";
 
 interface ArticleViewSingleProps {
   articleId: string;
@@ -149,6 +150,14 @@ const ArticleView: React.FC<ArticleViewSingleProps> = ({ articleId }) => {
 
   const heroImage = article.imageUrl;
 
+  // Enhance image quality to HD/Full HD without changing UI
+  const enhancedHeroImage = useEnhancedImage(heroImage);
+  const enhancedArticleImage = useEnhancedImage(article.imageUrl);
+  const heroSrcSet = generateImageSrcSet(heroImage);
+  const articleSrcSet = generateImageSrcSet(article.imageUrl);
+  const heroFallbacks = generateImageFallbacks(heroImage);
+  const articleFallbacks = generateImageFallbacks(article.imageUrl);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f5f7fa] via-[#e9eff6] to-[#dbeafe]">
       <main className="w-full min-h-screen flex flex-col items-stretch justify-start">
@@ -156,11 +165,25 @@ const ArticleView: React.FC<ArticleViewSingleProps> = ({ articleId }) => {
         {heroImage && (
           <section className="relative w-full h-[38vw] min-h-[320px] max-h-[520px] overflow-hidden shadow-2xl rounded-b-[2.5rem] flex items-end">
             <img
-              src={heroImage}
+              src={enhancedHeroImage || heroImage}
+              srcSet={heroSrcSet || undefined}
               alt={article.title}
               className="w-full h-full object-cover object-center scale-105 transition-transform duration-1000"
-              style={{ filter: 'brightness(0.92) saturate(1.1)' }}
+              style={{
+                filter: 'brightness(0.92) saturate(1.1) contrast(1.1)',
+                imageRendering: 'auto'
+              }}
               referrerPolicy="no-referrer"
+              loading="eager"
+              decoding="async"
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                const currentSrc = img.src;
+                const fallbackIndex = heroFallbacks.indexOf(currentSrc);
+                if (fallbackIndex < heroFallbacks.length - 1) {
+                  img.src = heroFallbacks[fallbackIndex + 1];
+                }
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             {/* Floating back button */}
@@ -274,10 +297,25 @@ const ArticleView: React.FC<ArticleViewSingleProps> = ({ articleId }) => {
               <div className="xl:col-span-2">
                 <div className="rounded-3xl overflow-hidden shadow-2xl group h-[400px] lg:h-[500px] xl:h-[600px]">
                   <img
-                    src={article.imageUrl}
+                    src={enhancedArticleImage || article.imageUrl}
+                    srcSet={articleSrcSet || undefined}
                     alt={article.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    style={{
+                      filter: 'contrast(1.1) saturate(1.05)',
+                      imageRendering: 'auto'
+                    }}
                     referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      const currentSrc = img.src;
+                      const fallbackIndex = articleFallbacks.indexOf(currentSrc);
+                      if (fallbackIndex < articleFallbacks.length - 1) {
+                        img.src = articleFallbacks[fallbackIndex + 1];
+                      }
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent pointer-events-none"></div>
                 
