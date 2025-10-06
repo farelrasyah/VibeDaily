@@ -10,11 +10,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "VibeDaily - New Generation News",
   description: "Modern news website",
-  icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/apple-touch-icon.svg',
-  },
+  icons: '/logo.png'
 };
 
 export default function RootLayout({
