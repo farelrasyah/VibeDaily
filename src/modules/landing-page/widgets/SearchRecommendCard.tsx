@@ -172,7 +172,7 @@ export default function SearchRecommendCard({
 
         {/* Featured Article - Responsive */}
         {featuredItem && (
-          <div onClick={() => router.push(`/article/${featuredItem?.id || 'default'}`)} className="featured-card cursor-pointer">
+          <div onClick={() => router.push(featuredItem.href)} className="featured-card cursor-pointer">
             <div className="featured-image-wrapper h-40 sm:h-48 md:h-56">
               <Image
                 src={featuredItem.thumb}
@@ -196,7 +196,7 @@ export default function SearchRecommendCard({
           {regularItems.map((item, index) => (
             <div
               key={index}
-              onClick={() => router.push(`/article/${item.id}`)}
+              onClick={() => router.push(item.href)}
               className="article-list-item p-3 sm:p-4 cursor-pointer"
             >
               <div className="article-text flex-1">

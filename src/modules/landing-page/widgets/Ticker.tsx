@@ -24,7 +24,7 @@ export default function Ticker({ items }: TickerProps) {
           {items.map((item, index) => (
             <div
               key={index}
-              onClick={() => router.push(`/article/${item.id}`)}
+              onClick={() => router.push(item.href)}
               className="relative flex-shrink-0 w-[240px] sm:w-[260px] md:w-[280px] group cursor-pointer ticker-card"
               style={{ 
                 opacity: index === 0 ? 1 : index === 1 ? 0.9 : index === 2 ? 0.7 : 0.5,

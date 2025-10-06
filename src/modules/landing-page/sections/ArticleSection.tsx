@@ -192,7 +192,7 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
         {/* Featured article - responsive sizing */}
         <div className="lg:col-span-3 -mx-4 sm:-mx-6 lg:-ml-8">
           <div 
-            onClick={() => router.push(`/article/${featuredArticle.id}`)}
+            onClick={() => router.push(featuredArticle.href)}
             className="block cursor-pointer"
           >
             <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden h-[240px] sm:h-[320px] md:h-[380px] lg:h-[500px] cursor-pointer">
@@ -244,7 +244,7 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ items }) => {
                 {rightItems.slice(0, 6).map((article, idx) => (
                   <article key={`article-${article.id}-${idx}`} className="group">
                     <div 
-                      onClick={() => router.push(`/article/${article.id}`)}
+                      onClick={() => router.push(article.href)}
                       className="block hover:opacity-80 transition-opacity cursor-pointer"
                     >
                       <div className="grid grid-cols-[1fr_70px] sm:grid-cols-[1fr_80px] lg:grid-cols-[1fr_90px] gap-3 sm:gap-4 lg:gap-5 py-4 sm:py-5 lg:py-6 px-0 min-h-[120px] sm:min-h-[130px] lg:min-h-[140px]">

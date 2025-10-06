@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import NavigationDropdown from '../modules/landing-page/widgets/NavigationDropdown'
 import Hero from '../modules/landing-page/sections/Hero'
 import Ticker from '../modules/landing-page/widgets/Ticker'
@@ -107,11 +108,57 @@ export default function HomeClient({
   articleSectionItems,
   socialMediaSectionData
 }: HomeClientProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
   const [activeChip, setActiveChip] = useState('All')
   const [selectedSource, setSelectedSource] = useState<NewsSource | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [filteredArticles, setFilteredArticles] = useState<any[]>([])
+
+  // Function to load filtered articles
+  const loadFilteredArticles = useCallback(async (source: NewsSource, category: string) => {
+    setIsLoading(true)
+    try {
+      console.log(`� Auto-loading articles for ${source}/${category}`)
+      const articles = await newsService.getNewsBySourceAndCategory(source, category, 20)
+      console.log(`✅ Auto-loaded ${articles.length} articles`)
+      setFilteredArticles(articles)
+    } catch (error) {
+      console.error(`❌ Failed to auto-load articles for ${source}/${category}:`, error)
+      setFilteredArticles([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  // Load articles when source/category changes
+  useEffect(() => {
+    if (selectedSource && selectedCategory) {
+      loadFilteredArticles(selectedSource, selectedCategory)
+    } else {
+      setFilteredArticles([])
+    }
+  }, [selectedSource, selectedCategory, loadFilteredArticles])
+
+  // Read filter state from URL on mount
+  useEffect(() => {
+    const sourceParam = searchParams.get('source')
+    const categoryParam = searchParams.get('category')
+    
+    if (sourceParam && categoryParam) {
+      console.log('� Restoring filter state from URL:', { source: sourceParam, category: categoryParam })
+      setSelectedSource(sourceParam as NewsSource)
+      setSelectedCategory(categoryParam)
+      setActiveChip('Category')  // Set active chip to Category when restoring from URL
+    } else {
+      // Clear state if no params
+      setSelectedSource(null)
+      setSelectedCategory(null)
+      setActiveChip('All')
+    }
+  }, [searchParams])
 
   // Get navigation items with proper structure
   const navItems = [
@@ -190,6 +237,12 @@ export default function HomeClient({
         setSelectedCategory(dropdownId)
         setActiveChip(parentLabel)
 
+        // Update URL with filter params
+        const params = new URLSearchParams()
+        params.set('source', foundSource)
+        params.set('category', dropdownId)
+        router.replace(`?${params.toString()}`, { scroll: false })
+
         try {
           console.log(`📡 Calling newsService.getNewsBySourceAndCategory(${foundSource}, ${dropdownId}, 20)`)
           const articles = await newsService.getNewsBySourceAndCategory(foundSource, dropdownId, 20)
@@ -212,6 +265,12 @@ export default function HomeClient({
       setSelectedCategory(dropdownId)
       setActiveChip(parentLabel)
 
+      // Update URL with filter params
+      const params = new URLSearchParams()
+      params.set('source', source)
+      params.set('category', dropdownId)
+      router.replace(`?${params.toString()}`, { scroll: false })
+
       try {
         console.log(`📡 Calling newsService.getNewsBySourceAndCategory(${source}, ${dropdownId}, 20)`)
         const articles = await newsService.getNewsBySourceAndCategory(source, dropdownId, 20)
@@ -230,6 +289,9 @@ export default function HomeClient({
       setSelectedSource(null)
       setSelectedCategory(null)
       setFilteredArticles([])
+      
+      // Clear URL params
+      router.replace('/', { scroll: false })
     }
   }, [])
 
@@ -240,6 +302,9 @@ export default function HomeClient({
       setSelectedSource(null)
       setSelectedCategory(null)
       setFilteredArticles([])
+      
+      // Clear URL params
+      router.replace('/', { scroll: false })
     }
   }
 

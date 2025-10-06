@@ -104,7 +104,7 @@ export default function NewsSlide({ items }: NewsSlideProps) {
               style={{ width: 'min(280px, 85vw)', margin: 0, padding: 0 }}
             >
               <div 
-                onClick={() => router.push(`/article/${item.id}`)}
+                onClick={() => router.push(item.href)}
                 className="group block cursor-pointer"
               >
                 <div
