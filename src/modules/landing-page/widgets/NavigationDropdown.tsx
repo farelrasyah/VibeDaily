@@ -24,6 +24,15 @@ export default function NavigationDropdown({
   onDropdownItemClick 
 }: NavigationDropdownProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
+  const [isMouseInContent, setIsMouseInContent] = useState(false)
+
+  const handleMouseLeave = (label: string) => {
+    // Only close the dropdown if the mouse is not in the content area
+    if (!isMouseInContent) {
+      console.log(`❄️ Leaving: ${label} (content: ${isMouseInContent})`)
+      setHoveredItem(null)
+    }
+  }
 
   return (
     <nav className="flex flex-wrap gap-2 sm:gap-3 justify-center sm:justify-start" style={{ overflow: 'visible' }}>
@@ -36,10 +45,7 @@ export default function NavigationDropdown({
             console.log(`🔥 Hovering: ${item.label}`)
             setHoveredItem(item.label)
           }}
-          onMouseLeave={() => {
-            console.log(`❄️ Leaving: ${item.label}`)
-            setHoveredItem(null)
-          }}
+          onMouseLeave={() => handleMouseLeave(item.label)}
         >
           {/* Main Navigation Button - Enhanced Hover + Responsive */}
           <button
@@ -128,10 +134,17 @@ export default function NavigationDropdown({
             onMouseEnter={() => {
               console.log(`🎯 DROPDOWN ENTER: ${item.label}`)
               setHoveredItem(item.label)
+              setIsMouseInContent(true)
             }}
             onMouseLeave={() => {
               console.log(`🚪 DROPDOWN LEAVE: ${item.label}`)
-              setHoveredItem(null)
+              setIsMouseInContent(false)
+              // Add a small delay to check if mouse moved to another part of the dropdown
+              setTimeout(() => {
+                if (!isMouseInContent) {
+                  setHoveredItem(null)
+                }
+              }, 100)
             }}
           >
             <div className={`
@@ -147,10 +160,16 @@ export default function NavigationDropdown({
                     ${item.label === 'Category' ? 'min-w-[120px]' : 'w-full'}
                   `}
                   onClick={() => {
-                    console.log(`✅ Selected: ${dropdownItem} from ${item.label}`)
+                    console.log('🔄 Category Selection Details:')
+                    console.log(`✅ Selected Item: "${dropdownItem}" from "${item.label}"`)
                     const dropdownId = item.dropdownIds?.[dropdownIndex]
                     const source = item.sources?.[dropdownIndex] || item.source
-                    console.log(`🔍 dropdownId: ${dropdownId}, source: ${source}, dropdownIndex: ${dropdownIndex}`)
+                    console.log(`🔍 Selection Data:`)
+                    console.log(`  - Dropdown ID: ${dropdownId || 'undefined'}`)
+                    console.log(`  - Source: ${source || 'undefined'}`)
+                    console.log(`  - Index: ${dropdownIndex}`)
+                    console.log(`  - Parent: ${item.label}`)
+                    console.log(`  - Available Sources:`, item.sources)
                     onDropdownItemClick?.(item.label, dropdownItem, dropdownId, source)
                     setHoveredItem(null)
                   }}

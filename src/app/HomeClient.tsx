@@ -151,16 +151,34 @@ export default function HomeClient({
     dropdownId?: string,
     source?: NewsSource
   ) => {
-    console.log(`🎯 Category selected: ${parentLabel}/${dropdownItem} (ID: ${dropdownId}, Source: ${source})`)
+    console.log('\n📋 Category Selection Debug Log:')
+    console.log(`🎯 Selection Details:`);
+    console.log(`  - Parent Label: ${parentLabel}`);
+    console.log(`  - Selected Item: ${dropdownItem}`);
+    console.log(`  - Category ID: ${dropdownId || 'undefined'}`);
+    console.log(`  - Source: ${source || 'undefined'}`);
+
+    // Validate category ID
+    if (!dropdownId) {
+      console.error('❌ Error: No category ID provided');
+      return;
+    }
 
     if (parentLabel === 'Category' && dropdownId) {
       // For unified Category dropdown, find the first source that has this category
       const allSources = getAllNewsSources();
       let foundSource: NewsSource | null = null;
+      
+      console.log('🔍 Searching for valid source for category:', dropdownId);
+      console.log('Available sources:', allSources.map(s => s.id).join(', '));
 
       for (const sourceInfo of allSources) {
-        if (isValidCategoryForSource(sourceInfo.id, dropdownId)) {
+        console.log(`Checking source ${sourceInfo.id}...`);
+        const isValid = isValidCategoryForSource(sourceInfo.id, dropdownId);
+        console.log(`  - Is ${dropdownId} valid for ${sourceInfo.id}? ${isValid ? '✅ Yes' : '❌ No'}`);
+        if (isValid) {
           foundSource = sourceInfo.id;
+          console.log(`  ✨ Found valid source: ${sourceInfo.id}`);
           break;
         }
       }
@@ -231,6 +249,178 @@ export default function HomeClient({
     }
   }
 
+  // Transform filtered articles to match component data structures
+  const getDisplayData = () => {
+    // If we have filtered articles, transform them for all components
+    if (selectedSource && selectedCategory && filteredArticles.length > 0) {
+      const articles = filteredArticles;
+      console.log(`🔄 Transforming ${articles.length} filtered articles for all components`);
+      
+      // Transform for Hero (use first article)
+      const heroArticle = articles[0];
+      const transformedHero = heroArticle ? {
+        category: heroArticle.category || selectedSource?.toUpperCase() || 'NEWS',
+        time: heroArticle.publishedAt ? new Date(heroArticle.publishedAt).toLocaleString() : 'Just now',
+        title: heroArticle.title || 'Loading...',
+        tags: heroArticle.tags || [],
+        ctaText: 'Read article',
+        articleId: heroArticle.id
+      } : heroData;
+
+      // Transform for Ticker (use articles 1-5, fallback to cycling through available articles)
+      const getTickerArticles = () => {
+        if (articles.length <= 1) return [];
+        const tickerArticles = articles.slice(1, 6);
+        // If we don't have enough articles, cycle through them
+        while (tickerArticles.length < 5 && articles.length > 1) {
+          const nextIndex = tickerArticles.length % (articles.length - 1) + 1;
+          tickerArticles.push(articles[nextIndex]);
+        }
+        return tickerArticles;
+      };
+
+      const transformedTicker = getTickerArticles().map(article => ({
+        id: article.id,
+        title: article.title,
+        href: `/article/${article.id}`,
+        category: article.category || selectedSource?.toUpperCase() || 'NEWS',
+        time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now'
+      }));
+
+      // Transform for ArticleGrid (ensure we have enough articles)
+      const getArticleGridData = () => {
+        const gridArticles = [...articles];
+        // Ensure we have at least 6 articles for proper grid display
+        while (gridArticles.length < 6 && articles.length > 0) {
+          gridArticles.push(...articles.slice(0, Math.min(6 - gridArticles.length, articles.length)));
+        }
+        return gridArticles.slice(0, 15);
+      };
+
+      const transformedArticleGrid = getArticleGridData().map((article, index) => ({
+        id: `${article.id}-grid-${index}`,
+        title: article.title,
+        category: article.category || selectedSource?.toUpperCase() || 'NEWS',
+        time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
+        href: `/article/${article.id}`,
+        image: article.imageUrl,
+        featured: index === 0, // Make first article featured
+        tags: article.tags,
+        description: article.description
+      }));
+
+      // Transform for NewsSlide (use different articles or cycle if needed)
+      const getNewsSlideData = () => {
+        if (articles.length <= 6) return articles;
+        return articles.slice(6, 16);
+      };
+
+      const transformedNewsSlide = getNewsSlideData().map((article, index) => ({
+        id: `${article.id}-slide-${index}`,
+        title: article.title,
+        category: article.category || selectedSource?.toUpperCase() || 'NEWS',
+        time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
+        href: `/article/${article.id}`,
+        image: article.imageUrl || '/placeholder-image.jpg',
+        tags: article.tags
+      }));
+
+      // Transform for ArticleSection (use articles ensuring variety)
+      const transformedArticleSection = articles.slice(0, 7).map((article, index) => ({
+        id: `${article.id}-section-${index}`,
+        title: article.title,
+        category: article.category || selectedSource?.toUpperCase() || 'NEWS',
+        time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
+        href: `/article/${article.id}`,
+        image: article.imageUrl || '/placeholder-image.jpg',
+        description: article.description,
+        tags: article.tags
+      }));
+
+      // Transform for SearchRecommendCard (use different articles if available)
+      const getRecommendedData = () => {
+        if (articles.length <= 7) return articles.slice(0, 6);
+        return articles.slice(7, 13);
+      };
+
+      const transformedRecommended = getRecommendedData().map((article, index) => ({
+        id: `${article.id}-rec-${index}`,
+        thumb: article.imageUrl || '/placeholder-image.jpg',
+        meta: article.category || selectedSource?.toUpperCase() || 'NEWS',
+        title: article.title,
+        href: `/article/${article.id}`,
+        featured: index === 0
+      }));
+
+      // Transform for SocialMediaSection
+      const transformedSocialMedia = {
+        featuredNews: articles[0] ? {
+          id: articles[0].id,
+          title: articles[0].title,
+          category: articles[0].category || selectedSource?.toUpperCase() || 'NEWS',
+          time: articles[0].publishedAt ? new Date(articles[0].publishedAt).toLocaleString() : 'Just now',
+          href: `/article/${articles[0].id}`,
+          description: articles[0].description,
+          tags: articles[0].tags
+        } : undefined,
+        newsList: articles.slice(1, 9).map((article, index) => ({
+          id: `${article.id}-social-${index}`,
+          title: article.title,
+          category: article.category || selectedSource?.toUpperCase() || 'NEWS',
+          time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
+          href: `/article/${article.id}`,
+          description: article.description,
+          tags: article.tags
+        })),
+        newsImages: articles.slice(0, 3).map(article => article.imageUrl).filter(Boolean),
+        backgroundImage: articles.find(article => article.imageUrl)?.imageUrl,
+        allArticles: articles.slice(0, 20).map((article, index) => ({
+          id: `${article.id}-all-${index}`,
+          title: article.title,
+          category: article.category || selectedSource?.toUpperCase() || 'NEWS',
+          time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
+          href: `/article/${article.id}`,
+          description: article.description,
+          tags: article.tags,
+          imageUrl: article.imageUrl
+        }))
+      };
+
+      console.log(`✅ Transformed data:`, {
+        hero: !!transformedHero,
+        ticker: transformedTicker.length,
+        articleGrid: transformedArticleGrid.length,
+        newsSlide: transformedNewsSlide.length,
+        articleSection: transformedArticleSection.length,
+        recommended: transformedRecommended.length,
+        socialMedia: !!transformedSocialMedia.featuredNews
+      });
+
+      return {
+        hero: transformedHero,
+        ticker: transformedTicker,
+        articleGrid: transformedArticleGrid,
+        newsSlide: transformedNewsSlide,
+        articleSection: transformedArticleSection,
+        recommended: transformedRecommended,
+        socialMedia: transformedSocialMedia
+      };
+    }
+
+    // Return original data when no filter is applied
+    return {
+      hero: heroData,
+      ticker: tickerItems,
+      articleGrid: articleGridItems,
+      newsSlide: newsSlideItems,
+      articleSection: articleSectionItems,
+      recommended: recommendedItems,
+      socialMedia: socialMediaSectionData
+    };
+  }
+
+  const displayData = getDisplayData();
+
   return (
     <div className="min-h-screen w-full">
       <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
@@ -267,49 +457,66 @@ export default function HomeClient({
                 </div>
               )}
 
-              {/* Show filtered content when category is selected, otherwise show default content */}
-              {selectedSource && selectedCategory && !isLoading ? (
-                // Filtered Category Content
-                <div className="space-y-8">
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-0.5 h-6 bg-violet-600 rounded-full"></div>
-                      <h2 className="text-2xl font-bold text-slate-900">
-                        {navItems.find(item => item.active)?.label} - {selectedCategory}
-                      </h2>
-                    </div>
-                    <p className="text-slate-600">
-                      Showing latest articles from {selectedSource} in {selectedCategory} category
-                    </p>
+              {/* Show filter info when category is selected */}
+              {selectedSource && selectedCategory && !isLoading && (
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-0.5 h-6 bg-violet-600 rounded-full"></div>
+                    <h2 className="text-2xl font-bold text-slate-900">
+                      {navItems.find(item => item.active)?.label} - {selectedCategory}
+                    </h2>
                   </div>
-                  
-                  {filteredArticles.length > 0 ? (
-                    <ArticleSection items={filteredArticles.slice(0, 7)} />
-                  ) : (
-                    <div className="text-center py-12">
-                      <p className="text-slate-500">No articles found for this category</p>
-                    </div>
-                  )}
+                  <p className="text-slate-600">
+                    Showing latest articles from {selectedSource} in {selectedCategory} category
+                  </p>
                 </div>
-              ) : (
-                // Default Content (when no category is selected)
-                <>
-                  <Hero {...heroData} onCta={handleHeroCta} />
-                  <Ticker items={tickerItems} />
-                  <ArticleGrid items={articleGridItems} />
-                  {/* News Slide Section (new, below ArticleGrid) */}
-                  <NewsSlide items={newsSlideItems} />
-                  {/* Article Section (new, after NewsSlide) */}
-                  <ArticleSection items={articleSectionItems} />
-                  {/* Social Media Section moved outside the centered max-w container so it can span the page */}
-                </>
+              )}
+
+              {/* Always show same layout structure with appropriate data */}
+              {!isLoading && (
+                <div className={`space-y-8 ${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'} transition-opacity duration-300`}>
+                  <Hero {...displayData.hero} onCta={handleHeroCta} />
+                  <Ticker items={displayData.ticker} />
+                  <ArticleGrid items={displayData.articleGrid} />
+                  <NewsSlide items={displayData.newsSlide} />
+                  <ArticleSection items={displayData.articleSection} />
+                </div>
+              )}
+
+              {/* Show "no articles" message only when filtering returns no results */}
+              {selectedSource && selectedCategory && !isLoading && filteredArticles.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
+                      <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-2">No articles found</h3>
+                    <p className="text-slate-500">
+                      No articles were found for {selectedCategory} category from {selectedSource}. 
+                      Try selecting a different category or check back later.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setActiveChip('All')
+                        setSelectedSource(null)
+                        setSelectedCategory(null)
+                        setFilteredArticles([])
+                      }}
+                      className="mt-4 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
+                    >
+                      Show All Articles
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
 
             <aside className="w-full xl:w-[380px] xl:flex-shrink-0 xl:-mt-[72px] order-last xl:order-none">
               <div className="sticky top-4 xl:top-20">
                 <SearchRecommendCard
-                  items={recommendedItems}
+                  items={displayData.recommended}
                   onSearch={(query: string) => console.log('Search:', query)}
                 />
               </div>
@@ -320,11 +527,11 @@ export default function HomeClient({
 
       {/* Social Media Section (full-bleed within page padding) */}
       <SocialMediaSection 
-        featuredNews={socialMediaSectionData?.featuredNews}
-        newsList={socialMediaSectionData?.newsList || []}
-        newsImages={socialMediaSectionData?.newsImages || []}
-        backgroundImage={socialMediaSectionData?.backgroundImage}
-        allArticles={socialMediaSectionData?.allArticles || []}
+        featuredNews={displayData.socialMedia?.featuredNews}
+        newsList={displayData.socialMedia?.newsList || []}
+        newsImages={displayData.socialMedia?.newsImages || []}
+        backgroundImage={displayData.socialMedia?.backgroundImage}
+        allArticles={displayData.socialMedia?.allArticles || []}
       />
       
       {/* Footer Section */}

@@ -143,9 +143,20 @@ class NewsService {
     limit: number = 20
   ): Promise<NewsArticle[]> {
     try {
-      console.log(`🎯 NewsService: Fetching ${source}/${category} news (limit: ${limit})`);
+      console.log('\n📰 NewsService API Request:')
+      console.log('Parameters:')
+      console.log(`  - Source: ${source}`)
+      console.log(`  - Category: ${category}`)
+      console.log(`  - Limit: ${limit}`)
 
       const result = await beritaIndo.getNewsBySourceAndCategory(source, category);
+      
+      console.log('\n📊 API Response:')
+      console.log(`  - Success: ${result.success ? '✅ Yes' : '❌ No'}`)
+      console.log(`  - Data Length: ${result.data?.length || 0} articles`)
+      if (!result.success) {
+        console.log(`  - Error: ${result.error || 'Unknown error'}`);
+      }
 
       if (result.success && result.data) {
         const articles = result.data.slice(0, limit);

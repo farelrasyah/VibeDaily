@@ -6,10 +6,13 @@ type IndonesiaSource = 'cnn' | 'cnbc' | 'republika' | 'tempo' |
 
 class BeritaIndoService {
   private baseUrl: string;
+  private proxyUrl: string;
 
   constructor() {
     this.baseUrl = process.env.BERITA_INDO_BASE_URL || 
       'https://berita-indo-api-next.vercel.app';
+    // Use your API route as a proxy
+    this.proxyUrl = '/api/article/source';
   }
 
   /**
@@ -227,7 +230,10 @@ class BeritaIndoService {
     category: string
   ): Promise<ApiResponse<NewsArticle>> {
     try {
-      console.log(`🎯 Fetching news from ${source} with category: ${category}`);
+      console.log('\n📡 Berita Indo API - Category News Request:')
+      console.log('Request Details:')
+      console.log(`  - Source: ${source}`)
+      console.log(`  - Category: ${category}`);
 
       // Validate if category exists for this source
       if (!isValidCategoryForSource(source, category)) {
@@ -247,14 +253,14 @@ class BeritaIndoService {
         }
       }
 
-      // Build proper API URL using the mapping system
-      const apiUrl = buildApiUrl(source, category);
-      console.log(`🌐 Fetching from: ${apiUrl}`);
+      // Use our proxy API route to avoid CORS issues
+      const proxyUrl = `/api/article/source/${source}/${category}`;
+      console.log(`🌐 Fetching from proxy: ${proxyUrl}`);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      const response = await fetch(apiUrl, {
+      const response = await fetch(proxyUrl, {
         next: { revalidate: 300 },
         signal: controller.signal,
       });
