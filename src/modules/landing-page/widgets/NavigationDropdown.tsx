@@ -1,17 +1,21 @@
 'use client'
 
 import { useState } from 'react'
+import { NewsSource } from '@/lib/news-categories'
 
 interface NavItem {
   label: string
   active?: boolean
+  source?: NewsSource
   dropdownItems: string[]
+  dropdownIds?: string[]
+  sources?: NewsSource[]
 }
 
 interface NavigationDropdownProps {
   items: NavItem[]
   onItemClick?: (item: NavItem) => void
-  onDropdownItemClick?: (parentLabel: string, dropdownItem: string) => void
+  onDropdownItemClick?: (parentLabel: string, dropdownItem: string, dropdownId?: string, source?: NewsSource) => void
 }
 
 export default function NavigationDropdown({ 
@@ -91,9 +95,9 @@ export default function NavigationDropdown({
             </svg>
           </button>
 
-          {/* Dropdown Menu - ENHANCED SMOOTH ANIMATIONS + Mobile Responsive */}
+          {/* Dropdown Menu - Grid Layout with Enhanced Animations */}
           <div
-            className="absolute left-0 w-48 sm:w-52 bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
+            className="absolute left-0 bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
             style={{
               top: 'calc(100% + 12px)',
               background: 'rgba(255, 255, 255, 0.96)',
@@ -103,6 +107,12 @@ export default function NavigationDropdown({
               border: '1px solid rgba(255, 255, 255, 0.3)',
               zIndex: 50,
               position: 'absolute',
+              maxHeight: '400px',
+              overflowY: 'auto',
+              width: item.label === 'Category' ? 'max-content' : 'w-48 sm:w-52',
+              // Custom scrollbar
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(0, 0, 0, 0.2) transparent',
               // NATURAL SLIDE DOWN & FADE IN - SLIDE UP & FADE OUT
               opacity: hoveredItem === item.label ? 1 : 0,
               transform: hoveredItem === item.label 
@@ -124,33 +134,44 @@ export default function NavigationDropdown({
               setHoveredItem(null)
             }}
           >
-            {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
-              <button
-                key={dropdownIndex}
-                className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-white/60 hover:text-slate-800 transition-all duration-200"
-                onClick={() => {
-                  console.log(`✅ Selected: ${dropdownItem} from ${item.label}`)
-                  onDropdownItemClick?.(item.label, dropdownItem)
-                  setHoveredItem(null)
-                }}
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontWeight: '500',
-                  borderRadius: dropdownIndex === 0 ? '12px 12px 4px 4px' : 
-                               dropdownIndex === item.dropdownItems.length - 1 ? '4px 4px 12px 12px' : '4px',
-                  // Staggered animation untuk setiap item
-                  opacity: hoveredItem === item.label ? 1 : 0,
-                  transform: hoveredItem === item.label 
-                    ? 'translateY(0px)' 
-                    : 'translateY(-8px)',
-                  transition: hoveredItem === item.label 
-                    ? `all 0.7s cubic-bezier(0.23, 1, 0.32, 1) ${dropdownIndex * 0.08}s` // Lebih lambat dengan stagger delay yang lebih panjang
-                    : `all 0.35s cubic-bezier(0.4, 0, 0.6, 0.15) ${(item.dropdownItems.length - dropdownIndex) * 0.05}s`
-                }}
-              >
-                {dropdownItem}
-              </button>
-            ))}
+            <div className={`
+              ${item.label === 'Category' ? 'grid grid-cols-2 sm:grid-cols-3 gap-1' : 'flex flex-col'}
+              p-1
+            `}>
+              {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
+                <button
+                  key={dropdownIndex}
+                  className={`
+                    text-left px-3 py-2 text-sm text-gray-700 
+                    hover:bg-white/60 hover:text-slate-800 transition-all duration-200
+                    ${item.label === 'Category' ? 'min-w-[120px]' : 'w-full'}
+                  `}
+                  onClick={() => {
+                    console.log(`✅ Selected: ${dropdownItem} from ${item.label}`)
+                    const dropdownId = item.dropdownIds?.[dropdownIndex]
+                    const source = item.sources?.[dropdownIndex] || item.source
+                    console.log(`🔍 dropdownId: ${dropdownId}, source: ${source}, dropdownIndex: ${dropdownIndex}`)
+                    onDropdownItemClick?.(item.label, dropdownItem, dropdownId, source)
+                    setHoveredItem(null)
+                  }}
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontWeight: '500',
+                    borderRadius: '8px',
+                    // Staggered animation untuk setiap item
+                    opacity: hoveredItem === item.label ? 1 : 0,
+                    transform: hoveredItem === item.label 
+                      ? 'translateY(0px)' 
+                      : 'translateY(-8px)',
+                    transition: hoveredItem === item.label 
+                      ? `all 0.7s cubic-bezier(0.23, 1, 0.32, 1) ${dropdownIndex * 0.05}s` // Faster stagger
+                      : `all 0.35s cubic-bezier(0.4, 0, 0.6, 0.15) ${(item.dropdownItems.length - dropdownIndex) * 0.03}s`
+                  }}
+                >
+                  {dropdownItem}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       ))}

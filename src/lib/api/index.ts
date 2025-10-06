@@ -1,5 +1,6 @@
 import { beritaIndo } from './berita-indo';
 import { NewsArticle } from '@/types/news.types';
+import { NewsSource } from '@/lib/news-categories';
 
 // Simple in-memory cache for articles
 const articleCache = new Map<string, NewsArticle>();
@@ -129,6 +130,42 @@ class NewsService {
       }
     } catch (error) {
       console.error('Trending news error:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get news by source and category (NEW METHOD for category filtering)
+   */
+  async getNewsBySourceAndCategory(
+    source: NewsSource,
+    category: string,
+    limit: number = 20
+  ): Promise<NewsArticle[]> {
+    try {
+      console.log(`🎯 NewsService: Fetching ${source}/${category} news (limit: ${limit})`);
+
+      const result = await beritaIndo.getNewsBySourceAndCategory(source, category);
+
+      if (result.success && result.data) {
+        const articles = result.data.slice(0, limit);
+
+        // Cache all articles for future lookups
+        articles.forEach(article => {
+          if (!articleCache.has(article.id)) {
+            articleCache.set(article.id, article);
+            cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
+          }
+        });
+
+        console.log(`✅ NewsService: Returning ${articles.length} articles from ${source}/${category}`);
+        return articles;
+      } else {
+        console.error(`❌ NewsService: Failed to fetch ${source}/${category}:`, result.error);
+        return [];
+      }
+    } catch (error) {
+      console.error(`💥 NewsService: Error fetching ${source}/${category}:`, error);
       return [];
     }
   }

@@ -1,4 +1,5 @@
 import { BeritaIndoResponse, NewsArticle, ApiResponse } from '@/types/news.types';
+import { NewsSource, buildApiUrl, isValidCategoryForSource, getDefaultCategoryForSource } from '@/lib/news-categories';
 
 type IndonesiaSource = 'cnn' | 'cnbc' | 'republika' | 'tempo' | 
   'kumparan' | 'okezone' | 'bbc' | 'jawa-pos' | 'vice' | 'suara' | 'voa';
@@ -215,6 +216,94 @@ class BeritaIndoService {
         totalResults: 0,
         error: error instanceof Error ? error.message : 'Unknown error occurred'
       };
+    }
+  }
+
+  /**
+   * Get news by specific source and category with proper validation
+   */
+  async getNewsBySourceAndCategory(
+    source: NewsSource,
+    category: string
+  ): Promise<ApiResponse<NewsArticle>> {
+    try {
+      console.log(`🎯 Fetching news from ${source} with category: ${category}`);
+
+      // Validate if category exists for this source
+      if (!isValidCategoryForSource(source, category)) {
+        console.warn(`⚠️ Invalid category "${category}" for source "${source}"`);
+        // Try to get default category instead
+        const defaultCategory = getDefaultCategoryForSource(source);
+        if (defaultCategory) {
+          console.log(`🔄 Using default category "${defaultCategory}" instead`);
+          category = defaultCategory;
+        } else {
+          return {
+            success: false,
+            data: [],
+            totalResults: 0,
+            error: `Invalid category "${category}" for source "${source}"`
+          };
+        }
+      }
+
+      // Build proper API URL using the mapping system
+      const apiUrl = buildApiUrl(source, category);
+      console.log(`🌐 Fetching from: ${apiUrl}`);
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      const response = await fetch(apiUrl, {
+        next: { revalidate: 300 },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      console.log(`📡 ${source}/${category} API response status: ${response.status} ${response.statusText}`);
+
+      if (response.status >= 200 && response.status < 400) {
+        const data: BeritaIndoResponse = await response.json();
+        console.log(`📦 ${source}/${category} API raw response:`, {
+          hasData: !!data.data,
+          dataType: typeof data.data,
+          dataLength: Array.isArray(data.data) ? data.data.length : 'not array',
+          total: data.total,
+          messages: data.messages
+        });
+
+        if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+          console.log(`✅ Successfully fetched ${data.data.length} articles from ${source}/${category}`);
+          const transformedArticles = data.data.map((article) => this.transformArticle(article, source as IndonesiaSource));
+          return {
+            success: true,
+            data: transformedArticles,
+            totalResults: data.total || data.data.length,
+          };
+        }
+      }
+
+      // If API fails, try RSS feed as fallback (without category)
+      console.log(`⚠️ ${source}/${category} API failed (status: ${response.status}), trying RSS feed...`);
+      return await this.getNewsFromRSS(source as IndonesiaSource);
+
+    } catch (error) {
+      console.error(`💥 Error fetching ${source}/${category}:`, error);
+
+      // Try RSS feed as fallback
+      console.log(`🔄 Trying RSS feed for ${source}...`);
+      try {
+        return await this.getNewsFromRSS(source as IndonesiaSource);
+      } catch (rssError) {
+        console.error(`❌ Both API and RSS failed for ${source}/${category}:`, rssError);
+        return {
+          success: false,
+          data: [],
+          totalResults: 0,
+          error: `Failed to fetch news from ${source}/${category}`
+        };
+      }
     }
   }
 
