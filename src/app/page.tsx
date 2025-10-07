@@ -1,6 +1,7 @@
 import { newsService } from '@/lib/api'
 import { getRelativeTime } from '@/lib/utils/date-formatter'
 import { NewsArticle } from '@/types/news.types'
+import { Suspense } from 'react'
 import HomeClient from './HomeClient'
 
 export const revalidate = 300 // Revalidate every 5 minutes
@@ -300,15 +301,22 @@ export default async function Home() {
   }
 
   return (
-    <HomeClient 
-      heroData={heroData}
-      tickerItems={tickerItems}
-      articleGridItems={articleGridItems}
-      recommendedItems={recommendedItems}
-      newsSlideItems={newsSlideItems}
-      articleSectionItems={articleSectionItems}
-      socialMediaSectionData={socialMediaSectionData}
-    />
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-[#f5f7fa] via-[#e9eff6] to-[#dbeafe] flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-violet-600 mx-auto"></div>
+        <p className="mt-4 text-lg text-slate-600">Loading...</p>
+      </div>
+    </div>}>
+      <HomeClient 
+        heroData={heroData}
+        tickerItems={tickerItems}
+        articleGridItems={articleGridItems}
+        recommendedItems={recommendedItems}
+        newsSlideItems={newsSlideItems}
+        articleSectionItems={articleSectionItems}
+        socialMediaSectionData={socialMediaSectionData}
+      />
+    </Suspense>
   )
 }
 
