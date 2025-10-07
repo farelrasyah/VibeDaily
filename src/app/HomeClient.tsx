@@ -132,6 +132,9 @@ export default function HomeClient({
   const [selectedGuide, setSelectedGuide] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [filteredArticles, setFilteredArticles] = useState<NewsArticle[]>([])
+  const [searchResults, setSearchResults] = useState<NewsArticle[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Function to load filtered articles
   const loadFilteredArticles = useCallback(async (source: NewsSource, category: string) => {
@@ -148,6 +151,43 @@ export default function HomeClient({
       setIsLoading(false)
     }
   }, [])
+
+  // Search function with debouncing
+  const handleSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      console.log('🔍 Search query is empty, clearing results');
+      setSearchResults([])
+      setSearchQuery('')
+      return
+    }
+
+    console.log(`🔍 Starting search for: "${query}"`);
+    setIsSearching(true)
+    try {
+      const results = await newsService.searchAllNews(query.trim(), 10)
+      console.log(`✅ Search completed: found ${results.length} results for "${query}"`);
+      console.log('📋 Search results preview:', results.slice(0, 3).map(r => r.title.substring(0, 50) + '...'));
+      setSearchResults(results)
+    } catch (error) {
+      console.error('❌ Search failed:', error)
+      setSearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
+  }, [])
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout
+      return (query: string) => {
+        setSearchQuery(query)
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(() => handleSearch(query), 300)
+      }
+    })(),
+    [handleSearch]
+  )
 
   // Load articles when source/category changes
   useEffect(() => {
@@ -350,6 +390,32 @@ export default function HomeClient({
 
   // Transform filtered articles to match component data structures
   const getDisplayData = () => {
+    // If we have search results, transform them for SearchRecommendCard
+    if (searchQuery.trim() && searchResults.length > 0) {
+      console.log(`🔍 Transforming ${searchResults.length} search results for SearchRecommendCard`);
+      console.log('📋 Search results being displayed:', searchResults.map(r => `"${r.title.substring(0, 40)}..."`).join(', '));
+
+      const transformedRecommended = searchResults.slice(0, 6).map((article, index) => ({
+        id: `${article.id}-search-${index}`,
+        thumb: article.imageUrl || '/placeholder-image.jpg',
+        meta: article.category || 'SEARCH',
+        title: article.title,
+        articleId: article.id,
+        featured: index === 0
+      }));
+
+      // Return data with search results for recommended section
+      return {
+        hero: heroData,
+        ticker: tickerItems,
+        articleGrid: articleGridItems,
+        newsSlide: newsSlideItems,
+        articleSection: articleSectionItems,
+        recommended: transformedRecommended,
+        socialMedia: socialMediaSectionData
+      };
+    }
+
     // If we have filtered articles, transform them for all components
     if (selectedSource && selectedCategory && filteredArticles.length > 0) {
       const articles = filteredArticles;
@@ -437,14 +503,17 @@ export default function HomeClient({
         tags: article.category ? [article.category] : []
       }));
 
-      // Transform for SearchRecommendCard (use different articles if available)
+      // Transform for SearchRecommendCard (use search results if available, otherwise use different articles)
       const getRecommendedData = () => {
+        if (searchQuery.trim() && searchResults.length > 0) {
+          return searchResults.slice(0, 6);
+        }
         if (articles.length <= 7) return articles.slice(0, 6);
         return articles.slice(7, 13);
       };
 
       const transformedRecommended = getRecommendedData().map((article, index) => ({
-        id: `${article.id}-rec-${index}`,
+        id: searchQuery.trim() ? `${article.id}-search-${index}` : `${article.id}-rec-${index}`,
         thumb: article.imageUrl || '/placeholder-image.jpg',
         meta: article.category || selectedSource?.toUpperCase() || 'NEWS',
         title: article.title,
@@ -627,7 +696,9 @@ export default function HomeClient({
               <div className="sticky top-4 xl:top-20">
                 <SearchRecommendCard
                   items={displayData.recommended}
-                  onSearch={(query: string) => console.log('Search:', query)}
+                  onSearch={debouncedSearch}
+                  isSearching={isSearching}
+                  searchQuery={searchQuery}
                 />
               </div>
             </aside>

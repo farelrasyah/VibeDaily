@@ -83,15 +83,15 @@ const Footer = () => {
               <div className="space-y-1 text-white/90 text-left">
                 <p>
                   <a
-                    href="mailto:news@vibedaily.com"
+                    href="mailto:farelrasyah87@gmail.com"
                     className="underline underline-offset-[4px] decoration-white hover:text-white"
                   >
-                    news@vibedaily.com
+                    farelrasyah87@gmail.com
                   </a>
                 </p>
                 <p>
                   <a href="tel:+6281234567890" className="hover:text-white">
-                    +62 812 3456 7890
+                    +62 123 4567 890
                   </a>
                 </p>
                 <p className="text-xs leading-5 pt-1">
@@ -114,15 +114,15 @@ const Footer = () => {
               <div className="space-y-1 text-white/90 text-left">
                 <p>
                   <a
-                    href="mailto:business@vibedaily.com"
+                    href="mailto:farelrasyah87@gmail.com"
                     className="underline underline-offset-[4px] decoration-white hover:text-white"
                   >
-                    business@vibedaily.com
+                    farelrasyah87@gmail.com
                   </a>
                 </p>
                 <p>
                   <a href="tel:+6222987654321" className="hover:text-white">
-                    +62 22 9876 5432
+                    +62 123 4567 890
                   </a>
                 </p>
                 <p className="text-xs leading-5 pt-1">

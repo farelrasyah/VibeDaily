@@ -21,6 +21,8 @@ interface SearchRecommendCardProps {
   onSearch?: (query: string) => void
   placeholder?: string
   showLanguageSelector?: boolean
+  isSearching?: boolean
+  searchQuery?: string
 }
 
 export default function SearchRecommendCard({ 
@@ -29,12 +31,17 @@ export default function SearchRecommendCard({
   viewAllHref = "#",
   onSearch,
   placeholder = "Article name, tag, category...",
-  showLanguageSelector = true
+  showLanguageSelector = true,
+  isSearching = false,
+  searchQuery: externalSearchQuery
 }: SearchRecommendCardProps) {
   const [selectedLanguage, setSelectedLanguage] = useState('En')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const router = useRouter()
+
+  // Use external search query if provided, otherwise use internal state
+  const currentSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery
 
   const languages = [
     { code: 'En', name: 'English' },
@@ -46,12 +53,17 @@ export default function SearchRecommendCard({
 
   // Debug: Log items count
   console.log('SearchRecommendCard items:', items.length)
+  console.log('SearchRecommendCard searchQuery:', currentSearchQuery)
+  console.log('SearchRecommendCard isSearching:', isSearching)
+  if (items.length > 0) {
+    console.log('📋 Items being displayed:', items.map(item => `"${item.title.substring(0, 40)}..."`).join(', '))
+  }
 
   const featuredItem = items.find(item => item.featured) || items[0]
   const regularItems = items.filter(item => !item.featured).slice(0, 4)
 
-  // Jika tidak ada items sama sekali, tampilkan pesan
-  if (!items || items.length === 0) {
+  // Jika tidak ada items sama sekali atau sedang searching, tampilkan pesan
+  if (!items || items.length === 0 || isSearching) {
     return (
       <div className="w-full space-y-2 sm:space-y-3">
         <div className="search-bar-container">
@@ -102,7 +114,7 @@ export default function SearchRecommendCard({
             <h3 className="recommended-title">{title}</h3>
           </div>
           <div className="p-8 text-center text-slate-500">
-            <p>Loading recommendations...</p>
+            <p>{isSearching ? 'Searching articles...' : currentSearchQuery ? 'No articles found' : 'Loading recommendations...'}</p>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { beritaIndo } from './berita-indo';
+import { newsApiOrg } from './newsapi-org';
 import { NewsArticle } from '@/types/news.types';
 import { NewsSource } from '@/lib/news-categories';
 
@@ -66,21 +67,134 @@ class NewsService {
   }
 
   /**
-   * Search across Indonesian news only (NewsAPI.org removed due to API key requirements)
+   * Search across news sources with enhanced algorithm
+   * Uses NewsAPI.org for better search results if API key is available
    */
   async searchAllNews(query: string, limit: number = 20): Promise<NewsArticle[]> {
     try {
-      // Only search in Indonesian news since NewsAPI.org requires paid API key
+      // First try NewsAPI.org if API key is configured
+      if (process.env.NEWSAPI_ORG_API_KEY) {
+        console.log(`🔍 Using NewsAPI.org for search: "${query}"`);
+        try {
+          const newsApiResult = await newsApiOrg.searchNews({
+            query: query,
+            language: 'id', // Prioritize Indonesian results
+            sortBy: 'relevancy',
+            pageSize: limit
+          });
+
+          if (newsApiResult.success && newsApiResult.data.length > 0) {
+            const articles = newsApiResult.data.slice(0, limit);
+
+            // Cache search results
+            articles.forEach(article => {
+              if (!articleCache.has(article.id)) {
+                articleCache.set(article.id, article);
+                cacheExpiry.set(article.id, Date.now() + CACHE_DURATION);
+              }
+            });
+
+            console.log(`✅ NewsAPI.org search found ${articles.length} relevant articles`);
+            return articles;
+          }
+        } catch (error) {
+          console.warn('NewsAPI.org search failed, falling back to Berita Indo:', error);
+        }
+      }
+
+      // Fallback to enhanced Berita Indo search
+      console.log(`🔍 Using enhanced Berita Indo search for: "${query}"`);
       const indonesiaResult = await beritaIndo.getAllIndonesiaNews();
 
       if (indonesiaResult.success) {
-        // Filter Indonesia news by query (title and description)
-        const filtered = indonesiaResult.data.filter((article) =>
-          article.title.toLowerCase().includes(query.toLowerCase()) ||
-          (article.description && article.description.toLowerCase().includes(query.toLowerCase()))
-        );
+        console.log(`📊 Fetched ${indonesiaResult.data.length} total articles from Berita Indo API`);
+
+        const searchTerms = query.toLowerCase().trim().split(/\s+/);
+        console.log(`🔍 Search terms:`, searchTerms);
+
+        let filtered = indonesiaResult.data;
+
+        // Multi-term search with scoring
+        if (searchTerms.length > 1) {
+          console.log(`🔍 Multi-term search (${searchTerms.length} terms)`);
+          // For multi-term queries, find articles that match any of the terms
+          filtered = indonesiaResult.data.filter((article) => {
+            const title = article.title.toLowerCase();
+            const description = (article.description || '').toLowerCase();
+            const content = (article.content || '').toLowerCase();
+
+            // Check if article contains all search terms (AND logic)
+            const matches = searchTerms.every(term =>
+              title.includes(term) ||
+              description.includes(term) ||
+              content.includes(term)
+            );
+
+            if (matches) {
+              console.log(`✅ Article "${article.title.substring(0, 50)}..." matches all terms`);
+            }
+
+            return matches;
+          });
+        } else {
+          // For single term, use more flexible matching
+          const searchTerm = searchTerms[0];
+          console.log(`🔍 Single term search: "${searchTerm}"`);
+
+          filtered = indonesiaResult.data.filter((article) => {
+            const title = article.title.toLowerCase();
+            const description = (article.description || '').toLowerCase();
+            const content = (article.content || '').toLowerCase();
+
+            // Check multiple fields with different priorities
+            const titleMatch = title.includes(searchTerm);
+            const descMatch = description.includes(searchTerm);
+            const contentMatch = content.includes(searchTerm);
+
+            // Also check for partial matches (minimum 3 characters)
+            const partialMatch = searchTerm.length >= 3 && (
+              title.includes(searchTerm.substring(0, Math.max(3, searchTerm.length - 1))) ||
+              description.includes(searchTerm.substring(0, Math.max(3, searchTerm.length - 1)))
+            );
+
+            const matches = titleMatch || descMatch || contentMatch || partialMatch;
+
+            if (matches) {
+              console.log(`✅ Article "${article.title.substring(0, 50)}..." matches (title:${titleMatch}, desc:${descMatch}, content:${contentMatch}, partial:${partialMatch})`);
+            }
+
+            return matches;
+          });
+        }
+
+        console.log(`📊 After filtering: ${filtered.length} articles match the query`);
+
+        // Sort by relevance (articles with query in title get higher priority)
+        filtered.sort((a, b) => {
+          const aTitle = a.title.toLowerCase();
+          const bTitle = b.title.toLowerCase();
+          const queryLower = query.toLowerCase();
+
+          const aInTitle = aTitle.includes(queryLower);
+          const bInTitle = bTitle.includes(queryLower);
+
+          if (aInTitle && !bInTitle) return -1;
+          if (!aInTitle && bInTitle) return 1;
+
+          // If both have query in title, sort by position
+          if (aInTitle && bInTitle) {
+            return aTitle.indexOf(queryLower) - bTitle.indexOf(queryLower);
+          }
+
+          return 0;
+        });
 
         const articles = filtered.slice(0, limit);
+
+        console.log(`🎯 Final results: ${articles.length} articles (showing top ${limit})`);
+        articles.forEach((article, index) => {
+          console.log(`  ${index + 1}. "${article.title.substring(0, 60)}..." (${article.source.name})`);
+        });
 
         // Cache search results
         articles.forEach(article => {
@@ -90,7 +204,7 @@ class NewsService {
           }
         });
 
-        console.log(`🔍 Search "${query}": found ${articles.length} Indonesian articles`);
+        console.log(`✅ Enhanced Berita Indo search found ${articles.length} relevant articles from ${filtered.length} matches`);
         return articles;
       } else {
         console.error('Failed to fetch Indonesian news for search:', indonesiaResult.error);
