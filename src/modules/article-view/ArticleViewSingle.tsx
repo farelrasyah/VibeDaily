@@ -1,7 +1,6 @@
 "use client";
 // This file uses React hooks and must be a client component
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import ContentHub from "../../common/ContentHub";
 import ArticleFooter from "../../common/ArticleFooter";
@@ -14,8 +13,6 @@ interface ArticleViewSingleProps {
 
 /**
  * Single-file version combining:
- * - BackButton
- * - AuthorInfo
  * - ImageGrid
  * - ArticleStats
  * - ArticleView (default export)
@@ -24,43 +21,19 @@ interface ArticleViewSingleProps {
  * - This expects TailwindCSS + your existing `index.css` (fonts & .serif-font) to be present.
  */
 
-const BackButton: React.FC = () => {
-  const router = useRouter();
-  return (
-    <button
-      className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-      aria-label="Back to list"
-      onClick={() => router.back()}
-    >
-      <svg
-        className="w-5 h-5 mr-2"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-      </svg>
-      <span className="text-sm font-medium">Back to list</span>
-    </button>
-  );
-};
-
-const AuthorInfo: React.FC<{ article?: NewsArticle }> = ({ article }) => {
-  return (
-    <div className="flex items-center">
-      <span className="text-gray-700 font-medium">{article?.author || "Anonymous"}</span>
-    </div>
-  );
-};
-
-
 const ArticleView: React.FC<ArticleViewSingleProps> = ({ articleId }) => {
-  // Ref untuk container artikel Content Hub
-  const contentHubRef = useRef<HTMLDivElement>(null);
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Call hooks unconditionally before any early returns
+  const heroImage = article?.imageUrl || null;
+  const enhancedHeroImage = useEnhancedImage(heroImage);
+  const enhancedArticleImage = useEnhancedImage(article?.imageUrl || null);
+  const heroSrcSet = generateImageSrcSet(heroImage);
+  const articleSrcSet = generateImageSrcSet(article?.imageUrl || null);
+  const heroFallbacks = generateImageFallbacks(heroImage);
+  const articleFallbacks = generateImageFallbacks(article?.imageUrl || null);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -109,17 +82,6 @@ const ArticleView: React.FC<ArticleViewSingleProps> = ({ articleId }) => {
     }
   }, [articleId]);
 
-  // Fungsi scroll
-  const scrollContentHub = (dir: "left" | "right") => {
-    const container = contentHubRef.current;
-    if (!container) return;
-    const scrollAmount = 370; // card width + gap
-    container.scrollBy({
-      left: dir === "left" ? -scrollAmount : scrollAmount,
-      behavior: "smooth",
-    });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#f5f7fa] via-[#e9eff6] to-[#dbeafe] flex items-center justify-center">
@@ -147,16 +109,6 @@ const ArticleView: React.FC<ArticleViewSingleProps> = ({ articleId }) => {
       </div>
     );
   }
-
-  const heroImage = article.imageUrl;
-
-  // Enhance image quality to HD/Full HD without changing UI
-  const enhancedHeroImage = useEnhancedImage(heroImage);
-  const enhancedArticleImage = useEnhancedImage(article.imageUrl);
-  const heroSrcSet = generateImageSrcSet(heroImage);
-  const articleSrcSet = generateImageSrcSet(article.imageUrl);
-  const heroFallbacks = generateImageFallbacks(heroImage);
-  const articleFallbacks = generateImageFallbacks(article.imageUrl);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f5f7fa] via-[#e9eff6] to-[#dbeafe]">

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { NewsArticle } from '@/types/news.types'
 import NavigationDropdown from '../modules/landing-page/widgets/NavigationDropdown'
 import Hero from '../modules/landing-page/sections/Hero'
 import Ticker from '../modules/landing-page/widgets/Ticker'
@@ -11,12 +12,27 @@ import ArticleSection from '../modules/landing-page/sections/ArticleSection'
 import SocialMediaSection from '../modules/landing-page/sections/SocialMediaSection'
 import SearchRecommendCard from '../modules/landing-page/widgets/SearchRecommendCard'
 import Footer from '../modules/landing-page/sections/Footer'
-import { getNavigationItems, NewsSource, getAllCategoriesForNavigation, getAllCategoryIdsForNavigation, getAllCategorySourcesForNavigation, getAllNewsSources, isValidCategoryForSource } from '../lib/news-categories'
+import { NewsSource, getAllCategoriesForNavigation, getAllCategoryIdsForNavigation, getAllCategorySourcesForNavigation, getAllNewsSources, isValidCategoryForSource } from '../lib/news-categories'
 import { newsService } from '../lib/api'
 import HowToGuides from '../modules/guides/HowToGuides'
 import Tutorials from '../modules/guides/Tutorials'
 import BestPractices from '../modules/guides/BestPractices'
 import TipsTricks from '../modules/guides/TipsTricks'
+
+// Define NavigationItem type based on NavigationDropdown's NavItem
+interface NavigationItem {
+  label: string;
+  active?: boolean;
+  source?: NewsSource;
+  dropdownItems: string[];
+  dropdownIds?: string[];
+  sources?: NewsSource[];
+}
+
+// Extended NewsArticle with tags for internal use
+interface NewsArticleWithTags extends NewsArticle {
+  tags?: string[];
+}
 
 interface HomeClientProps {
   heroData: {
@@ -120,7 +136,7 @@ export default function HomeClient({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedGuide, setSelectedGuide] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [filteredArticles, setFilteredArticles] = useState<any[]>([])
+  const [filteredArticles, setFilteredArticles] = useState<NewsArticle[]>([])
 
   // Function to load filtered articles
   const loadFilteredArticles = useCallback(async (source: NewsSource, category: string) => {
@@ -305,9 +321,9 @@ export default function HomeClient({
       // Clear URL params
       router.replace('/', { scroll: false })
     }
-  }, [])
+  }, [router])
 
-  const handleNavItemClick = (item: any) => {
+  const handleNavItemClick = (item: NavigationItem) => {
     console.log(`🎯 Nav item clicked: ${item.label}`)
     if (item.label === 'All') {
       setActiveChip('All')
@@ -350,7 +366,7 @@ export default function HomeClient({
         category: heroArticle.category || selectedSource?.toUpperCase() || 'NEWS',
         time: heroArticle.publishedAt ? new Date(heroArticle.publishedAt).toLocaleString() : 'Just now',
         title: heroArticle.title || 'Loading...',
-        tags: heroArticle.tags || [],
+        tags: heroArticle.category ? [heroArticle.category] : [],
         ctaText: 'Read article',
         articleId: heroArticle.id
       } : heroData;
@@ -392,9 +408,9 @@ export default function HomeClient({
         time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
         articleId: article.id,
         
-        image: article.imageUrl,
+        image: article.imageUrl || undefined,
         featured: index === 0, // Make first article featured
-        tags: article.tags,
+        tags: article.category ? [article.category] : [],
         description: article.description
       }));
 
@@ -411,7 +427,7 @@ export default function HomeClient({
         time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
          articleId: article.id,
         image: article.imageUrl || '/placeholder-image.jpg',
-        tags: article.tags
+        tags: article.category ? [article.category] : []
       }));
 
       // Transform for ArticleSection (use articles ensuring variety)
@@ -423,7 +439,7 @@ export default function HomeClient({
         articleId: article.id,
         image: article.imageUrl || '/placeholder-image.jpg',
         description: article.description,
-        tags: article.tags
+        tags: article.category ? [article.category] : []
       }));
 
       // Transform for SearchRecommendCard (use different articles if available)
@@ -450,7 +466,7 @@ export default function HomeClient({
           time: articles[0].publishedAt ? new Date(articles[0].publishedAt).toLocaleString() : 'Just now',
           href: `/article/${articles[0].id}`,
           description: articles[0].description,
-          tags: articles[0].tags
+          tags: articles[0].category ? [articles[0].category] : []
         } : undefined,
         newsList: articles.slice(1, 9).map((article, index) => ({
           id: `${article.id}-social-${index}`,
@@ -459,10 +475,10 @@ export default function HomeClient({
           time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
           href: `/article/${article.id}`,
           description: article.description,
-          tags: article.tags
+          tags: article.category ? [article.category] : []
         })),
-        newsImages: articles.slice(0, 3).map(article => article.imageUrl).filter(Boolean),
-        backgroundImage: articles.find(article => article.imageUrl)?.imageUrl,
+        newsImages: articles.slice(0, 3).map(article => article.imageUrl).filter((url): url is string => url !== null),
+        backgroundImage: articles.find(article => article.imageUrl)?.imageUrl || undefined,
         allArticles: articles.slice(0, 20).map((article, index) => ({
           id: `${article.id}-all-${index}`,
           title: article.title,
@@ -470,8 +486,8 @@ export default function HomeClient({
           time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
           href: `/article/${article.id}`,
           description: article.description,
-          tags: article.tags,
-          imageUrl: article.imageUrl
+          tags: article.category ? [article.category] : [],
+          imageUrl: article.imageUrl || undefined
         }))
       };
 

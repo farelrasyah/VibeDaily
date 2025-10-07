@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 /**
  * SocialMediaSection
  * - IG cards sama seperti sebelumnya
- * - Featured News: menggunakan data real dari                  onClick={() => router.push(featuredNews.href)}API
+ * - Featured News: menggunakan data real dari API
  * - News List: menggunakan data real dari API
  */
 
@@ -247,13 +247,13 @@ const SocialMediaSection: React.FC<SocialMediaSectionProps> = ({
               )}
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => router.push(featuredNews.href)}
+                  onClick={() => router.push('/article/' + featuredNews.id)}
                   className="inline-flex items-center rounded-full border border-black/10 bg-[#E9F0FF] px-5 py-3 text-[15px] font-semibold text-black transition-colors hover:bg-[#dfe8ff] cursor-pointer"
                 >
                   Read article
                 </button>
                 <button
-                  onClick={() => router.push(featuredNews.href)}
+                  onClick={() => router.push('/article/' + featuredNews.id)}
                   aria-label="Open article"
                   className="grid h-11 w-11 place-items-center rounded-full border border-black/10 bg-[#E9F0FF] transition-transform hover:bg-[#dfe8ff] hover:translate-x-[2px] cursor-pointer"
                 >
@@ -280,7 +280,7 @@ const SocialMediaSection: React.FC<SocialMediaSectionProps> = ({
           newsList.slice(0, 8).map((news, index) => (
             <div
               key={news.id}
-              onClick={() => router.push(news.href)}
+              onClick={() => router.push('/article/' + news.id)}
               className="pl-12 py-3 border-b border-white/20 last:border-none transition-all duration-500 hover:bg-white/5 cursor-pointer group"
             >
               <div className="text-[12px] text-white/60 font-medium mb-1">

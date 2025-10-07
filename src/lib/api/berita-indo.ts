@@ -1,5 +1,5 @@
-import { BeritaIndoResponse, NewsArticle, ApiResponse } from '@/types/news.types';
-import { NewsSource, buildApiUrl, isValidCategoryForSource, getDefaultCategoryForSource } from '@/lib/news-categories';
+import { BeritaIndoResponse, BeritaIndoArticle, NewsArticle, ApiResponse } from '@/types/news.types';
+import { NewsSource, isValidCategoryForSource, getDefaultCategoryForSource } from '@/lib/news-categories';
 
 type IndonesiaSource = 'cnn' | 'cnbc' | 'republika' | 'tempo' | 
   'kumparan' | 'okezone' | 'bbc' | 'jawa-pos' | 'vice' | 'suara' | 'voa';
@@ -355,7 +355,7 @@ class BeritaIndoService {
    * Transform Berita Indo article to unified format
    */
   private transformArticle = (
-    article: any,
+    article: BeritaIndoArticle & { content?: string; category?: string; image?: any },
     source: IndonesiaSource
   ): NewsArticle => {
 
@@ -399,7 +399,7 @@ class BeritaIndoService {
       try {
         const articleUrl = new URL(article.link);
         imageUrl = articleUrl.origin + imageUrl;
-      } catch (e) {
+      } catch {
         // If URL parsing fails, keep the original
         console.log(`⚠️ Could not construct full image URL for ${source}: ${imageUrl}`);
       }

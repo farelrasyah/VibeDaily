@@ -1,5 +1,6 @@
 import { newsService } from '@/lib/api'
 import { getRelativeTime } from '@/lib/utils/date-formatter'
+import { NewsArticle } from '@/types/news.types'
 import HomeClient from './HomeClient'
 
 export const revalidate = 300 // Revalidate every 5 minutes
@@ -20,7 +21,7 @@ export default async function Home() {
    * Check if article is unique (not already used)
    * Normalize title and URL for better duplicate detection
    */
-  const isUnique = (article: any): boolean => {
+  const isUnique = (article: NewsArticle): boolean => {
     const normalizedTitle = article.title?.toLowerCase().trim()
     const normalizedUrl = article.url?.toLowerCase().trim()
     const articleId = article.id?.toLowerCase().trim()
@@ -36,7 +37,7 @@ export default async function Home() {
   /**
    * Mark article as used
    */
-  const markAsUsed = (article: any): void => {
+  const markAsUsed = (article: NewsArticle): void => {
     const normalizedTitle = article.title?.toLowerCase().trim()
     const normalizedUrl = article.url?.toLowerCase().trim()
     const articleId = article.id?.toLowerCase().trim()
@@ -48,7 +49,7 @@ export default async function Home() {
 
   // Hero data (first unique article from mixed news)
   const heroArticles = heroResult.status === 'fulfilled' ? heroResult.value : []
-  const heroArticle = heroArticles.find((article: any) => isUnique(article)) || heroArticles[0] || null
+  const heroArticle = heroArticles.find((article: NewsArticle) => isUnique(article)) || heroArticles[0] || null
   
   if (heroArticle) markAsUsed(heroArticle)
 
@@ -108,15 +109,15 @@ export default async function Home() {
   // Recommended items (from mixed news for sidebar - filter duplicates and ensure valid images)
   const allMixedNews = mixedNewsResult.status === 'fulfilled' ? mixedNewsResult.value : []
   const indonesiaNews = allMixedNews
-    .filter((article: any) => isUnique(article))
-    .filter((article: any) => !article.imageUrl || article.imageUrl.trim() === '' || !article.imageUrl.includes('picsum.photos'))
+    .filter((article: NewsArticle) => isUnique(article))
+    .filter((article: NewsArticle) => !article.imageUrl || article.imageUrl.trim() === '' || !article.imageUrl.includes('picsum.photos'))
     .slice(0, 6)
 
   // Fallback from social media result if needed
   const socialMediaNews = socialMediaResult.status === 'fulfilled' ? socialMediaResult.value : []
   const internationalForFallback = socialMediaNews
-    .filter((article: any) => isUnique(article))
-    .filter((article: any) => article.imageUrl && article.imageUrl.trim() !== '' && !article.imageUrl.includes('picsum.photos'))
+    .filter((article: NewsArticle) => isUnique(article))
+    .filter((article: NewsArticle) => article.imageUrl && article.imageUrl.trim() !== '' && !article.imageUrl.includes('picsum.photos'))
     .slice(0, 6)
   
   const fallbackNews = indonesiaNews.length === 0 ? internationalForFallback : []
@@ -141,8 +142,8 @@ export default async function Home() {
 
   // NewsSlide items (from social media news - filter duplicates and invalid images)
   const internationalNews = socialMediaNews
-    .filter((article: any) => isUnique(article))
-    .filter((article: any) => article.imageUrl && article.imageUrl.trim() !== '' && !article.imageUrl.includes('oval.gif'))
+    .filter((article: NewsArticle) => isUnique(article))
+    .filter((article: NewsArticle) => article.imageUrl && article.imageUrl.trim() !== '' && !article.imageUrl.includes('oval.gif'))
     .slice(0, 8)
 
   const newsSlideItems = internationalNews.map(article => {
@@ -281,7 +282,7 @@ export default async function Home() {
     newsList: [],
     newsImages: ['', '', ''],
     backgroundImage: undefined,
-    allArticles: allSocialArticles.slice(0, 10).map((article: any) => ({
+    allArticles: allSocialArticles.slice(0, 10).map((article: NewsArticle) => ({
       id: article.id,
       title: article.title,
       category: article.source.name,

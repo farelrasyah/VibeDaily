@@ -1,4 +1,4 @@
-import { NewsApiOrgResponse, NewsArticle, ApiResponse } from '@/types/news.types';
+import { NewsApiOrgResponse, NewsApiOrgArticle, NewsArticle, ApiResponse } from '@/types/news.types';
 
 class NewsApiOrgService {
   private baseUrl: string;
@@ -131,7 +131,7 @@ class NewsApiOrgService {
         const cleanPart = lastPart.replace(/[^a-zA-Z0-9-_]/g, '-').substring(0, 50);
         return `${cleanPart}-${combinedHash}`;
       }
-    } catch (e) {
+    } catch {
       // Invalid URL, fallback to title
     }
     
@@ -147,7 +147,7 @@ class NewsApiOrgService {
   /**
    * Transform NewsAPI.org article to unified format
    */
-  private transformArticle = (article: any): NewsArticle => {
+  private transformArticle = (article: NewsApiOrgArticle): NewsArticle => {
     return {
       id: this.generateSafeId(article.url, article.title),
       title: article.title || 'No title',
@@ -168,12 +168,12 @@ class NewsApiOrgService {
   /**
    * Error handler
    */
-  private handleError(error: any): ApiResponse<NewsArticle> {
+  private handleError(error: unknown): ApiResponse<NewsArticle> {
     console.error('NewsAPI.org Error:', error);
     return {
       success: false,
       data: [],
-      error: error.message || 'Failed to fetch news',
+      error: error instanceof Error ? error.message : 'Failed to fetch news',
     };
   }
 }

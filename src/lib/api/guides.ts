@@ -1,4 +1,5 @@
 import { NewsArticle } from '@/types/news.types';
+import { NewsSource } from '@/lib/news-categories';
 import { newsService } from './index';
 
 // Guide categories mapping
@@ -72,7 +73,7 @@ class GuidesService {
         for (const sourceCategory of categoryConfig.categories) {
           try {
             const articles = await newsService.getNewsBySourceAndCategory(
-              source as any,
+              source as NewsSource,
               sourceCategory,
               Math.ceil(limit / 2) // Get more articles to filter
             );

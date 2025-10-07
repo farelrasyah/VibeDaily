@@ -51,7 +51,7 @@ export default function HowToGuides() {
             </div>
             <p className="text-lg text-slate-600 max-w-3xl">
               Step-by-step instructions and practical guides to help you master development tools,
-              frameworks, and best practices. Whether you're setting up your first project or
+              frameworks, and best practices. Whether you&apos;re setting up your first project or
               optimizing existing applications, our guides provide clear, actionable solutions.
             </p>
           </header>

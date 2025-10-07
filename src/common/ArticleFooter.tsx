@@ -15,7 +15,7 @@ const ArticleFooter: React.FC = () => {
       await navigator.clipboard.writeText(window.location.href);
       setShowToast(true);
       setTimeout(() => setShowToast(false), 1800);
-    } catch (err) {
+    } catch {
       // fallback
       setShowToast(false);
       alert("Gagal menyalin link");
