@@ -17,8 +17,6 @@ interface NewsSlideProps {
   items?: NewsItem[];
 }
 
-const CARD_W = 240; // px, responsive card width
-
 export default function NewsSlide({ items }: NewsSlideProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isAtStart, setIsAtStart] = useState(true);

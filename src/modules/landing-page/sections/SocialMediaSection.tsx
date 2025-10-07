@@ -277,7 +277,7 @@ const SocialMediaSection: React.FC<SocialMediaSectionProps> = ({
     <div className="relative h-full overflow-auto pt-4 pb-6">
       <div className="flex flex-col">
         {newsList.length > 0 ? (
-          newsList.slice(0, 8).map((news, index) => (
+          newsList.slice(0, 8).map((news) => (
             <div
               key={news.id}
               onClick={() => router.push('/article/' + news.id)}

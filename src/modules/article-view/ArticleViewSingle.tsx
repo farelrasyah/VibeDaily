@@ -1,7 +1,6 @@
 "use client";
 // This file uses React hooks and must be a client component
 import React, { useState, useEffect } from "react";
-import { useRef } from "react";
 import ContentHub from "../../common/ContentHub";
 import ArticleFooter from "../../common/ArticleFooter";
 import { NewsArticle } from "@/types/news.types";

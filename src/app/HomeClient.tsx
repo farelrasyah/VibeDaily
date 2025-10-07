@@ -29,11 +29,6 @@ interface NavigationItem {
   sources?: NewsSource[];
 }
 
-// Extended NewsArticle with tags for internal use
-interface NewsArticleWithTags extends NewsArticle {
-  tags?: string[];
-}
-
 interface HomeClientProps {
   heroData: {
     category: string

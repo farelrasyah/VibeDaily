@@ -355,7 +355,7 @@ class BeritaIndoService {
    * Transform Berita Indo article to unified format
    */
   private transformArticle = (
-    article: BeritaIndoArticle & { content?: string; category?: string; image?: any },
+    article: BeritaIndoArticle & { content?: string; category?: string; image?: { url?: string; medium?: string; extraLarge?: string; small?: string; large?: string } },
     source: IndonesiaSource
   ): NewsArticle => {
 
