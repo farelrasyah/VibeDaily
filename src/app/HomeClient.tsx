@@ -13,6 +13,10 @@ import SearchRecommendCard from '../modules/landing-page/widgets/SearchRecommend
 import Footer from '../modules/landing-page/sections/Footer'
 import { getNavigationItems, NewsSource, getAllCategoriesForNavigation, getAllCategoryIdsForNavigation, getAllCategorySourcesForNavigation, getAllNewsSources, isValidCategoryForSource } from '../lib/news-categories'
 import { newsService } from '../lib/api'
+import HowToGuides from '../modules/guides/HowToGuides'
+import Tutorials from '../modules/guides/Tutorials'
+import BestPractices from '../modules/guides/BestPractices'
+import TipsTricks from '../modules/guides/TipsTricks'
 
 interface HomeClientProps {
   heroData: {
@@ -114,6 +118,7 @@ export default function HomeClient({
   const [activeChip, setActiveChip] = useState('All')
   const [selectedSource, setSelectedSource] = useState<NewsSource | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedGuide, setSelectedGuide] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [filteredArticles, setFilteredArticles] = useState<any[]>([])
 
@@ -183,11 +188,6 @@ export default function HomeClient({
       label: 'Guides', 
       active: activeChip === 'Guides',
       dropdownItems: ['How-to Guides', 'Tutorials', 'Best Practices', 'Tips & Tricks']
-    },
-    { 
-      label: 'Recommended', 
-      active: activeChip === 'Recommended',
-      dropdownItems: ['Editor\'s Choice', 'Must Read', 'Top Picks', 'Staff Recommendations']
     },
   ]
 
@@ -282,12 +282,24 @@ export default function HomeClient({
       } finally {
         setIsLoading(false)
       }
+    } else if (parentLabel === 'Guides') {
+      // Handle Guides selection
+      console.log(`📚 Guides Selection: ${dropdownItem}`)
+      setActiveChip(parentLabel)
+      setSelectedGuide(dropdownItem)
+      setSelectedSource(null)
+      setSelectedCategory(null)
+      setFilteredArticles([])
+
+      // Clear URL params for guides
+      router.replace('/', { scroll: false })
     } else {
       console.log(`⚠️ Missing source or dropdownId: source=${source}, dropdownId=${dropdownId}`)
       // Handle "All" or other non-source categories
       setActiveChip(parentLabel)
       setSelectedSource(null)
       setSelectedCategory(null)
+      setSelectedGuide(null)
       setFilteredArticles([])
       
       // Clear URL params
@@ -299,6 +311,17 @@ export default function HomeClient({
     console.log(`🎯 Nav item clicked: ${item.label}`)
     if (item.label === 'All') {
       setActiveChip('All')
+      setSelectedSource(null)
+      setSelectedCategory(null)
+      setSelectedGuide(null)
+      setFilteredArticles([])
+      
+      // Clear URL params
+      router.replace('/', { scroll: false })
+    } else if (item.label === 'Guides') {
+      // When clicking Guides tab, show all guides or reset to first guide
+      setActiveChip('Guides')
+      setSelectedGuide('How-to Guides') // Default to first guide
       setSelectedSource(null)
       setSelectedCategory(null)
       setFilteredArticles([])
@@ -513,6 +536,16 @@ export default function HomeClient({
           {/* Main two-column layout - responsive with proper ordering */}
           <main className="flex flex-col xl:flex-row gap-6 sm:gap-8 xl:items-start">
             <div className="flex-1 min-w-0">
+              {/* Show guide component when guide is selected */}
+              {selectedGuide && !isLoading && (
+                <div className="transition-opacity duration-300 opacity-100">
+                  {selectedGuide === 'How-to Guides' && <HowToGuides />}
+                  {selectedGuide === 'Tutorials' && <Tutorials />}
+                  {selectedGuide === 'Best Practices' && <BestPractices />}
+                  {selectedGuide === 'Tips & Tricks' && <TipsTricks />}
+                </div>
+              )}
+
               {/* Show loading indicator when filtering */}
               {isLoading && (
                 <div className="flex items-center justify-center py-12">
@@ -524,7 +557,7 @@ export default function HomeClient({
               )}
 
               {/* Show filter info when category is selected */}
-              {selectedSource && selectedCategory && !isLoading && (
+              {selectedSource && selectedCategory && !isLoading && !selectedGuide && (
                 <div className="mb-6">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-0.5 h-6 bg-violet-600 rounded-full"></div>
@@ -539,7 +572,7 @@ export default function HomeClient({
               )}
 
               {/* Always show same layout structure with appropriate data */}
-              {!isLoading && (
+              {!isLoading && !selectedGuide && (
                 <div className={`space-y-8 ${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'} transition-opacity duration-300`}>
                   <Hero {...displayData.hero} onCta={handleHeroCta} />
                   <Ticker items={displayData.ticker} />
@@ -550,7 +583,7 @@ export default function HomeClient({
               )}
 
               {/* Show "no articles" message only when filtering returns no results */}
-              {selectedSource && selectedCategory && !isLoading && filteredArticles.length === 0 && (
+              {selectedSource && selectedCategory && !isLoading && !selectedGuide && filteredArticles.length === 0 && (
                 <div className="text-center py-12">
                   <div className="max-w-md mx-auto">
                     <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
