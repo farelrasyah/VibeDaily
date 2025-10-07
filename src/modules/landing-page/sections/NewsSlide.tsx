@@ -8,7 +8,7 @@ type NewsItem = {
   title: string;
   category: string;
   time: string;
-  href: string;
+  articleId: string;
   image: string;
   tags?: string[];
 };
@@ -104,7 +104,7 @@ export default function NewsSlide({ items }: NewsSlideProps) {
               style={{ width: 'min(280px, 85vw)', margin: 0, padding: 0 }}
             >
               <div 
-                onClick={() => router.push(item.href)}
+                onClick={() => router.push(`/article/${item.articleId}`)}
                 className="group block cursor-pointer"
               >
                 <div

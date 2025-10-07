@@ -26,7 +26,7 @@ interface HomeClientProps {
   tickerItems: Array<{
     id: string
     title: string
-    href: string
+    articleId: string
     category: string
     time: string
   }>
@@ -35,7 +35,7 @@ interface HomeClientProps {
     title: string
     category: string
     time: string
-    href: string
+    articleId: string
     featured?: boolean
     description?: string
     tags?: string[]
@@ -46,7 +46,7 @@ interface HomeClientProps {
     thumb: string
     meta: string
     title: string
-    href: string
+    articleId: string
     featured?: boolean
   }>
   newsSlideItems: Array<{
@@ -54,7 +54,7 @@ interface HomeClientProps {
     title: string
     category: string
     time: string
-    href: string
+    articleId: string
     image: string
     tags?: string[]
   }>
@@ -63,7 +63,7 @@ interface HomeClientProps {
     title: string
     category: string
     time: string
-    href: string
+    articleId: string
     image: string
     description?: string
   }>
@@ -347,7 +347,7 @@ export default function HomeClient({
       const transformedTicker = getTickerArticles().map(article => ({
         id: article.id,
         title: article.title,
-        href: `/article/${article.id}`,
+        articleId: article.id,
         category: article.category || selectedSource?.toUpperCase() || 'NEWS',
         time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now'
       }));
@@ -367,7 +367,8 @@ export default function HomeClient({
         title: article.title,
         category: article.category || selectedSource?.toUpperCase() || 'NEWS',
         time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
-        href: `/article/${article.id}`,
+        articleId: article.id,
+        
         image: article.imageUrl,
         featured: index === 0, // Make first article featured
         tags: article.tags,
@@ -385,7 +386,7 @@ export default function HomeClient({
         title: article.title,
         category: article.category || selectedSource?.toUpperCase() || 'NEWS',
         time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
-        href: `/article/${article.id}`,
+         articleId: article.id,
         image: article.imageUrl || '/placeholder-image.jpg',
         tags: article.tags
       }));
@@ -396,7 +397,7 @@ export default function HomeClient({
         title: article.title,
         category: article.category || selectedSource?.toUpperCase() || 'NEWS',
         time: article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Just now',
-        href: `/article/${article.id}`,
+        articleId: article.id,
         image: article.imageUrl || '/placeholder-image.jpg',
         description: article.description,
         tags: article.tags
@@ -413,7 +414,7 @@ export default function HomeClient({
         thumb: article.imageUrl || '/placeholder-image.jpg',
         meta: article.category || selectedSource?.toUpperCase() || 'NEWS',
         title: article.title,
-        href: `/article/${article.id}`,
+        articleId: article.id,
         featured: index === 0
       }));
 

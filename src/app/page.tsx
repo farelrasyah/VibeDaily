@@ -77,7 +77,7 @@ export default async function Home() {
     return {
       id: article.id,
       title: article.title,
-      href: article.url,
+      articleId: article.id,
       category: article.source.name,
       time: getRelativeTime(article.publishedAt, article.language),
     }
@@ -97,7 +97,7 @@ export default async function Home() {
       title: article.title,
       category: article.source.name,
       time: getRelativeTime(article.publishedAt, article.language),
-      href: article.url,
+      articleId: article.id,
       featured: index === 0 || index === 7, // Make first and 8th item featured
       description: article.description,
       tags: article.category ? [article.category] : ['News'],
@@ -131,7 +131,7 @@ export default async function Home() {
           thumb: article.imageUrl || '', // Empty string, bukan picsum dummy
           meta: `${article.source.name} • ${getRelativeTime(article.publishedAt, article.language)}`,
           title: article.title,
-          href: article.url,
+          articleId: article.id,
           featured: index === 0,
         }
       })
@@ -152,7 +152,7 @@ export default async function Home() {
       title: article.title,
       category: article.source.name,
       time: getRelativeTime(article.publishedAt, 'en'),
-      href: article.url,
+      articleId: article.id,
       image: article.imageUrl!, // Non-null karena sudah di-filter
       tags: article.category ? [article.category] : [],
     }
@@ -175,7 +175,7 @@ export default async function Home() {
       title: article.title,
       category: article.source?.name || 'News',
       time: getRelativeTime(article.publishedAt, article.language),
-      href: article.url,
+      articleId: article.id,
       image: article.imageUrl || '',
       description: article.description,
       tags: article.category ? [article.category] : [],

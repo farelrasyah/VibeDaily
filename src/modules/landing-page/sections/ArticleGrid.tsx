@@ -9,7 +9,7 @@ interface ArticleGridItem {
   title: string
   category: string
   time: string
-  href: string
+  articleId: string
   image?: string
   featured?: boolean
   tags?: string[]
@@ -77,11 +77,11 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
     const usedTitles = new Set<string>()
     
     // Also exclude featured articles from thumbnails to prevent duplication
-    const featuredUrls = new Set(featuredPool.map(f => f.href))
+    const featuredUrls = new Set(featuredPool.map(f => f.articleId))
     const featuredTitles = new Set(featuredPool.map(f => f.title.toLowerCase().trim()))
     
     for (const thumb of thumbs) {
-      const thumbUrl = thumb.href
+      const thumbUrl = thumb.articleId
       const thumbTitle = thumb.title.toLowerCase().trim()
       
       // Skip if already used or if it matches a featured article
@@ -124,7 +124,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
             const article = thumbsPool[index]
             
             // Only add if not already in result (prevent immediate duplicates)
-            if (!result.some(item => item.href === article.href || item.title.toLowerCase().trim() === article.title.toLowerCase().trim())) {
+            if (!result.some(item => item.articleId === article.articleId || item.title.toLowerCase().trim() === article.title.toLowerCase().trim())) {
               result.push(article)
             } else if (result.length < 6) {
               // If we can't avoid duplication and still need items, add with modified data
@@ -161,8 +161,8 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
     totalSlides,
     smallItemsCount: smallItems.length,
     featuredHasImage: featured?.image ? 'yes' : 'no',
-    uniqueSmallItems: new Set(smallItems.map(item => item.href)).size,
-    duplicatesInSmallItems: smallItems.length - new Set(smallItems.map(item => item.href)).size
+    uniqueSmallItems: new Set(smallItems.map(item => item.articleId)).size,
+    duplicatesInSmallItems: smallItems.length - new Set(smallItems.map(item => item.articleId)).size
   })
 
   return (
@@ -178,7 +178,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
         {/* KIRI: FEATURED – responsive margins */}
         <div className="lg:col-span-3 -mx-4 sm:-mx-6 md:-mx-8 lg:bleed-left lg:sm:bleed-left lg:lg:bleed-left lg:-ml-12">
           <article className="group h-full">
-            <div onClick={() => router.push(featured?.href || '/')} className="block h-full cursor-pointer">
+            <div onClick={() => router.push(`/article/${featured?.articleId}`)} className="block h-full cursor-pointer">
               <div
                 className="
                   h-full flex flex-col overflow-hidden rounded-[28px]
@@ -248,7 +248,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
                   <div className="mt-4 sm:mt-6">
                     <div className="flex gap-2 items-center">
                       <a
-                        href={featured?.href || '#'}
+                        href={`/article/${featured?.articleId}`}
                         className="inline-flex items-center rounded-full bg-[#e6eefc] text-slate-900 pl-4 pr-2 h-9 sm:h-10 text-xs sm:text-[14px] font-semibold shadow-none border-none hover:bg-[#dbe7fa] transition-colors"
                         style={{
                           boxShadow: 'none',
@@ -329,7 +329,7 @@ export default function ArticleGrid({ items }: ArticleGridProps) {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-8 sm:gap-y-10 md:gap-y-12 lg:gap-y-14">
               {smallItems.map((item, i) => (
                 <article key={`${item.id}-${i}`} className="group">
-                  <div onClick={() => router.push(item.href)} className="block cursor-pointer">
+                  <div onClick={() => router.push(`/article/${item.articleId}`)} className="block cursor-pointer">
                     <div className="rounded-[20px] sm:rounded-[24px] overflow-hidden bg-white/65 border border-white/35 backdrop-blur-xl shadow-[0_14px_40px_rgba(15,23,42,0.08)] hover:bg-white/75 transition-all duration-300 mb-3 sm:mb-4">
                       <div className="relative w-full h-[120px] sm:h-[140px] md:h-[120px] lg:h-[150px] overflow-hidden">
                         {item.image && !imageErrors.has(item.id) ? (
