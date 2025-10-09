@@ -282,7 +282,7 @@ const ArticleView: React.FC<ArticleViewSingleProps> = ({ articleId }) => {
         <ContentHub />
 
         {/* Article Footer Section */}
-        <ArticleFooter articleId={articleId} />
+        <ArticleFooter articleId={articleId} publishedAt={article?.publishedAt} />
       </main>
     </div>
   );

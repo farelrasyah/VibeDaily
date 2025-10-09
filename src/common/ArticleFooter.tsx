@@ -4,37 +4,21 @@ import { FaHeart, FaRegCommentDots, FaShareAlt, FaPaperPlane, FaEdit, FaTrash } 
 import { useComments } from "@/hooks/useComments";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
+import { getRelativeTime } from "@/lib/utils/date-formatter";
 
 interface ArticleFooterProps {
   articleId: string;
+  publishedAt?: string; // Opsional, jika ada
 }
 
-const ArticleFooter: React.FC<ArticleFooterProps> = ({ articleId }) => {
+const ArticleFooter: React.FC<ArticleFooterProps> = ({ articleId, publishedAt }) => {
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [comment, setComment] = useState("");
   const [showToast, setShowToast] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { user, signUp, signIn, signOut } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth();
   const { comments, loading, error, addComment, editComment, deleteComment } = useComments(articleId);
-
-  // Handle auth
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (authMode === 'login') {
-      const { error } = await signIn(email, password);
-      if (error) alert(error.message);
-      else setShowAuthModal(false);
-    } else {
-      const { error } = await signUp(email, password);
-      if (error) alert(error.message);
-      else alert('Check your email for confirmation');
-    }
-  };
 
   // Copy link to clipboard
   const handleShare = async () => {
@@ -77,12 +61,12 @@ const ArticleFooter: React.FC<ArticleFooterProps> = ({ articleId }) => {
             <div key={c.id} className="bg-white/80 backdrop-blur-md rounded-lg p-4 shadow-md border">
               <div className="flex items-start gap-3">
                 <img
-                  src={c.profiles?.avatar_url || "https://randomuser.me/api/portraits/men/32.jpg"}
+                  src={c.avatar_url || "https://randomuser.me/api/portraits/men/32.jpg"}
                   alt="Avatar"
                   className="w-8 h-8 rounded-full"
                 />
                 <div className="flex-1">
-                  <p className="font-medium">{c.profiles?.username || "Anonymous"}</p>
+                  <p className="font-medium">{c.username || "Anonymous"}</p>
                   <p className="text-sm text-gray-600">{new Date(c.created_at).toLocaleString()}</p>
                   <p className="mt-2">{c.content}</p>
                 </div>
@@ -116,50 +100,28 @@ const ArticleFooter: React.FC<ArticleFooterProps> = ({ articleId }) => {
       <div className="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-blue-200/40 via-pink-200/40 to-emerald-200/40 blur-sm opacity-80" />
       <div className="max-w-6xl mx-auto px-4 sm:px-8 md:px-16 xl:px-32 py-8 md:py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-8 lg:gap-10">
         <div className="flex flex-wrap items-center gap-4 md:gap-6 lg:gap-10">
-          {/* Like */}
-          <button className="group flex items-center text-slate-700 hover:text-pink-500 transition-all duration-300 hover:scale-105 focus:outline-none">
-            <span className="p-2 md:p-3 rounded-full bg-white/90 backdrop-blur-md shadow-md border border-slate-200/60 group-hover:bg-pink-50 group-hover:shadow-pink-100 transition-all duration-300 mr-2 md:mr-3 flex items-center justify-center">
-              <FaHeart className="w-5 h-5 md:w-6 md:h-6 transition-colors duration-300" />
-            </span>
-            <span className="text-base md:text-lg font-semibold tracking-wide">2.1k Likes</span>
-          </button>
-
+          {/* Like - Hapus jika belum ada sistem */}
           {/* Comment */}
           <button
             className="group flex items-center text-slate-700 hover:text-sky-600 transition-all duration-300 hover:scale-105 focus:outline-none"
             onClick={() => {
-              if (!user) setShowAuthModal(true);
+              if (authLoading) return; // Tunggu auth load
+              if (!user) signInWithGoogle();
               else setShowCommentInput((v) => !v);
             }}
+            disabled={authLoading}
             aria-expanded={showCommentInput}
             aria-controls="comment-input-footer"
           >
             <span className="p-2 md:p-3 rounded-full bg-white/90 backdrop-blur-md shadow-md border border-slate-200/60 group-hover:bg-sky-50 group-hover:shadow-sky-100 transition-all duration-300 mr-2 md:mr-3 flex items-center justify-center">
-              <FaRegCommentDots className="w-5 h-5 md:w-6 md:h-6 transition-colors duration-300" />
+              {authLoading ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-sky-600"></div>
+              ) : (
+                <FaRegCommentDots className="w-5 h-5 md:w-6 md:h-6 transition-colors duration-300" />
+              )}
             </span>
-            <span className="text-base md:text-lg font-semibold tracking-wide">1.4k Comments</span>
+            <span className="text-base md:text-lg font-semibold tracking-wide">{comments.length} Comments</span>
           </button>
-
-          {/* Auth */}
-          {user ? (
-            <button
-              onClick={signOut}
-              className="group flex items-center text-slate-700 hover:text-red-600 transition-all duration-300 hover:scale-105 focus:outline-none"
-            >
-              <span className="p-2 md:p-3 rounded-full bg-white/90 backdrop-blur-md shadow-md border border-slate-200/60 group-hover:bg-red-50 group-hover:shadow-red-100 transition-all duration-300 mr-2 md:mr-3 flex items-center justify-center">
-                Logout
-              </span>
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="group flex items-center text-slate-700 hover:text-green-600 transition-all duration-300 hover:scale-105 focus:outline-none"
-            >
-              <span className="p-2 md:p-3 rounded-full bg-white/90 backdrop-blur-md shadow-md border border-slate-200/60 group-hover:bg-green-50 group-hover:shadow-green-100 transition-all duration-300 mr-2 md:mr-3 flex items-center justify-center">
-                Login
-              </span>
-            </button>
-          )}
 
           {/* Share */}
           <button
@@ -175,7 +137,9 @@ const ArticleFooter: React.FC<ArticleFooterProps> = ({ articleId }) => {
 
         <div className="flex items-center bg-white/95 backdrop-blur-lg rounded-full px-4 md:px-7 py-2 md:py-3 shadow-md border border-slate-200/60 animate-fade-in">
           <span className="text-slate-600 text-base md:text-lg mr-2 md:mr-3 font-medium">Published</span>
-          <span className="font-semibold text-slate-900 text-base md:text-lg tracking-wide">2 days ago</span>
+          <span className="font-semibold text-slate-900 text-base md:text-lg tracking-wide">
+            {publishedAt ? getRelativeTime(publishedAt, 'id') : 'Unknown'}
+          </span>
         </div>
       </div>
 
@@ -190,9 +154,9 @@ const ArticleFooter: React.FC<ArticleFooterProps> = ({ articleId }) => {
             style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.12)' }}
             onSubmit={handleSubmitComment}
           >
-            {/* Avatar user dummy */}
+            {/* Avatar user */}
             <img
-              src="https://randomuser.me/api/portraits/men/32.jpg"
+              src={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || "https://randomuser.me/api/portraits/men/32.jpg"}
               alt="User avatar"
               className="w-8 h-8 md:w-10 md:h-10 rounded-full shadow border-2 border-white/80 object-cover transition-all duration-300"
               loading="lazy"
@@ -233,51 +197,10 @@ const ArticleFooter: React.FC<ArticleFooterProps> = ({ articleId }) => {
           Link artikel berhasil disalin!
         </div>
       )}
-
-      {/* Auth Modal */}
-      {showAuthModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <form onSubmit={handleAuth} className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl mb-4">{authMode === 'login' ? 'Login' : 'Sign Up'}</h2>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded mb-2"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border rounded mb-4"
-              required
-            />
-            <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-              {authMode === 'login' ? 'Login' : 'Sign Up'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
-              className="w-full mt-2 text-blue-500"
-            >
-              {authMode === 'login' ? 'Need an account? Sign Up' : 'Have an account? Login'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowAuthModal(false)}
-              className="w-full mt-2 text-gray-500"
-            >
-              Cancel
-            </button>
-          </form>
-        </div>
-      )}
-    </footer>
+      </footer>
     </>
   );
 };
 
 export default ArticleFooter;
+

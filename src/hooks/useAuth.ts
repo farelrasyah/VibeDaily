@@ -8,12 +8,14 @@ export const useAuth = () => {
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
+      console.log('Current user:', data.user);
       setUser(data.user);
       setLoading(false);
     };
     getUser();
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state change:', event, session?.user);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -21,13 +23,13 @@ export const useAuth = () => {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    return { data, error };
-  };
-
-  const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const signInWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.href, // Redirect back to current page
+      },
+    });
     return { data, error };
   };
 
@@ -36,5 +38,5 @@ export const useAuth = () => {
     return { error };
   };
 
-  return { user, loading, signUp, signIn, signOut };
+  return { user, loading, signInWithGoogle, signOut };
 };

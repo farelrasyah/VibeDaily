@@ -7,7 +7,8 @@ interface Comment {
   content: string;
   created_at: string;
   user_id: string;
-  profiles?: { username: string; avatar_url: string }; // Jika ada tabel profiles
+  username?: string;
+  avatar_url?: string;
 }
 
 export const useComments = (articleId: string) => {
@@ -21,7 +22,7 @@ export const useComments = (articleId: string) => {
     setLoading(true);
     const { data, error } = await supabase
       .from('comments')
-      .select('*, profiles(username, avatar_url)') // Join dengan tabel profiles jika ada
+      .select('*') // Tidak join profiles
       .eq('article_id', articleId)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -41,12 +42,20 @@ export const useComments = (articleId: string) => {
       content,
       created_at: new Date().toISOString(),
       user_id: user.user.id,
+      username: user.user.user_metadata?.name || user.user.email || 'Anonymous',
+      avatar_url: user.user.user_metadata?.avatar_url || user.user.user_metadata?.picture || null,
     };
     setComments([optimisticComment, ...comments]); // Optimistik update
 
     const { data, error } = await supabase
       .from('comments')
-      .insert([{ article_id: articleId, user_id: user.user.id, content }])
+      .insert([{
+        article_id: articleId,
+        user_id: user.user.id,
+        content,
+        username: user.user.user_metadata?.name || user.user.email || 'Anonymous',
+        avatar_url: user.user.user_metadata?.avatar_url || user.user.user_metadata?.picture || null,
+      }])
       .select();
 
     if (error) {
