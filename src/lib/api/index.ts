@@ -82,7 +82,6 @@ class NewsService {
             sortBy: 'relevancy',
             pageSize: limit
           });
-
           if (newsApiResult.success && newsApiResult.data.length > 0) {
             const articles = newsApiResult.data.slice(0, limit);
 
@@ -483,8 +482,6 @@ class NewsService {
     return { totalCached, cacheSize, oldestArticle, newestArticle };
   }
 }
-
 export const newsService = new NewsService();
-
 // Export individual services
 export { beritaIndo };

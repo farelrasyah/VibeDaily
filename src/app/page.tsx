@@ -103,7 +103,7 @@ export default async function Home() {
       featured: index === 0 || index === 7, // Make first and 8th item featured
       description: article.description,
       tags: article.category ? [article.category] : ['News'],
-      image: article.imageUrl || '', // Empty string jika tidak ada gambar, bukan dummy
+      image: article.imageUrl || undefined, // undefined jika tidak ada gambar
     }
   })
 
@@ -130,7 +130,7 @@ export default async function Home() {
         markAsUsed(article)
         return {
           id: article.id,
-          thumb: article.imageUrl || '', // Empty string, bukan picsum dummy
+          thumb: article.imageUrl || '/oval.gif', // placeholder jika tidak ada gambar
           meta: `${article.source.name} • ${getRelativeTime(article.publishedAt, article.language)}`,
           title: article.title,
           articleId: article.id,
@@ -178,7 +178,7 @@ export default async function Home() {
       category: article.source?.name || 'News',
       time: getRelativeTime(article.publishedAt, article.language),
       articleId: article.id,
-      image: article.imageUrl || '',
+      image: article.imageUrl || '/oval.gif',
       description: article.description,
       tags: article.category ? [article.category] : [],
     }))
