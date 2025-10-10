@@ -9,6 +9,9 @@ export interface Comment {
   user_id: string;
   username?: string;
   avatar_url?: string;
+  likes_count?: number;
+  replies_count?: number;
+  user_liked?: boolean;
 }
 
 export const useComments = (articleId: string) => {
