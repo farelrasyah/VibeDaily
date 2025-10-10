@@ -502,7 +502,6 @@ export default function HomeClient({
         description: article.description,
         tags: article.category ? [article.category] : []
       }));
-
       // Transform for SearchRecommendCard (use search results if available, otherwise use different articles)
       const getRecommendedData = () => {
         if (searchQuery.trim() && searchResults.length > 0) {

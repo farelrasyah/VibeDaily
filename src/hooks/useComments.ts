@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
-interface Comment {
+export interface Comment {
   id: string;
   content: string;
   created_at: string;
@@ -42,8 +42,8 @@ export const useComments = (articleId: string) => {
       content,
       created_at: new Date().toISOString(),
       user_id: user.user.id,
-      username: user.user.user_metadata?.name || user.user.email || 'Anonymous',
-      avatar_url: user.user.user_metadata?.avatar_url || user.user.user_metadata?.picture || null,
+      username: user.user.user_metadata?.name || user.user.user_metadata?.full_name || user.user.email || 'Anonymous',
+      avatar_url: user.user.user_metadata?.picture || user.user.user_metadata?.avatar_url || user.user.user_metadata?.avatar || null,
     };
     setComments([optimisticComment, ...comments]); // Optimistik update
 
@@ -53,8 +53,8 @@ export const useComments = (articleId: string) => {
         article_id: articleId,
         user_id: user.user.id,
         content,
-        username: user.user.user_metadata?.name || user.user.email || 'Anonymous',
-        avatar_url: user.user.user_metadata?.avatar_url || user.user.user_metadata?.picture || null,
+        username: user.user.user_metadata?.name || user.user.user_metadata?.full_name || user.user.email || 'Anonymous',
+        avatar_url: user.user.user_metadata?.picture || user.user.user_metadata?.avatar_url || user.user.user_metadata?.avatar || null,
       }])
       .select();
 
