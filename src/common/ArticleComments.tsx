@@ -6,12 +6,96 @@ import { useCommentLikes } from "@/hooks/useCommentLikes";
 import { useCommentReplies, CommentReply } from "@/hooks/useCommentReplies";
 import { useAuth } from "@/hooks/useAuth";
 import { getRelativeTime } from "@/lib/utils/date-formatter";
+import { supabase } from "@/lib/supabase";
 
 interface ArticleCommentsProps {
   articleId: string;
   showCommentInput: boolean;
   setShowCommentInput: (show: boolean) => void;
 }
+
+// Comment Reply Form Component
+const CommentReplyForm: React.FC<{
+  commentId: string;
+  replyingTo: string | null;
+  replyContent: string;
+  setReplyContent: (content: string) => void;
+  onCancel: () => void;
+  onSubmit: (commentId: string, content: string) => void;
+}> = ({ commentId, replyingTo, replyContent, setReplyContent, onCancel, onSubmit }) => {
+  const { user } = useAuth();
+
+  if (replyingTo !== commentId) return null;
+
+  const handleSubmit = async () => {
+    if (!replyContent.trim()) return;
+    await onSubmit(commentId, replyContent);
+  };
+
+  return (
+    <div className="mt-4 mb-4 p-4 bg-gray-50/80 rounded-xl border border-gray-200/50">
+      <div className="flex items-start gap-3 mb-3">
+        <div className="relative flex-shrink-0">
+          <img
+            src={
+              user?.user_metadata?.picture ||
+              user?.user_metadata?.avatar_url ||
+              user?.user_metadata?.avatar ||
+              user?.user_metadata?.image ||
+              user?.user_metadata?.photo ||
+              "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'User') + "&background=6366f1&color=fff&size=64"
+            }
+            alt="Your avatar"
+            className="w-8 h-8 rounded-lg object-cover"
+            onError={(e) => {
+              // Jika avatar gagal load, coba fallback
+              const fallbackUrl = "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'User') + "&background=6366f1&color=fff&size=64";
+              if (e.currentTarget.src !== fallbackUrl) {
+                e.currentTarget.src = fallbackUrl;
+              } else {
+                // Jika fallback juga gagal, hide dan show placeholder
+                e.currentTarget.style.display = 'none';
+                const placeholder = e.currentTarget.parentElement?.querySelector('.reply-avatar-placeholder') as HTMLElement;
+                if (placeholder) placeholder.style.display = 'flex';
+              }
+            }}
+          />
+          {/* Placeholder dengan inisial sebagai backup terakhir */}
+          <div className="reply-avatar-placeholder w-8 h-8 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 hidden items-center justify-center">
+            <span className="text-gray-600 font-bold text-sm">
+              {(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'A')[0].toUpperCase()}
+            </span>
+          </div>
+        </div>
+        <div className="flex-1">
+          <textarea
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            placeholder="Tulis balasan Anda..."
+            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
+            rows={2}
+            maxLength={300}
+          />
+        </div>
+      </div>
+      <div className="flex items-center justify-end gap-2">
+        <button
+          onClick={onCancel}
+          className="px-3 py-1.5 text-gray-600 text-sm hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          Batal
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={!replyContent.trim()}
+          className="px-4 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          Balas
+        </button>
+      </div>
+    </div>
+  );
+};
 
 // Comment Replies List Component
 const CommentRepliesList: React.FC<{ commentId: string }> = ({ commentId }) => {
@@ -21,15 +105,15 @@ const CommentRepliesList: React.FC<{ commentId: string }> = ({ commentId }) => {
   if (replies.length === 0) return null;
 
   return (
-    <div className="mt-4 ml-6 sm:ml-8 space-y-3">
+    <div className="mt-4 space-y-3">
       {replies.map((reply) => (
-        <div key={reply.id} className="flex items-start gap-3 p-3 bg-gray-50/50 rounded-lg border-l-2 border-purple-200">
+        <div key={reply.id} className="flex items-start gap-3 p-4 bg-gray-50/60 rounded-xl border-l-4 border-purple-300 shadow-sm hover:shadow-md transition-all duration-300 ml-4 sm:ml-6">
           <div className="relative flex-shrink-0">
             {reply.avatar_url ? (
               <img
                 src={reply.avatar_url}
                 alt="Reply avatar"
-                className="w-6 h-6 rounded-md object-cover"
+                className="w-8 h-8 rounded-lg object-cover"
                 onError={(e) => {
                   // Jika avatar gagal load, tampilkan inisial
                   e.currentTarget.style.display = 'none';
@@ -39,14 +123,14 @@ const CommentRepliesList: React.FC<{ commentId: string }> = ({ commentId }) => {
               />
             ) : null}
             {/* Placeholder dengan inisial jika tidak ada avatar */}
-            <div className={`avatar-placeholder w-6 h-6 rounded-md bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center ${reply.avatar_url ? 'hidden' : ''}`}>
-              <span className="text-gray-600 font-bold text-xs">
+            <div className={`avatar-placeholder w-8 h-8 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center ${reply.avatar_url ? 'hidden' : ''}`}>
+              <span className="text-gray-600 font-bold text-sm">
                 {(reply.username || 'A')[0].toUpperCase()}
               </span>
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-2">
               <span className="font-medium text-gray-800 text-sm">{reply.username}</span>
               <span className="text-xs text-gray-500">{getRelativeTime(reply.created_at, 'id')}</span>
             </div>
@@ -63,6 +147,191 @@ const CommentRepliesList: React.FC<{ commentId: string }> = ({ commentId }) => {
           )}
         </div>
       ))}
+    </div>
+  );
+};
+
+// Comment Item Component (untuk setiap komentar individual)
+const CommentItem: React.FC<{
+  comment: Comment;
+  onReply: (commentId: string) => void;
+  replyingTo: string | null;
+  replyContent: string;
+  setReplyContent: (content: string) => void;
+  onCancelReply: () => void;
+}> = ({ comment: c, onReply, replyingTo, replyContent, setReplyContent, onCancelReply }) => {
+  const { user } = useAuth();
+  const { addReply } = useCommentReplies(c.id);
+
+  console.log('CommentItem: Rendering for comment:', c.id, c.content?.substring(0, 20));
+
+  const handleSubmitReply = async () => {
+    if (!replyContent.trim()) return;
+    console.log('CommentItem: Submitting reply for comment:', c.id);
+    await addReply(replyContent);
+    setReplyContent("");
+    onCancelReply();
+  };
+
+  return (
+    <div className="group relative">
+      {/* Comment bubble tail - hide on mobile untuk space */}
+      <div className="hidden sm:block absolute -left-2 top-6 sm:top-8 w-4 h-4 bg-white/80 backdrop-blur-xl transform rotate-45 border-l border-b border-gray-100/50"></div>
+
+      {/* Comment container with white background - includes avatar */}
+      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100/50 hover:shadow-md transition-shadow duration-300">
+        <div className="flex items-start gap-3 sm:gap-4">
+          {/* Avatar with online indicator */}
+          <div className="relative flex-shrink-0">
+            {c.avatar_url ? (
+              <img
+                src={c.avatar_url}
+                alt="Avatar"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl shadow-lg ring-2 sm:ring-3 ring-white group-hover:ring-indigo-100 transition-all duration-300 object-cover"
+                onError={(e) => {
+                  // Jika avatar gagal load, tampilkan inisial
+                  e.currentTarget.style.display = 'none';
+                  const placeholder = e.currentTarget.parentElement?.querySelector('.avatar-placeholder') as HTMLElement;
+                  if (placeholder) placeholder.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            {/* Placeholder dengan inisial jika tidak ada avatar */}
+            <div className={`avatar-placeholder w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl shadow-lg ring-2 sm:ring-3 ring-white bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center group-hover:ring-indigo-100 transition-all duration-300 ${c.avatar_url ? 'hidden' : ''}`}>
+              <span className="text-gray-600 font-bold text-sm sm:text-base">
+                {(c.username || 'A')[0].toUpperCase()}
+              </span>
+            </div>
+            <div className="absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-3 h-3 sm:w-4 sm:h-4 bg-emerald-500 rounded-full border-2 border-white shadow-lg"></div>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            {/* User info with edit/delete buttons */}
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 flex-1">
+                <h4 className="font-bold text-gray-800 text-base sm:text-lg group-hover:text-indigo-600 transition-colors duration-300 truncate">
+                  {c.username || "Anonymous"}
+                </h4>
+                <span className="text-xs sm:text-sm text-gray-500 font-medium bg-gray-100 px-2 sm:px-3 py-1 rounded-full w-fit">
+                  {getRelativeTime(c.created_at, 'id')}
+                </span>
+              </div>
+
+              {/* Edit/Delete buttons (hanya untuk pemilik komentar) - moved to top */}
+              {user && user.id === c.user_id && (
+                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out ml-2">
+                  <button
+                    onClick={() => {/* handle edit */}}
+                    className="group/edit flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md hover:bg-indigo-50/90 hover:border-indigo-300/70 transition-all duration-200 ease-out"
+                    title="Edit komentar"
+                  >
+                    <FaEdit className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 group-hover/edit:text-indigo-700 transition-colors duration-200" />
+                  </button>
+
+                  <button
+                    onClick={() => {/* handle delete */}}
+                    className="group/delete flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md hover:bg-rose-50/90 hover:border-rose-300/70 transition-all duration-200 ease-out"
+                    title="Hapus komentar"
+                  >
+                    <FaTrash className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 group-hover/delete:text-rose-700 transition-colors duration-200" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Comment content */}
+            <p className="text-gray-700 leading-relaxed text-sm sm:text-base mb-4 font-medium break-words">
+              {c.content}
+            </p>
+
+            {/* Reply Form */}
+            {replyingTo === c.id && (
+              <div className="mt-4 mb-4 p-4 bg-gray-50/80 rounded-xl border border-gray-200/50">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={
+                        user?.user_metadata?.picture ||
+                        user?.user_metadata?.avatar_url ||
+                        user?.user_metadata?.avatar ||
+                        user?.user_metadata?.image ||
+                        user?.user_metadata?.photo ||
+                        "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'User') + "&background=6366f1&color=fff&size=64"
+                      }
+                      alt="Your avatar"
+                      className="w-8 h-8 rounded-lg object-cover"
+                      onError={(e) => {
+                        // Jika avatar gagal load, coba fallback
+                        const fallbackUrl = "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'User') + "&background=6366f1&color=fff&size=64";
+                        if (e.currentTarget.src !== fallbackUrl) {
+                          e.currentTarget.src = fallbackUrl;
+                        } else {
+                          // Jika fallback juga gagal, hide dan show placeholder
+                          e.currentTarget.style.display = 'none';
+                          const placeholder = e.currentTarget.parentElement?.querySelector('.reply-avatar-placeholder') as HTMLElement;
+                          if (placeholder) placeholder.style.display = 'flex';
+                        }
+                      }}
+                    />
+                    {/* Placeholder dengan inisial sebagai backup terakhir */}
+                    <div className="reply-avatar-placeholder w-8 h-8 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 hidden items-center justify-center">
+                      <span className="text-gray-600 font-bold text-sm">
+                        {(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'A')[0].toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <textarea
+                      value={replyContent}
+                      onChange={(e) => setReplyContent(e.target.value)}
+                      placeholder={`Balas komentar ${c.username}...`}
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
+                      rows={2}
+                      maxLength={300}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    onClick={onCancelReply}
+                    className="px-3 py-1.5 text-gray-600 text-sm hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleSubmitReply}
+                    disabled={!replyContent.trim()}
+                    className="px-4 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Balas
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Show Replies */}
+            <CommentRepliesList commentId={c.id} />
+
+            {/* Action buttons */}
+            <div className="flex items-center">
+              {/* Like and Reply buttons */}
+              <div className="flex items-center gap-3 sm:gap-4">
+                {/* Like Button with Hook */}
+                <CommentLikeButton commentId={c.id} />
+
+                {/* Reply Button */}
+                <button
+                  onClick={() => onReply(c.id)}
+                  className="flex items-center gap-1.5 sm:gap-2 text-gray-500 hover:text-purple-600 transition-colors duration-300 group/reply"
+                >
+                  <FaReply className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover/reply:scale-110 transition-transform duration-300" />
+                  <span className="text-xs sm:text-sm font-medium">Balas</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -133,17 +402,6 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({
     setReplyContent("");
   };
 
-  // Handle submit reply
-  const handleSubmitReply = async (commentId: string) => {
-    if (!replyContent.trim()) return;
-
-    const { addReply } = useCommentReplies(commentId);
-    await addReply(replyContent);
-
-    setReplyContent("");
-    setReplyingTo(null);
-  };
-
   // Handle submit edit
   const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,161 +470,15 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({
           {/* Comments List */}
           <div className="space-y-4 sm:space-y-6">
             {comments.map((c, index) => (
-              <div 
-                key={c.id} 
-                className="group relative bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg shadow-gray-100/50 border border-gray-100/50 hover:shadow-xl hover:shadow-gray-200/30 transition-all duration-500 animate-slide-in-up mx-2 sm:mx-0"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                {/* Comment bubble tail - hide on mobile untuk space */}
-                <div className="hidden sm:block absolute -left-2 top-6 sm:top-8 w-4 h-4 bg-white/80 backdrop-blur-xl transform rotate-45 border-l border-b border-gray-100/50"></div>
-                
-                <div className="flex items-start gap-3 sm:gap-4">
-                  {/* Avatar with online indicator */}
-                  <div className="relative flex-shrink-0">
-                    {c.avatar_url ? (
-                      <img
-                        src={c.avatar_url}
-                        alt="Avatar"
-                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl shadow-lg ring-2 sm:ring-3 ring-white group-hover:ring-indigo-100 transition-all duration-300 object-cover"
-                        onError={(e) => {
-                          // Jika avatar gagal load, tampilkan inisial
-                          e.currentTarget.style.display = 'none';
-                          const placeholder = e.currentTarget.parentElement?.querySelector('.avatar-placeholder') as HTMLElement;
-                          if (placeholder) placeholder.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    {/* Placeholder dengan inisial jika tidak ada avatar */}
-                    <div className={`avatar-placeholder w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl shadow-lg ring-2 sm:ring-3 ring-white bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center group-hover:ring-indigo-100 transition-all duration-300 ${c.avatar_url ? 'hidden' : ''}`}>
-                      <span className="text-gray-600 font-bold text-sm sm:text-base">
-                        {(c.username || 'A')[0].toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-3 h-3 sm:w-4 sm:h-4 bg-emerald-500 rounded-full border-2 border-white shadow-lg"></div>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    {/* User info */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-2">
-                      <h4 className="font-bold text-gray-800 text-base sm:text-lg group-hover:text-indigo-600 transition-colors duration-300 truncate">
-                        {c.username || "Anonymous"}
-                      </h4>
-                      <span className="text-xs sm:text-sm text-gray-500 font-medium bg-gray-100 px-2 sm:px-3 py-1 rounded-full w-fit">
-                        {getRelativeTime(c.created_at, 'id')}
-                      </span>
-                    </div>
-
-                    {/* Comment content */}
-                    <p className="text-gray-700 leading-relaxed text-sm sm:text-base mb-3 sm:mb-4 font-medium break-words">
-                      {c.content}
-                    </p>
-
-                    {/* Reply Form */}
-                    {replyingTo === c.id && (
-                      <div className="mt-4 mb-4 p-4 bg-gray-50/80 rounded-xl border border-gray-200/50">
-                        <div className="flex items-start gap-3 mb-3">
-                          <div className="relative flex-shrink-0">
-                            <img
-                              src={
-                                user?.user_metadata?.picture || 
-                                user?.user_metadata?.avatar_url || 
-                                user?.user_metadata?.avatar ||
-                                user?.user_metadata?.image ||
-                                user?.user_metadata?.photo ||
-                                "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'User') + "&background=6366f1&color=fff&size=64"
-                              }
-                              alt="Your avatar"
-                              className="w-8 h-8 rounded-lg object-cover"
-                              onError={(e) => {
-                                // Jika avatar gagal load, coba fallback
-                                const fallbackUrl = "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'User') + "&background=6366f1&color=fff&size=64";
-                                if (e.currentTarget.src !== fallbackUrl) {
-                                  e.currentTarget.src = fallbackUrl;
-                                } else {
-                                  // Jika fallback juga gagal, hide dan show placeholder
-                                  e.currentTarget.style.display = 'none';
-                                  const placeholder = e.currentTarget.parentElement?.querySelector('.reply-avatar-placeholder') as HTMLElement;
-                                  if (placeholder) placeholder.style.display = 'flex';
-                                }
-                              }}
-                            />
-                            {/* Placeholder dengan inisial sebagai backup terakhir */}
-                            <div className="reply-avatar-placeholder w-8 h-8 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 hidden items-center justify-center">
-                              <span className="text-gray-600 font-bold text-sm">
-                                {(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'A')[0].toUpperCase()}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <textarea
-                              value={replyContent}
-                              onChange={(e) => setReplyContent(e.target.value)}
-                              placeholder={`Balas komentar ${c.username}...`}
-                              className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
-                              rows={2}
-                              maxLength={300}
-                            />
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => setReplyingTo(null)}
-                            className="px-3 py-1.5 text-gray-600 text-sm hover:bg-gray-100 rounded-lg transition-colors"
-                          >
-                            Batal
-                          </button>
-                          <button
-                            onClick={() => handleSubmitReply(c.id)}
-                            disabled={!replyContent.trim()}
-                            className="px-4 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            Balas
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Show Replies */}
-                    <CommentRepliesList commentId={c.id} />
-
-                    {/* Action buttons */}
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      {/* Like Button with Hook */}
-                      <CommentLikeButton commentId={c.id} />
-
-                      {/* Reply Button */}
-                      <button
-                        onClick={() => handleReply(c.id)}
-                        className="flex items-center gap-1.5 sm:gap-2 text-gray-500 hover:text-purple-600 transition-colors duration-300 group/reply"
-                      >
-                        <FaReply className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover/reply:scale-110 transition-transform duration-300" />
-                        <span className="text-xs sm:text-sm font-medium">Balas</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Edit/Delete buttons for owner - Clean and elegant design */}
-                  {user && user.id === c.user_id && (
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out">
-                      <button
-                        onClick={() => handleEditComment(c.id, c.content)}
-                        className="group/edit flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md hover:bg-indigo-50/90 hover:border-indigo-300/70 transition-all duration-200 ease-out"
-                        title="Edit komentar"
-                      >
-                        <FaEdit className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 group-hover/edit:text-indigo-700 transition-colors duration-200" />
-                      </button>
-
-                      <button
-                        onClick={() => deleteComment(c.id)}
-                        className="group/delete flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md hover:bg-rose-50/90 hover:border-rose-300/70 transition-all duration-200 ease-out"
-                        title="Hapus komentar"
-                      >
-                        <FaTrash className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 group-hover/delete:text-rose-700 transition-colors duration-200" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <CommentItem
+                key={c.id}
+                comment={c}
+                onReply={handleReply}
+                replyingTo={replyingTo}
+                replyContent={replyContent}
+                setReplyContent={setReplyContent}
+                onCancelReply={() => setReplyingTo(null)}
+              />
             ))}
           </div>
 
