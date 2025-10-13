@@ -99,9 +99,10 @@ export const useLikes = (articleId: string) => {
 
         if (error) throw error;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Revert optimistic update on error
-      setError(error.message);
+      const message = error instanceof Error ? error.message : 'An unknown error occurred';
+      setError(message);
       // Revert likes
       if (isLiked) {
         setLikes(prev => [...prev, likes.find(like => like.user_id === currentUserId)!]);

@@ -185,20 +185,22 @@ export default function SearchRecommendCard({
         {/* Featured Article - Responsive */}
         {featuredItem && (
           <div onClick={() => router.push(`/article/${featuredItem.articleId}`)} className="featured-card cursor-pointer">
-            <div className="featured-image-wrapper h-40 sm:h-48 md:h-56">
-              <Image
-                src={featuredItem.thumb}
-                alt={featuredItem.title}
-                fill
-                className="featured-img"
-              />
-              <div className="featured-gradient"></div>
-              <div className="featured-text">
-                <p className="featured-category text-xs sm:text-sm">{featuredItem.meta}</p>
-                <h4 className="featured-headline text-sm sm:text-base md:text-lg">
-                  {featuredItem.title}
-                </h4>
+            {featuredItem.thumb && !featuredItem.thumb.includes('oval.gif') && (
+              <div className="featured-image-wrapper h-40 sm:h-48 md:h-56">
+                <Image
+                  src={featuredItem.thumb}
+                  alt={featuredItem.title}
+                  fill
+                  className="featured-img"
+                />
+                <div className="featured-gradient"></div>
               </div>
+            )}
+            <div className="featured-text">
+              <p className="featured-category text-xs sm:text-sm">{featuredItem.meta}</p>
+              <h4 className="featured-headline text-sm sm:text-base md:text-lg">
+                {featuredItem.title}
+              </h4>
             </div>
           </div>
         )}
@@ -218,12 +220,14 @@ export default function SearchRecommendCard({
                 </h5>
               </div>
               <div className="article-thumbnail w-12 h-12 sm:w-16 sm:h-16">
-                <Image
-                  src={item.thumb}
-                  alt={item.title}
-                  fill
-                  className="article-img"
-                />
+                {item.thumb && !item.thumb.includes('oval.gif') && (
+                  <Image
+                    src={item.thumb}
+                    alt={item.title}
+                    fill
+                    className="article-img"
+                  />
+                )}
               </div>
             </div>
           ))}
