@@ -235,7 +235,7 @@ const CommentItem: React.FC<{
 }> = ({ comment: c, onReply, replyingTo, replyContent, setReplyContent, onCancelReply, addReply: propAddReply }) => {
   const { user } = useAuth();
   // Only create hook instance if addReply is not provided as prop
-  const { addReply: hookAddReply } = useCommentReplies(c.id);
+  const { addReply: hookAddReply, replies } = useCommentReplies(c.id);
   const addReply = propAddReply || hookAddReply;
 
   console.log('CommentItem: Rendering for comment:', c.id, c.content?.substring(0, 20));
@@ -329,19 +329,19 @@ const CommentItem: React.FC<{
             />
 
             {/* Action buttons */}
-            <div className="flex items-center">
+            <div className={`flex items-center ${replies.length > 0 ? 'mt-4' : ''}`}>
               {/* Like and Reply buttons */}
-              <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-4 sm:gap-6">
                 {/* Like Button with Hook */}
                 <CommentLikeButton commentId={c.id} />
 
                 {/* Reply Button */}
                 <button
                   onClick={() => onReply(c.id)}
-                  className="flex items-center gap-1.5 sm:gap-2 text-gray-500 hover:text-purple-600 transition-colors duration-300 group/reply"
+                  className="flex items-center gap-2 text-gray-500 hover:text-purple-600 transition-colors duration-300 group/reply"
                 >
-                  <FaReply className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover/reply:scale-110 transition-transform duration-300" />
-                  <span className="text-xs sm:text-sm font-medium">Balas</span>
+                  <FaReply className="w-4 h-4 group-hover/reply:scale-110 transition-transform duration-300" />
+                  <span className="text-sm font-medium">Balas</span>
                 </button>
               </div>
             </div>

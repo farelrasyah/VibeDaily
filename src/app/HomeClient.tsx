@@ -240,6 +240,11 @@ export default function HomeClient({
       active: activeChip === 'Guides',
       dropdownItems: ['How-to Guides', 'Tutorials', 'Best Practices', 'Tips & Tricks']
     },
+    { 
+      label: 'Personal', 
+      active: activeChip === 'Personal',
+      dropdownItems: ['Liked', 'Saved']
+    },
   ]
 
   // Handle category selection
@@ -256,7 +261,21 @@ export default function HomeClient({
     console.log(`  - Category ID: ${dropdownId || 'undefined'}`);
     console.log(`  - Source: ${source || 'undefined'}`);
 
-    // Validate category ID
+    // Special handling for Personal menu (doesn't need dropdownId)
+    if (parentLabel === 'Personal') {
+      console.log(`👤 PERSONAL MENU DETECTED: ${dropdownItem}`)
+      if (dropdownItem === 'Liked') {
+        console.log('❤️ REDIRECTING TO LIKED ARTICLES')
+        router.push('/liked-articles')
+        return
+      } else if (dropdownItem === 'Saved') {
+        console.log('⭐ REDIRECTING TO SAVED ARTICLES')
+        router.push('/saved-articles')
+        return
+      }
+    }
+
+    // Validate category ID for other menus
     if (!dropdownId) {
       console.error('❌ Error: No category ID provided');
       return;

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NewsSource } from '@/lib/news-categories'
 
 interface NavItem {
@@ -24,15 +24,54 @@ export default function NavigationDropdown({
   onDropdownItemClick 
 }: NavigationDropdownProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
-  const [isMouseInContent, setIsMouseInContent] = useState(false)
+  const [closeTimeout, setCloseTimeout] = useState<NodeJS.Timeout | null>(null)
+
+  const handleMouseEnter = (label: string) => {
+    // Clear any pending close timeout
+    if (closeTimeout) {
+      clearTimeout(closeTimeout)
+      setCloseTimeout(null)
+    }
+    console.log(`🔥 Hovering: ${label}`)
+    setHoveredItem(label)
+  }
 
   const handleMouseLeave = (label: string) => {
-    // Only close the dropdown if the mouse is not in the content area
-    if (!isMouseInContent) {
-      console.log(`❄️ Leaving: ${label} (content: ${isMouseInContent})`)
+    // Delay closing to allow mouse to move to dropdown content
+    const timeout = setTimeout(() => {
+      console.log(`❄️ Leaving: ${label} (closing dropdown)`)
       setHoveredItem(null)
-    }
+    }, 150) // Increased delay to 150ms
+    setCloseTimeout(timeout)
   }
+
+  const handleDropdownMouseEnter = (label: string) => {
+    // Clear close timeout when entering dropdown content
+    if (closeTimeout) {
+      clearTimeout(closeTimeout)
+      setCloseTimeout(null)
+    }
+    console.log(`🎯 DROPDOWN ENTER: ${label}`)
+    setHoveredItem(label)
+  }
+
+  const handleDropdownMouseLeave = (label: string) => {
+    // Delay closing when leaving dropdown content
+    const timeout = setTimeout(() => {
+      console.log(`🚪 DROPDOWN LEAVE: ${label} (closing dropdown)`)
+      setHoveredItem(null)
+    }, 150) // Same delay for consistency
+    setCloseTimeout(timeout)
+  }
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeout) {
+        clearTimeout(closeTimeout)
+      }
+    }
+  }, [closeTimeout])
 
   return (
     <nav className="flex flex-wrap gap-2 sm:gap-3 justify-center sm:justify-start" style={{ overflow: 'visible' }}>
@@ -41,10 +80,7 @@ export default function NavigationDropdown({
           key={index}
           className="relative flex-shrink-0"
           style={{ overflow: 'visible' }}
-          onMouseEnter={() => {
-            console.log(`🔥 Hovering: ${item.label}`)
-            setHoveredItem(item.label)
-          }}
+          onMouseEnter={() => handleMouseEnter(item.label)}
           onMouseLeave={() => handleMouseLeave(item.label)}
         >
           {/* Main Navigation Button - Enhanced Hover + Responsive */}
@@ -131,21 +167,8 @@ export default function NavigationDropdown({
                 : 'all 0.4s cubic-bezier(0.4, 0, 0.6, 0.15)', // Hilang: lebih lambat dengan gentle ease-in
               pointerEvents: hoveredItem === item.label ? 'auto' : 'none'
             }}
-            onMouseEnter={() => {
-              console.log(`🎯 DROPDOWN ENTER: ${item.label}`)
-              setHoveredItem(item.label)
-              setIsMouseInContent(true)
-            }}
-            onMouseLeave={() => {
-              console.log(`🚪 DROPDOWN LEAVE: ${item.label}`)
-              setIsMouseInContent(false)
-              // Add a small delay to check if mouse moved to another part of the dropdown
-              setTimeout(() => {
-                if (!isMouseInContent) {
-                  setHoveredItem(null)
-                }
-              }, 100)
-            }}
+            onMouseEnter={() => handleDropdownMouseEnter(item.label)}
+            onMouseLeave={() => handleDropdownMouseLeave(item.label)}
           >
             <div className={`
               ${item.label === 'Category' ? 'grid grid-cols-2 sm:grid-cols-3 gap-1' : 'flex flex-col'}
