@@ -104,6 +104,8 @@ export const useCommentReplies = (commentId: string) => {
             new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
           );
         });
+        // Also refetch to ensure real-time consistency
+        setTimeout(() => fetchReplies(), 1000);
       }
     } catch (err) {
       console.error('useCommentReplies: Failed to add reply:', err);
@@ -142,8 +144,8 @@ export const useCommentReplies = (commentId: string) => {
 
     fetchReplies();
 
-    // Subscribe to realtime changes with unique channel name
-    const channelName = `comment-replies-${commentId}-${Date.now()}`;
+    // Subscribe to realtime changes with stable channel name
+    const channelName = `comment-replies-${commentId}`;
     console.log('useCommentReplies: Creating channel:', channelName);
 
     const channel = supabase
@@ -157,37 +159,49 @@ export const useCommentReplies = (commentId: string) => {
         console.log('useCommentReplies: Real-time event received:', payload);
         console.log('useCommentReplies: Event type:', payload.eventType);
         console.log('useCommentReplies: Payload data:', payload.new || payload.old);
+        console.log('useCommentReplies: Current replies count:', replies.length);
 
         if (payload.eventType === 'INSERT') {
           console.log('useCommentReplies: Adding reply via real-time:', payload.new);
           setReplies(prev => {
             // Check if reply already exists to avoid duplicates
             const exists = prev.some(reply => reply.id === payload.new.id);
+            console.log('useCommentReplies: Reply exists check:', exists, 'for id:', payload.new.id);
             if (!exists) {
               console.log('useCommentReplies: Reply added to state:', payload.new.id);
-              return [...prev, payload.new as CommentReply].sort((a, b) =>
+              const newReplies = [...prev, payload.new as CommentReply].sort((a, b) =>
                 new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
               );
+              console.log('useCommentReplies: New replies count:', newReplies.length);
+              return newReplies;
             }
             console.log('useCommentReplies: Reply already exists, skipping:', payload.new.id);
             return prev;
           });
         } else if (payload.eventType === 'DELETE') {
           console.log('useCommentReplies: Deleting reply via real-time:', payload.old.id);
-          setReplies(prev => prev.filter(reply => reply.id !== payload.old.id));
+          setReplies(prev => {
+            const newReplies = prev.filter(reply => reply.id !== payload.old.id);
+            console.log('useCommentReplies: After delete, replies count:', newReplies.length);
+            return newReplies;
+          });
         }
       })
       .subscribe((status, err) => {
-        console.log('useCommentReplies: Subscription status:', status);
+        console.log('useCommentReplies: Subscription status:', status, 'error:', err);
         if (err) {
           console.error('useCommentReplies: Subscription error:', err);
         }
         if (status === 'SUBSCRIBED') {
-          console.log('useCommentReplies: Successfully subscribed to real-time updates');
+          console.log('useCommentReplies: Successfully subscribed to real-time updates for comment:', commentId);
         } else if (status === 'CLOSED') {
-          console.log('useCommentReplies: Subscription closed');
+          console.log('useCommentReplies: Subscription closed for comment:', commentId);
         } else if (status === 'CHANNEL_ERROR') {
-          console.error('useCommentReplies: Channel error:', err);
+          console.error('useCommentReplies: Channel error for comment:', commentId, err);
+        } else if (status === 'TIMED_OUT') {
+          console.error('useCommentReplies: Subscription timed out for comment:', commentId);
+        } else if (status === 'SUBSCRIPTION_ERROR') {
+          console.error('useCommentReplies: Subscription error for comment:', commentId, err);
         }
       });
 

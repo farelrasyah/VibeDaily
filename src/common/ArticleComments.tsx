@@ -98,11 +98,25 @@ const CommentReplyForm: React.FC<{
 };
 
 // Comment Replies List Component
-const CommentRepliesList: React.FC<{ commentId: string }> = ({ commentId }) => {
+const CommentRepliesList: React.FC<{ 
+  commentId: string;
+  replyingTo?: string | null;
+  replyContent?: string;
+  setReplyContent?: (content: string) => void;
+  onCancelReply?: () => void;
+}> = ({ commentId, replyingTo, replyContent = "", setReplyContent = () => {}, onCancelReply = () => {} }) => {
   const { replies, loading, error, addReply, deleteReply } = useCommentReplies(commentId);
   const { user } = useAuth();
 
-  if (replies.length === 0) return null;
+  const handleSubmitReply = async () => {
+    if (!replyContent.trim()) return;
+    console.log('CommentRepliesList: Submitting reply for comment:', commentId);
+    await addReply(replyContent);
+    setReplyContent("");
+    onCancelReply();
+  };
+
+  if (replies.length === 0 && replyingTo !== commentId) return null;
 
   return (
     <div className="mt-4 space-y-3">
@@ -147,6 +161,64 @@ const CommentRepliesList: React.FC<{ commentId: string }> = ({ commentId }) => {
           )}
         </div>
       ))}
+      
+      {/* Reply Form */}
+      {replyingTo === commentId && (
+        <div className="ml-4 sm:ml-6 p-4 bg-gray-50/80 rounded-xl border border-gray-200/50">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="relative flex-shrink-0">
+              <img
+                src={
+                  user?.user_metadata?.picture ||
+                  user?.user_metadata?.avatar_url ||
+                  user?.user_metadata?.avatar ||
+                  user?.user_metadata?.image ||
+                  user?.user_metadata?.photo ||
+                  "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'User') + "&background=6366f1&color=fff&size=64"
+                }
+                alt="Your avatar"
+                className="w-8 h-8 rounded-lg object-cover"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  e.currentTarget.style.display = 'none';
+                  const placeholder = e.currentTarget.parentElement?.querySelector('.avatar-placeholder') as HTMLElement;
+                  if (placeholder) placeholder.style.display = 'flex';
+                }}
+              />
+              <div className={`avatar-placeholder w-8 h-8 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center ${user?.user_metadata?.picture ? 'hidden' : ''}`}>
+                <span className="text-gray-600 font-bold text-sm">
+                  {(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()}
+                </span>
+              </div>
+            </div>
+            <div className="flex-1">
+              <textarea
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                placeholder="Tulis balasan Anda..."
+                className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
+                rows={2}
+                maxLength={300}
+              />
+            </div>
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <button
+              onClick={onCancelReply}
+              className="px-3 py-1.5 text-gray-600 text-sm hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              onClick={handleSubmitReply}
+              disabled={!replyContent.trim()}
+              className="px-4 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Balas
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -159,9 +231,12 @@ const CommentItem: React.FC<{
   replyContent: string;
   setReplyContent: (content: string) => void;
   onCancelReply: () => void;
-}> = ({ comment: c, onReply, replyingTo, replyContent, setReplyContent, onCancelReply }) => {
+  addReply?: (content: string) => Promise<void>; // Optional prop
+}> = ({ comment: c, onReply, replyingTo, replyContent, setReplyContent, onCancelReply, addReply: propAddReply }) => {
   const { user } = useAuth();
-  const { addReply } = useCommentReplies(c.id);
+  // Only create hook instance if addReply is not provided as prop
+  const { addReply: hookAddReply } = useCommentReplies(c.id);
+  const addReply = propAddReply || hookAddReply;
 
   console.log('CommentItem: Rendering for comment:', c.id, c.content?.substring(0, 20));
 
@@ -244,73 +319,14 @@ const CommentItem: React.FC<{
               {c.content}
             </p>
 
-            {/* Reply Form */}
-            {replyingTo === c.id && (
-              <div className="mt-4 mb-4 p-4 bg-gray-50/80 rounded-xl border border-gray-200/50">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="relative flex-shrink-0">
-                    <img
-                      src={
-                        user?.user_metadata?.picture ||
-                        user?.user_metadata?.avatar_url ||
-                        user?.user_metadata?.avatar ||
-                        user?.user_metadata?.image ||
-                        user?.user_metadata?.photo ||
-                        "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'User') + "&background=6366f1&color=fff&size=64"
-                      }
-                      alt="Your avatar"
-                      className="w-8 h-8 rounded-lg object-cover"
-                      onError={(e) => {
-                        // Jika avatar gagal load, coba fallback
-                        const fallbackUrl = "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'User') + "&background=6366f1&color=fff&size=64";
-                        if (e.currentTarget.src !== fallbackUrl) {
-                          e.currentTarget.src = fallbackUrl;
-                        } else {
-                          // Jika fallback juga gagal, hide dan show placeholder
-                          e.currentTarget.style.display = 'none';
-                          const placeholder = e.currentTarget.parentElement?.querySelector('.reply-avatar-placeholder') as HTMLElement;
-                          if (placeholder) placeholder.style.display = 'flex';
-                        }
-                      }}
-                    />
-                    {/* Placeholder dengan inisial sebagai backup terakhir */}
-                    <div className="reply-avatar-placeholder w-8 h-8 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 hidden items-center justify-center">
-                      <span className="text-gray-600 font-bold text-sm">
-                        {(user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || 'A')[0].toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <textarea
-                      value={replyContent}
-                      onChange={(e) => setReplyContent(e.target.value)}
-                      placeholder={`Balas komentar ${c.username}...`}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
-                      rows={2}
-                      maxLength={300}
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center justify-end gap-2">
-                  <button
-                    onClick={onCancelReply}
-                    className="px-3 py-1.5 text-gray-600 text-sm hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    onClick={handleSubmitReply}
-                    disabled={!replyContent.trim()}
-                    className="px-4 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Balas
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Show Replies */}
-            <CommentRepliesList commentId={c.id} />
+            <CommentRepliesList 
+              commentId={c.id}
+              replyingTo={replyingTo}
+              replyContent={replyContent}
+              setReplyContent={setReplyContent}
+              onCancelReply={onCancelReply}
+            />
 
             {/* Action buttons */}
             <div className="flex items-center">
