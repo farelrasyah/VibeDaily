@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { RealtimeChannel } from '@supabase/supabase-js';
 
 interface Like {
   id: string;
@@ -14,7 +13,6 @@ export const useLikes = (articleId: string) => {
   const [userLiked, setUserLiked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
   // Fetch likes untuk article ini
   const fetchLikes = async () => {
@@ -99,7 +97,7 @@ export const useLikes = (articleId: string) => {
 
         if (error) throw error;
       }
-    } catch (error: unknown) {
+    } catch (error) {
       // Revert optimistic update on error
       const message = error instanceof Error ? error.message : 'An unknown error occurred';
       setError(message);
@@ -167,7 +165,6 @@ export const useLikes = (articleId: string) => {
       })
       .subscribe();
 
-    setChannel(newChannel);
     return () => {
       supabase.removeChannel(newChannel);
     };

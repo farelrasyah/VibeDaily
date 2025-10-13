@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface Comment {
   id: string;
@@ -18,7 +17,6 @@ export const useComments = (articleId: string) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
   // Fetch komentar dengan pagination
   const fetchComments = async (limit = 10, offset = 0) => {
@@ -101,7 +99,6 @@ export const useComments = (articleId: string) => {
       })
       .subscribe();
 
-    setChannel(newChannel);
     return () => {
       supabase.removeChannel(newChannel);
     };

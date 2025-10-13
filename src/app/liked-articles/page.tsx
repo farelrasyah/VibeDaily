@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useLikedArticles } from '@/hooks/useLikedArticles'
-import { NewsArticle } from '@/types/news.types'
 import { getRelativeTime } from '@/lib/utils/date-formatter'
+
+export const dynamic = 'force-dynamic'
 
 export default function LikedArticlesPage() {
   const router = useRouter()
