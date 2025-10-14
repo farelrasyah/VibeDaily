@@ -5,21 +5,45 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useSavedArticles } from '@/hooks/useSavedArticles'
+import { useSupabaseCheck } from '@/hooks/useSupabaseCheck'
 import { getRelativeTime } from '@/lib/utils/date-formatter'
 
 export const dynamic = 'force-dynamic'
 
 export default function SavedArticlesPage() {
   const router = useRouter()
+  const { isSupabaseAvailable, loading: supabaseLoading } = useSupabaseCheck()
   const { user, loading: authLoading } = useAuth()
   const { articles, loading, error, refetch } = useSavedArticles()
 
-  // Redirect to home if not authenticated
+  // Redirect to home if not authenticated or Supabase not available
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (!supabaseLoading && !isSupabaseAvailable) {
+      router.push('/')
+      return
+    }
+    
+    if (!authLoading && !user && isSupabaseAvailable) {
       router.push('/')
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading, router, isSupabaseAvailable, supabaseLoading])
+
+  // Show loading while checking Supabase availability
+  if (supabaseLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <div className="w-6 h-6 border-2 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-slate-600">Loading...</span>
+        </div>
+      </div>
+    )
+  }
+
+  // If Supabase is not available, redirect
+  if (!isSupabaseAvailable) {
+    return null
+  }
 
   if (authLoading) {
     return (

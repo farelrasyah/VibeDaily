@@ -8,20 +8,31 @@ export const useAuth = () => {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      console.log('Current user:', data.user);
-      setUser(data.user);
-      setLoading(false);
+      try {
+        const { data } = await supabase.auth.getUser();
+        console.log('Current user:', data.user);
+        setUser(data.user);
+      } catch (error) {
+        console.error('Auth error:', error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
     };
     getUser();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state change:', event, session?.user);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    try {
+      const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+        console.log('Auth state change:', event, session?.user);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      });
 
-    return () => listener.subscription.unsubscribe();
+      return () => listener.subscription.unsubscribe();
+    } catch (error) {
+      console.error('Auth listener error:', error);
+      return () => {};
+    }
   }, []);
 
   const signInWithGoogle = async () => {
